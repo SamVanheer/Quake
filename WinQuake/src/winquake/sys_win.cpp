@@ -550,7 +550,7 @@ char *Sys_ConsoleInput (void)
 {
 	static char	text[256];
 	static int		len;
-	INPUT_RECORD	recs[1024];
+	INPUT_RECORD	recs;
 	int		ch;
 	DWORD dummy;
 	DWORD numread, numevents;
@@ -567,17 +567,17 @@ char *Sys_ConsoleInput (void)
 		if (numevents <= 0)
 			break;
 
-		if (!ReadConsoleInput(hinput, recs, 1, &numread))
+		if (!ReadConsoleInput(hinput, &recs, 1, &numread))
 			Sys_Error ("Error reading console input");
 
 		if (numread != 1)
 			Sys_Error ("Couldn't read console input");
 
-		if (recs[0].EventType == KEY_EVENT)
+		if (recs.EventType == KEY_EVENT)
 		{
-			if (!recs[0].Event.KeyEvent.bKeyDown)
+			if (!recs.Event.KeyEvent.bKeyDown)
 			{
-				ch = recs[0].Event.KeyEvent.uChar.AsciiChar;
+				ch = recs.Event.KeyEvent.uChar.AsciiChar;
 
 				switch (ch)
 				{
