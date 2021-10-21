@@ -9,8 +9,13 @@ target_sources(winquake
 		net_ser.h
 		net_vcr.cpp
 		net_vcr.h
-		net_win.cpp
-		net_wins.cpp
-		net_wins.h
-		net_wipx.cpp
-		net_wipx.h)
+		$<$<CXX_COMPILER_ID:MSVC>:
+			net_win.cpp
+			net_wins.cpp
+			net_wins.h
+			net_wipx.cpp
+			net_wipx.h
+		>
+		$<$<PLATFORM_ID:UNIX>:
+			net_bsd.c
+		>)

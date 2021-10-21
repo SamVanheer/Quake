@@ -29,8 +29,10 @@ target_sources(winquake
 		cmd.h
 		common.cpp
 		common.h
-		conproc.cpp
-		conproc.h
+		$<$<CXX_COMPILER_ID:MSVC>:
+			conproc.cpp
+			conproc.h
+		>
 		console.cpp
 		console.h
 		crc.cpp
@@ -41,7 +43,9 @@ target_sources(winquake
 		draw.h
 		host.cpp
 		host_cmd.cpp
-		in_win.cpp
+		$<$<CXX_COMPILER_ID:MSVC>:
+			in_win.cpp
+		>
 		input.h
 		keys.cpp
 		keys.h
@@ -179,6 +183,12 @@ if(MSVC)
 		PRIVATE
 			# /SAFESEH:NO is needed because of assembly files. Can be removed once those are gone
 			/SAFESEH:NO ${IGNORE_LIBC})
+endif()
+
+if (UNIX)
+	target_compile_options(winquake
+		PRIVATE
+			-Wno-write-strings)
 endif()
 
 # TODO: for now we need to know which directories to look in, needs to be removed once assembly files are converted - Solokiller

@@ -11,7 +11,12 @@ target_sources(winquake
 		gl_rsurf.cpp
 		gl_screen.cpp
 		gl_test.cpp
-		gl_vidnt.cpp
+		$<$<CXX_COMPILER_ID:MSVC>:
+			gl_vidnt.cpp
+		>
+		$<$<PLATFORM_ID:UNIX>:
+			gl_vidlinux.c
+		>
 		gl_warp.cpp
 		gl_warp_sin.h
 		glquake.h)
