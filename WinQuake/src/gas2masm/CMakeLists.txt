@@ -3,7 +3,6 @@
 #
 
 include(InputFilesList)
-include(MSVCRuntime)
 
 add_sources(
 	gas2masm.cpp
@@ -17,8 +16,6 @@ add_executable(gas2masm ${PREP_SRCS})
 create_source_groups(${CMAKE_CURRENT_SOURCE_DIR})
 
 clear_sources()
-
-configure_msvc_runtime(gas2masm STATIC)
 
 target_compile_definitions(gas2masm PRIVATE
 	$<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>

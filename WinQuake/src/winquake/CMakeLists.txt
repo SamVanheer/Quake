@@ -3,7 +3,6 @@
 #
 
 include(InputFilesList)
-include(MSVCRuntime)
 
 find_package(OpenGL REQUIRED)
 
@@ -131,8 +130,6 @@ create_source_groups(${CMAKE_CURRENT_SOURCE_DIR})
 clear_sources()
 
 set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT winquake)
-
-configure_msvc_runtime(winquake STATIC)
 
 target_include_directories(winquake PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}

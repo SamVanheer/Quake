@@ -8,6 +8,9 @@ list(APPEND CMAKE_MODULE_PATH
 
 cmake_minimum_required(VERSION 3.21)
 
+# Link statically with the runtime
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+
 project(WinQuake LANGUAGES C CXX)
 
 add_subdirectory(src/gas2masm)
