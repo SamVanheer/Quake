@@ -2,20 +2,20 @@
 # WinQuake game
 #
 
-include( InputFilesList )
-include( MSVCRuntime )
+include(InputFilesList)
+include(MSVCRuntime)
 
-find_package( OpenGL REQUIRED )
+find_package(OpenGL REQUIRED)
 
-set( WINQUAKE_RENDERER "OpenGL" CACHE STRING "Renderer to use" )
-set_property( CACHE WINQUAKE_RENDERER PROPERTY STRINGS Software OpenGL )
+set(WINQUAKE_RENDERER "OpenGL" CACHE STRING "Renderer to use")
+set_property(CACHE WINQUAKE_RENDERER PROPERTY STRINGS Software OpenGL)
 
-if( ${WINQUAKE_RENDERER} STREQUAL "Software" )
-	set( RENDERER_IS_SOFTWARE ON )
-elseif( ${WINQUAKE_RENDERER} STREQUAL "OpenGL" )
-	set( RENDERER_IS_OPENGL ON )
+if(${WINQUAKE_RENDERER} STREQUAL "Software")
+	set(RENDERER_IS_SOFTWARE ON)
+elseif(${WINQUAKE_RENDERER} STREQUAL "OpenGL")
+	set(RENDERER_IS_OPENGL ON)
 else()
-	message( FATAL_ERROR "Unknown renderer ${WINQUAKE_RENDERER} selected" )
+	message(FATAL_ERROR "Unknown renderer ${WINQUAKE_RENDERER} selected")
 endif()
 
 add_sources(
@@ -84,118 +84,107 @@ add_sources(
 	worlda.s
 	zone.cpp
 	zone.h
-	renderer/d_ifacea.h
-)
+	renderer/d_ifacea.h)
 
-add_subdirectory( client )
-add_subdirectory( net )
-add_subdirectory( server )
+add_subdirectory(client)
+add_subdirectory(net)
+add_subdirectory(server)
 
-if( MSVC )
+if(MSVC)
 	add_sources(
 		cd_win.cpp
 		snd_win.cpp
 		sys_win.cpp
-		sys_wina.s
-	)
+		sys_wina.s)
 endif()
 
-if( UNIX )
+if(UNIX)
 	add_sources(
 		cd_linux.cpp
 		snd_linux.cpp
 		sys_dosa.s
-		sys_linux.cpp
-	)
+		sys_linux.cpp)
 endif()
 
-if( RENDERER_IS_SOFTWARE )
-	add_subdirectory( renderer/software )
-elseif( RENDERER_IS_OPENGL )
-	add_subdirectory( renderer/opengl )
+if(RENDERER_IS_SOFTWARE)
+	add_subdirectory(renderer/software)
+elseif(RENDERER_IS_OPENGL)
+	add_subdirectory(renderer/opengl)
 endif()
 
-if( MSVC )
+if(MSVC)
 	add_sources(
-		winquake.rc
-	)
+		winquake.rc)
 endif()
 
-set( PROGDEFS
+set(PROGDEFS
 	progdefs.q1
-	progdefs.q2
-)
+	progdefs.q2)
 
 preprocess_sources()
 
-add_executable( winquake ${PREP_SRCS} ${PROGDEFS} )
+add_executable(winquake ${PREP_SRCS} ${PROGDEFS})
 
 #Create filters
-create_source_groups( ${CMAKE_CURRENT_SOURCE_DIR} )
+create_source_groups(${CMAKE_CURRENT_SOURCE_DIR})
 
 clear_sources()
 
-set_property( DIRECTORY PROPERTY VS_STARTUP_PROJECT winquake )
+set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT winquake)
 
-configure_msvc_runtime( winquake STATIC )
+configure_msvc_runtime(winquake STATIC)
 
-target_include_directories( winquake PRIVATE
+target_include_directories(winquake PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}
 	#$<$<CXX_COMPILER_ID:MSVC>:${CMAKE_SOURCE_DIR}/external/dxsdk/sdk/inc>
 )
 
 # TODO: replace with the generator expression above when assembly files have been converted - Solokiller
-if( MSVC )
-	target_include_directories( winquake PRIVATE
-		${CMAKE_SOURCE_DIR}/external/dxsdk/sdk/inc
-	)
+if(MSVC)
+	target_include_directories(winquake PRIVATE
+		${CMAKE_SOURCE_DIR}/external/dxsdk/sdk/inc)
 endif()
 
-if( RENDERER_IS_SOFTWARE )
-	target_include_directories( winquake PRIVATE
-		${CMAKE_SOURCE_DIR}/external/scitech/include
-	)
+if(RENDERER_IS_SOFTWARE)
+	target_include_directories(winquake PRIVATE
+		${CMAKE_SOURCE_DIR}/external/scitech/include)
 endif()
 
-target_compile_definitions( winquake PRIVATE
+target_compile_definitions(winquake PRIVATE
 	$<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>
 	$<$<CXX_COMPILER_ID:MSVC>:$<$<CONFIG:Debug>:_DEBUG>>
 	$<$<CXX_COMPILER_ID:MSVC>:CINTERFACE> #DirectX interfaces need this (for now)
 )
 
-if( RENDERER_IS_OPENGL )
-	target_compile_definitions( winquake PRIVATE
-		GLQUAKE
-	)
+if(RENDERER_IS_OPENGL)
+	target_compile_definitions(winquake PRIVATE
+		GLQUAKE)
 endif()
 
-target_link_libraries( winquake PRIVATE
+target_link_libraries(winquake PRIVATE
 	$<$<CXX_COMPILER_ID:MSVC>:winmm>
 	$<$<CXX_COMPILER_ID:MSVC>:wsock32>
 	$<$<CXX_COMPILER_ID:MSVC>:comctl32>
-	$<$<CXX_COMPILER_ID:MSVC>:${CMAKE_SOURCE_DIR}/external/dxsdk/sdk/lib/dxguid.lib>
-)
+	$<$<CXX_COMPILER_ID:MSVC>:${CMAKE_SOURCE_DIR}/external/dxsdk/sdk/lib/dxguid.lib>)
 
-if( RENDERER_IS_SOFTWARE )
-	target_link_libraries( winquake PRIVATE
-		${CMAKE_SOURCE_DIR}/external/scitech/lib/win32/vc/mgllt.lib
-	)
+if(RENDERER_IS_SOFTWARE)
+	target_link_libraries(winquake PRIVATE
+		${CMAKE_SOURCE_DIR}/external/scitech/lib/win32/vc/mgllt.lib)
 endif()
 
-if( RENDERER_IS_OPENGL )
-	target_link_libraries( winquake PRIVATE
+if(RENDERER_IS_OPENGL)
+	target_link_libraries(winquake PRIVATE
 		OpenGL::GLU
-		OpenGL::GL
-	)
+		OpenGL::GL)
 endif()
 
-if( MSVC )
+if(MSVC)
 	#Software mode tries to link with this, but it doesn't appear to exist for new versions of MSVC
-	if( RENDERER_IS_SOFTWARE )
-		set( IGNORE_LIBC "/NODEFAULTLIB:LIBC.lib" )
+	if(RENDERER_IS_SOFTWARE)
+		set(IGNORE_LIBC "/NODEFAULTLIB:LIBC.lib")
 	endif()
 
-	set_target_properties( winquake PROPERTIES
+	set_target_properties(winquake PROPERTIES
 		# Disable warning 4805: '==': unsafe mix of type 'qboolean' and type 'bool' in operation
 		# TODO: once all code has upgraded away from qboolean, remove this
 		# Disable warning 4244: '=': conversion from 'type1' to 'type2', possible loss of data
@@ -205,24 +194,23 @@ if( MSVC )
 		COMPILE_FLAGS "/W4 /wd4805 /wd4244 /wd4100 /wd4459 /wd4611"
 		# Uses WinMain entry point
 		# /SAFESEH:NO is needed because of assembly files. Can be removed once those are gone
-		LINK_FLAGS "/SUBSYSTEM:WINDOWS /SAFESEH:NO ${IGNORE_LIBC}"
-	)
+		LINK_FLAGS "/SUBSYSTEM:WINDOWS /SAFESEH:NO ${IGNORE_LIBC}")
 endif()
 
 # TODO: for now we need to know which directories to look in, needs to be removed once assembly files are converted - Solokiller
-get_target_property( include_dirs winquake INCLUDE_DIRECTORIES )
+get_target_property(include_dirs winquake INCLUDE_DIRECTORIES)
 
-foreach( dir IN LISTS include_dirs )
-	set( ASM_INCLUDE_DIRS ${ASM_INCLUDE_DIRS} /I ${dir} )
+foreach(dir IN LISTS include_dirs)
+	set(ASM_INCLUDE_DIRS ${ASM_INCLUDE_DIRS} /I ${dir})
 endforeach()
 
 # Until we get rid of assembly code we'll need to add these custom builds
-function( configure_asm_file filename )
-	set( OUT_FILENAME ${CMAKE_CURRENT_BINARY_DIR}/${filename} )
+function(configure_asm_file filename)
+	set(OUT_FILENAME ${CMAKE_CURRENT_BINARY_DIR}/${filename})
 	
-	if( MSVC )
+	if(MSVC)
 		# Some commands can't handle forward slashes, so make sure they're all replaced
-		string( REGEX REPLACE "/" "\\\\" OUT_FILENAME ${OUT_FILENAME} ) 
+		string(REGEX REPLACE "/" "\\\\" OUT_FILENAME ${OUT_FILENAME}) 
 		
 		add_custom_command(
 			OUTPUT ${filename}.obj
@@ -230,49 +218,46 @@ function( configure_asm_file filename )
 			COMMAND cl ${ASM_INCLUDE_DIRS} /EP > ${OUT_FILENAME}.spp ${CMAKE_CURRENT_SOURCE_DIR}\\${filename}.s
 			COMMAND $<TARGET_FILE:gas2masm> < ${OUT_FILENAME}.spp > ${OUT_FILENAME}.asm
 			COMMAND ml /c /Cp /coff /Fo${OUT_FILENAME}.obj /Zm /Zi ${OUT_FILENAME}.asm
-			COMMAND del ${OUT_FILENAME}.spp
-		)
+			COMMAND del ${OUT_FILENAME}.spp)
 		
-		target_sources( winquake PRIVATE ${filename}.obj )
+		target_sources(winquake PRIVATE ${filename}.obj)
 	endif()
 endfunction()
 
-configure_asm_file( math )
-configure_asm_file( snd_mixa )
-configure_asm_file( sys_wina )
-configure_asm_file( worlda )
+configure_asm_file(math)
+configure_asm_file(snd_mixa)
+configure_asm_file(sys_wina)
+configure_asm_file(worlda)
 
-if( UNIX )
-	configure_asm_file( sys_dosa )
+if(UNIX)
+	configure_asm_file(sys_dosa)
 endif()
 
 # Software renderer specific assembly files
-if( RENDERER_IS_SOFTWARE )
-	configure_asm_file( renderer/software/d_draw )
-	configure_asm_file( renderer/software/d_draw16 )
-	configure_asm_file( renderer/software/d_parta )
-	configure_asm_file( renderer/software/d_polysa )
-	configure_asm_file( renderer/software/d_scana )
-	configure_asm_file( renderer/software/d_spr8 )
-	configure_asm_file( renderer/software/d_varsa )
-	configure_asm_file( renderer/software/r_aclipa )
-	configure_asm_file( renderer/software/r_aliasa )
-	configure_asm_file( renderer/software/r_drawa )
-	configure_asm_file( renderer/software/r_edgea )
-	configure_asm_file( renderer/software/r_varsa )
-	configure_asm_file( renderer/software/surf8 )
-	configure_asm_file( renderer/software/surf16 )
+if(RENDERER_IS_SOFTWARE)
+	configure_asm_file(renderer/software/d_draw)
+	configure_asm_file(renderer/software/d_draw16)
+	configure_asm_file(renderer/software/d_parta)
+	configure_asm_file(renderer/software/d_polysa)
+	configure_asm_file(renderer/software/d_scana)
+	configure_asm_file(renderer/software/d_spr8)
+	configure_asm_file(renderer/software/d_varsa)
+	configure_asm_file(renderer/software/r_aclipa)
+	configure_asm_file(renderer/software/r_aliasa)
+	configure_asm_file(renderer/software/r_drawa)
+	configure_asm_file(renderer/software/r_edgea)
+	configure_asm_file(renderer/software/r_varsa)
+	configure_asm_file(renderer/software/surf8)
+	configure_asm_file(renderer/software/surf16)
 endif()
 
-set_target_properties( winquake PROPERTIES
-	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_INSTALL_PREFIX}
-)
+set_target_properties(winquake PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_INSTALL_PREFIX})
 
-foreach( config IN LISTS CMAKE_CONFIGURATION_TYPES )
+foreach(config IN LISTS CMAKE_CONFIGURATION_TYPES)
 	# The property names are all caps
-	string( TOUPPER ${config} config )
+	string(TOUPPER ${config} config)
 	
-	set_target_properties( winquake PROPERTIES
-		RUNTIME_OUTPUT_DIRECTORY_${config} ${CMAKE_INSTALL_PREFIX}
-	)
+	set_target_properties(winquake PROPERTIES
+		RUNTIME_OUTPUT_DIRECTORY_${config} ${CMAKE_INSTALL_PREFIX})
 endforeach()
