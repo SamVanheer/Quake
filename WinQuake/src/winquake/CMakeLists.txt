@@ -164,17 +164,21 @@ if(MSVC)
 	if(RENDERER_IS_SOFTWARE)
 		set(IGNORE_LIBC "/NODEFAULTLIB:LIBC.lib")
 	endif()
-
-	set_target_properties(winquake PROPERTIES
-		# Disable warning 4805: '==': unsafe mix of type 'qboolean' and type 'bool' in operation
-		# TODO: once all code has upgraded away from qboolean, remove this
-		# Disable warning 4244: '=': conversion from 'type1' to 'type2', possible loss of data
-		# Disable warning 4100: 'parameter': unreferenced formal parameter
-		# Disable warning 4459: declaration of 'local variable' hides global declaration
-		# Disable warning 4611: interaction between '_setjmp' and C++ object destruction is non-portable TODO remove setjmp and use proper error handling
-		COMPILE_FLAGS "/W4 /wd4805 /wd4244 /wd4100 /wd4459 /wd4611"
-		# /SAFESEH:NO is needed because of assembly files. Can be removed once those are gone
-		LINK_FLAGS "/SAFESEH:NO ${IGNORE_LIBC}")
+	
+	target_compile_options(winquake
+		PRIVATE
+			# Disable warning 4805: '==': unsafe mix of type 'qboolean' and type 'bool' in operation
+			# TODO: once all code has upgraded away from qboolean, remove this
+			# Disable warning 4244: '=': conversion from 'type1' to 'type2', possible loss of data
+			# Disable warning 4100: 'parameter': unreferenced formal parameter
+			# Disable warning 4459: declaration of 'local variable' hides global declaration
+			# Disable warning 4611: interaction between '_setjmp' and C++ object destruction is non-portable TODO remove setjmp and use proper error handling
+			/W4 /wd4805 /wd4244 /wd4100 /wd4459 /wd4611)
+	
+	target_link_options(winquake
+		PRIVATE
+			# /SAFESEH:NO is needed because of assembly files. Can be removed once those are gone
+			/SAFESEH:NO ${IGNORE_LIBC})
 endif()
 
 # TODO: for now we need to know which directories to look in, needs to be removed once assembly files are converted - Solokiller

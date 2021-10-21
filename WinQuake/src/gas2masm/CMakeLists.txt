@@ -14,6 +14,5 @@ target_compile_definitions(gas2masm PRIVATE
 	$<$<CXX_COMPILER_ID:MSVC>:_CONSOLE>)
 
 if(MSVC)
-	set_target_properties(gas2masm PROPERTIES
-		COMPILE_FLAGS "/W3")
+	target_compile_options(gas2masm PRIVATE /W3)
 endif()
