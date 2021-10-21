@@ -287,7 +287,10 @@ void GL_Set2D( void );
 #define    TEXTURE1_SGIS				0x835F
 
 #ifndef _WIN32
+//Could be defined by GL.h
+#ifndef APIENTRY
 #define APIENTRY /* */
+#endif
 #endif
 
 typedef void (APIENTRY *lpMTexFUNC) (GLenum, GLfloat, GLfloat);
