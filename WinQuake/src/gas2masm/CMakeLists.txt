@@ -2,20 +2,11 @@
 # gas2masm: GNU Assembly to Microsoft Macro Assembler converter
 #
 
-include(InputFilesList)
-
-add_sources(
-	gas2masm.cpp
-)
-
-preprocess_sources()
-
-add_executable(gas2masm ${PREP_SRCS})
+add_executable(gas2masm gas2masm.cpp)
 
 #Create filters
-create_source_groups(${CMAKE_CURRENT_SOURCE_DIR})
-
-clear_sources()
+get_target_property(TARGET_SOURCES gas2masm SOURCES)
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${TARGET_SOURCES})
 
 target_compile_definitions(gas2masm PRIVATE
 	$<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>

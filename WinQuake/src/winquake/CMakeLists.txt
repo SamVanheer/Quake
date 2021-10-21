@@ -2,8 +2,6 @@
 # WinQuake game
 #
 
-include(InputFilesList)
-
 find_package(OpenGL REQUIRED)
 
 set(WINQUAKE_RENDERER "OpenGL" CACHE STRING "Renderer to use")
@@ -17,93 +15,95 @@ else()
 	message(FATAL_ERROR "Unknown renderer ${WINQUAKE_RENDERER} selected")
 endif()
 
-add_sources(
-	anorm_dots.h
-	anorms.h
-	bspfile.h
-	cdaudio.h
-	chase.cpp
-	client.h
-	cmd.cpp
-	cmd.h
-	common.cpp
-	common.h
-	conproc.cpp
-	conproc.h
-	console.cpp
-	console.h
-	crc.cpp
-	crc.h
-	cvar.cpp
-	cvar.h
-	dosisms.h
-	draw.h
-	host.cpp
-	host_cmd.cpp
-	in_win.cpp
-	input.h
-	keys.cpp
-	keys.h
-	math.s
-	mathlib.cpp
-	mathlib.h
-	menu.cpp
-	menu.h
-	modelgen.h
-	pr_cmds.cpp
-	pr_comp.h
-	pr_edict.cpp
-	pr_exec.cpp
-	progdefs.h
-	progs.h
-	protocol.h
-	quakeasm.h
-	quakedef.h
-	r_part.cpp
-	render.h
-	sbar.cpp
-	sbar.h
-	screen.h
-	server.h
-	snd_dma.cpp
-	snd_mem.cpp
-	snd_mix.cpp
-	snd_mixa.s
-	sound.h
-	spritegn.h
-	sys.h
-	vid.h
-	view.cpp
-	view.h
-	wad.cpp
-	wad.h
-	winquake.h
-	world.cpp
-	world.h
-	worlda.s
-	zone.cpp
-	zone.h
-	renderer/d_ifacea.h)
+add_executable(winquake)
+
+target_sources(winquake
+	PRIVATE
+		anorm_dots.h
+		anorms.h
+		bspfile.h
+		cdaudio.h
+		chase.cpp
+		client.h
+		cmd.cpp
+		cmd.h
+		common.cpp
+		common.h
+		conproc.cpp
+		conproc.h
+		console.cpp
+		console.h
+		crc.cpp
+		crc.h
+		cvar.cpp
+		cvar.h
+		dosisms.h
+		draw.h
+		host.cpp
+		host_cmd.cpp
+		in_win.cpp
+		input.h
+		keys.cpp
+		keys.h
+		math.s
+		mathlib.cpp
+		mathlib.h
+		menu.cpp
+		menu.h
+		modelgen.h
+		pr_cmds.cpp
+		pr_comp.h
+		pr_edict.cpp
+		pr_exec.cpp
+		progdefs.h
+		progs.h
+		protocol.h
+		quakeasm.h
+		quakedef.h
+		r_part.cpp
+		render.h
+		sbar.cpp
+		sbar.h
+		screen.h
+		server.h
+		snd_dma.cpp
+		snd_mem.cpp
+		snd_mix.cpp
+		snd_mixa.s
+		sound.h
+		spritegn.h
+		sys.h
+		vid.h
+		view.cpp
+		view.h
+		wad.cpp
+		wad.h
+		winquake.h
+		world.cpp
+		world.h
+		worlda.s
+		zone.cpp
+		zone.h
+		renderer/d_ifacea.h
+		progdefs.q1
+		progdefs.q2
+		$<$<CXX_COMPILER_ID:MSVC>:
+			cd_win.cpp
+			snd_win.cpp
+			sys_win.cpp
+			sys_wina.s
+			winquake.rc
+		>
+		$<$<PLATFORM_ID:UNIX>:
+			cd_linux.cpp
+			snd_linux.cpp
+			sys_dosa.s
+			sys_linux.cpp
+		>)
 
 add_subdirectory(client)
 add_subdirectory(net)
 add_subdirectory(server)
-
-if(MSVC)
-	add_sources(
-		cd_win.cpp
-		snd_win.cpp
-		sys_win.cpp
-		sys_wina.s)
-endif()
-
-if(UNIX)
-	add_sources(
-		cd_linux.cpp
-		snd_linux.cpp
-		sys_dosa.s
-		sys_linux.cpp)
-endif()
 
 if(RENDERER_IS_SOFTWARE)
 	add_subdirectory(renderer/software)
@@ -111,24 +111,9 @@ elseif(RENDERER_IS_OPENGL)
 	add_subdirectory(renderer/opengl)
 endif()
 
-if(MSVC)
-	add_sources(
-		winquake.rc)
-endif()
-
-set(PROGDEFS
-	progdefs.q1
-	progdefs.q2)
-
-preprocess_sources()
-
-add_executable(winquake ${PREP_SRCS} ${PROGDEFS})
-
 #Create filters
-create_source_groups(${CMAKE_CURRENT_SOURCE_DIR})
-
-clear_sources()
-
+get_target_property(TARGET_SOURCES winquake SOURCES)
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${TARGET_SOURCES})
 
 target_include_directories(winquake PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}

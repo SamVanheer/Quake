@@ -1,17 +1,17 @@
-add_sources(
-	gl_draw.cpp
-	gl_mesh.cpp
-	gl_model.cpp
-	gl_model.h
-	gl_refrag.cpp
-	gl_rlight.cpp
-	gl_rmain.cpp
-	gl_rmisc.cpp
-	gl_rsurf.cpp
-	gl_screen.cpp
-	gl_test.cpp
-	gl_vidnt.cpp
-	gl_warp.cpp
-	gl_warp_sin.h
-	glquake.h
-)
+target_sources(winquake
+	PRIVATE
+		gl_draw.cpp
+		gl_mesh.cpp
+		gl_model.cpp
+		gl_model.h
+		gl_refrag.cpp
+		gl_rlight.cpp
+		gl_rmain.cpp
+		gl_rmisc.cpp
+		gl_rsurf.cpp
+		gl_screen.cpp
+		gl_test.cpp
+		gl_vidnt.cpp
+		gl_warp.cpp
+		gl_warp_sin.h
+		glquake.h)
