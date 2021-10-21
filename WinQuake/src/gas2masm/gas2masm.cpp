@@ -46,8 +46,8 @@ char	tokens[MAX_TOKENS][MAX_TOKEN_LENGTH+1];
 segtype	currentseg = NOSEG;
 
 typedef struct {
-	char	*text;
-	char	*emit;
+	const char	*text;
+	const char	*emit;
 	int		numtokens;
 	void	(*parsefunc) (void);
 } parsefield;
@@ -59,8 +59,8 @@ void errorexit (void);
 //==============================================
 
 typedef struct {
-	char	*text;
-	char	*emit;
+	const char	*text;
+	const char	*emit;
 	int		len;
 } regdesc;
 
