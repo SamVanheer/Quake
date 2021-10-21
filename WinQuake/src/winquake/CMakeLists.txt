@@ -98,7 +98,7 @@ target_sources(winquake
 			sys_wina.s
 			winquake.rc
 		>
-		$<$<PLATFORM_ID:UNIX>:
+		$<$<PLATFORM_ID:Linux>:
 			cd_linux.cpp
 			snd_linux.cpp
 			sys_dosa.s
@@ -158,9 +158,15 @@ if(RENDERER_IS_SOFTWARE)
 endif()
 
 if(RENDERER_IS_OPENGL)
+
+	if (UNIX)
+		find_package(svgalib REQUIRED)
+	endif()
+	
 	target_link_libraries(winquake PRIVATE
 		OpenGL::GLU
-		OpenGL::GL)
+		OpenGL::GL
+		$<$<PLATFORM_ID:Linux>:svgalib>)
 endif()
 
 if(MSVC)

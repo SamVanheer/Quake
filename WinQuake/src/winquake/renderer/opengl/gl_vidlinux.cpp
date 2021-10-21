@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <stdio.h>
 #include <signal.h>
 
-#include <asm/io.h>
+#include <sys/io.h>
 #include <dlfcn.h>
 
 /*#include "vga.h" */

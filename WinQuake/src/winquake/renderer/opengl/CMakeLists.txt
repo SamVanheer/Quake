@@ -14,8 +14,8 @@ target_sources(winquake
 		$<$<CXX_COMPILER_ID:MSVC>:
 			gl_vidnt.cpp
 		>
-		$<$<PLATFORM_ID:UNIX>:
-			gl_vidlinux.c
+		$<$<PLATFORM_ID:Linux>:
+			gl_vidlinux.cpp
 		>
 		gl_warp.cpp
 		gl_warp_sin.h

@@ -16,6 +16,6 @@ target_sources(winquake
 			net_wipx.cpp
 			net_wipx.h
 		>
-		$<$<PLATFORM_ID:UNIX>:
-			net_bsd.c
+		$<$<PLATFORM_ID:Linux>:
+			net_bsd.cpp
 		>)
