@@ -24,6 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "errno.h"
 #include "resource.h"
 #include "conproc.h"
+#include <VersionHelpers.h>
 
 #define MINIMUM_WIN_MEMORY		0x0880000
 #define MAXIMUM_WIN_MEMORY		0x1000000
@@ -298,7 +299,6 @@ void Sys_Init (void)
 {
 	LARGE_INTEGER	PerformanceFreq;
 	unsigned int	lowpart, highpart;
-	OSVERSIONINFO	vinfo;
 
 	MaskExceptions ();
 	Sys_SetFPCW ();
@@ -324,21 +324,16 @@ void Sys_Init (void)
 
 	Sys_InitFloatTime ();
 
-	vinfo.dwOSVersionInfoSize = sizeof(vinfo);
-
-	if (!GetVersionEx (&vinfo))
-		Sys_Error ("Couldn't get OS info");
-
-	if ((vinfo.dwMajorVersion < 4) ||
-		(vinfo.dwPlatformId == VER_PLATFORM_WIN32s))
+	//Raised OS requirement to Windows 7 or newer because GetVersionEx is deprecated,
+	//and the XP toolset support is deprecated in VS2019 and removed entirely in current redistributables
+	//Steam dropped support for Windows Vista and this is being developed using the Steam version of Quake
+	//so this check avoids problems with older versions of the game
+	if (!IsWindows7OrGreater())
 	{
-		Sys_Error ("WinQuake requires at least Win95 or NT 4.0");
+		Sys_Error("WinQuake requires at least Windows 7");
 	}
 
-	if (vinfo.dwPlatformId == VER_PLATFORM_WIN32_NT)
-		WinNT = true;
-	else
-		WinNT = false;
+	WinNT = true;
 }
 
 
