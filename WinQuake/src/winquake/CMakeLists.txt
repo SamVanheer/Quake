@@ -235,13 +235,17 @@ if(RENDERER_IS_SOFTWARE)
 	configure_asm_file(renderer/software/surf16)
 endif()
 
-set_target_properties(winquake PROPERTIES
-	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_INSTALL_PREFIX})
+install(TARGETS winquake
+	RUNTIME DESTINATION .)
 
-foreach(config IN LISTS CMAKE_CONFIGURATION_TYPES)
-	# The property names are all caps
-	string(TOUPPER ${config} config)
-	
-	set_target_properties(winquake PROPERTIES
-		RUNTIME_OUTPUT_DIRECTORY_${config} ${CMAKE_INSTALL_PREFIX})
-endforeach()
+if (MSVC)
+	install(FILES $<TARGET_PDB_FILE:winquake> DESTINATION . OPTIONAL)
+endif()
+
+# Set up debugger to launch the game instead of the copy in the build directory
+set_target_properties(winquake
+	PROPERTIES
+		VS_DEBUGGER_COMMAND ${CMAKE_INSTALL_PREFIX}/winquake$<TARGET_FILE_SUFFIX:winquake>
+		VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
+		VS_DEBUGGER_COMMAND_ARGUMENTS "-window")
+		
