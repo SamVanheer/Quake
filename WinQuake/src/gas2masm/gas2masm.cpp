@@ -1027,8 +1027,29 @@ tokenstat parseline (void)
 	}
 }
 
+int process_stat(tokenstat stat)
+{
+	switch (stat)
+	{
+	case FILE_DONE:
+		if (currentseg == TEXTSEG)
+			printf ("_TEXT ENDS\n");
+		else if (currentseg == DATASEG)
+			printf ("_DATA ENDS\n");
 
-void main (int argc, char **argv)
+		printf (" END\n");
+		return 0;
+
+	case PARSED_OKAY:
+		return 1;
+
+	default:
+		fprintf (stderr, "Error: unknown tokenstat %d\n", stat);
+		return 0;
+	}
+}
+
+int main (int argc, char **argv)
 {
 	tokenstat	stat;
 
@@ -1041,25 +1062,13 @@ void main (int argc, char **argv)
 	{
 		stat = parseline ();
 		g_inline++;
-
-		switch (stat)
-		{
-		case FILE_DONE:
-			if (currentseg == TEXTSEG)
-				printf ("_TEXT ENDS\n");
-			else if (currentseg == DATASEG)
-				printf ("_DATA ENDS\n");
-
-			printf (" END\n");
-			exit (0);
 		
-		case PARSED_OKAY:
+		if (!process_stat(stat))
+		{
 			break;
-
-		default:
-			fprintf (stderr, "Error: unknown tokenstat %d\n", stat);
-			exit (0);
 		}
 	}
+	
+	return 0;
 }
 
