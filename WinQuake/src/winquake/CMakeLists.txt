@@ -129,7 +129,6 @@ create_source_groups(${CMAKE_CURRENT_SOURCE_DIR})
 
 clear_sources()
 
-set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT winquake)
 
 target_include_directories(winquake PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}

@@ -15,3 +15,6 @@ project(WinQuake LANGUAGES C CXX)
 
 add_subdirectory(src/gas2masm)
 add_subdirectory(src/winquake)
+
+# Set Visual Studio starting project
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT winquake)
