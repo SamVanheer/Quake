@@ -1319,7 +1319,7 @@ void VID_InitDIB (HINSTANCE hInstance)
 	if (COM_CheckParm("-width"))
 		modelist[0].width = Q_atoi(com_argv[COM_CheckParm("-width")+1]);
 	else
-		modelist[0].width = 640;
+		modelist[0].width = 640 * 2; //Double the windowed mode size
 
 	if (modelist[0].width < 320)
 		modelist[0].width = 320;
