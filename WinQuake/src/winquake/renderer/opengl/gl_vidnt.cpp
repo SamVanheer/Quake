@@ -1499,6 +1499,8 @@ qboolean VID_Is8bit() {
 
 void VID_Init8bitPalette() 
 {
+	//Disable this stuff. Color table support doesn't seem to work properly anymore nowadays, whereas 32 bit support works fine
+	/*
 	// Check for 8bit Extensions and initialize them.
 	int i;
 	char thePalette[256*3];
@@ -1522,6 +1524,7 @@ void VID_Init8bitPalette()
 	glColorTableEXT(GL_SHARED_TEXTURE_PALETTE_EXT, GL_RGB, 256, GL_RGB, GL_UNSIGNED_BYTE,
 		(void *) thePalette);
 	is8bit = TRUE;
+	*/
 }
 
 static void Check_Gamma (unsigned char *pal)
