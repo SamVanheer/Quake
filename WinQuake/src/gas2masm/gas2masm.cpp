@@ -28,6 +28,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifdef WIN32
 #define strcmpi _strcmpi
 #define strnicmp _strnicmp
+#else
+#include <strings.h>
+#define strcmpi strcasecmp
+#define strnicmp strncasecmp
 #endif
 
 #define MAX_TOKENS			100
