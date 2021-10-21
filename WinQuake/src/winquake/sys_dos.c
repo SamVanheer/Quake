@@ -665,7 +665,7 @@ int Sys_FileRead (int handle, void *dest, int count)
    return read (handle, dest, count);
 }
 
-int Sys_FileWrite (int handle, void *data, int count)
+int Sys_FileWrite (int handle, const void *data, int count)
 {
 	return write (handle, data, count);
 }
