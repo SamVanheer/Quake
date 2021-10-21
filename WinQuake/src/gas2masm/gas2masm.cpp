@@ -108,7 +108,7 @@ int	numregs = sizeof (reglist) / sizeof (reglist[0]);
 //==============================================
 
 
-void emitanoperand (int tnum, char *type, int notdata)
+void emitanoperand (int tnum, const char *type, int notdata)
 {
 	int		i, index, something_outside_parens, regfound;
 	int		parencount;
@@ -545,7 +545,7 @@ void emit_1_or_2_operandsl (void)
 }
 
 
-void emit_1_or_2_operandsl_vartext (char *str0, char *str1)
+void emit_1_or_2_operandsl_vartext (const char *str0, const char *str1)
 {
 	int		j;
 
