@@ -218,6 +218,7 @@ void BuildTris (void)
 			continue;
 
 		bestlen = 0;
+		besttype = 0;
 		for (type = 0 ; type < 2 ; type++)
 //	type = 1;
 		{
