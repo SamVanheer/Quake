@@ -69,7 +69,6 @@ typedef struct entity_s
 											//  not split
 } entity_t;
 
-// !!! if this is changed, it must be changed in asm_draw.h too !!!
 typedef struct
 {
 	vrect_t		vrect;				// subwindow in video for refresh

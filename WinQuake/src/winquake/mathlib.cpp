@@ -164,21 +164,6 @@ float	anglemod(float a)
 
 /*
 ==================
-BOPS_Error
-
-Split out like this for ASM to call.
-==================
-*/
-extern "C" void BOPS_Error (void)
-{
-	Sys_Error ("BoxOnPlaneSide:  Bad signbits");
-}
-
-
-#if	!id386
-
-/*
-==================
 BoxOnPlaneSide
 
 Returns 1, 2, or 1 + 2
@@ -239,7 +224,7 @@ dist2 = p->normal[0]*emaxs[0] + p->normal[1]*emaxs[1] + p->normal[2]*emaxs[2];
 		break;
 	default:
 		dist1 = dist2 = 0;		// shut up compiler
-		BOPS_Error ();
+		Sys_Error("BoxOnPlaneSide:  Bad signbits");
 		break;
 	}
 
@@ -283,8 +268,6 @@ if (sides == 0)
 
 	return sides;
 }
-
-#endif
 
 
 void AngleVectors (vec3_t angles, vec3_t forward, vec3_t right, vec3_t up)
@@ -558,11 +541,6 @@ int GreatestCommonDivisor (int i1, int i2)
 	}
 }
 
-
-#if	!id386
-
-// TODO: move to nonintel.c
-
 /*
 ===================
 Invert24To16
@@ -579,5 +557,3 @@ fixed16_t Invert24To16(fixed16_t val)
 	return (fixed16_t)
 			(((double)0x10000 * (double)0x1000000 / (double)val) + 0.5);
 }
-
-#endif

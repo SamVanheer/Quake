@@ -131,9 +131,6 @@ void Sys_Quit (void)
 
 void Sys_Init(void)
 {
-#if id386
-	Sys_SetFPCW();
-#endif
 }
 
 void Sys_Error (char *error, ...)
@@ -340,16 +337,6 @@ char *Sys_ConsoleInput(void)
 	}
 	return NULL;
 }
-
-#if !id386
-void Sys_HighFPPrecision (void)
-{
-}
-
-void Sys_LowFPPrecision (void)
-{
-}
-#endif
 
 int main (int c, char **v)
 {

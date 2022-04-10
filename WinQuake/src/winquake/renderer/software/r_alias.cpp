@@ -215,7 +215,6 @@ qboolean R_AliasCheckBBox (void)
 	anyclip = 0;
 	allclip = ALIAS_XY_CLIP_MASK;
 
-// TODO: probably should do this loop in ASM, especially if we use floats
 	for (i=0 ; i<numv ; i++)
 	{
 	// we don't need to bother with vertices that were z-clipped
@@ -224,7 +223,6 @@ qboolean R_AliasCheckBBox (void)
 
 		zi = 1.0 / viewaux[i].fv[2];
 
-	// FIXME: do with chop mode in ASM, or convert to float
 		v0 = (viewaux[i].fv[0] * xscale * zi) + xcenter;
 		v1 = (viewaux[i].fv[1] * yscale * zi) + ycenter;
 
@@ -463,9 +461,6 @@ void R_AliasTransformFinalVert (finalvert_t *fv, auxvert_t *av,
 	fv->v[4] = temp;
 }
 
-
-#if	!id386
-
 /*
 ================
 R_AliasTransformAndProjectFinalVerts
@@ -517,9 +512,6 @@ void R_AliasTransformAndProjectFinalVerts (finalvert_t *fv, stvert_t *pstverts)
 		fv->v[4] = temp;
 	}
 }
-
-#endif
-
 
 /*
 ================
@@ -745,12 +737,6 @@ void R_AliasDrawModel (alight_t *plighting)
 	if (r_affinetridesc.drawtype)
 	{
 		D_PolysetUpdateTables ();		// FIXME: precalc...
-	}
-	else
-	{
-#if	id386
-		D_Aff8Patch (currententity->colormap);
-#endif
 	}
 
 	acolormap = currententity->colormap;

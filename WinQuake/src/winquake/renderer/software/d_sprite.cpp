@@ -27,11 +27,10 @@ static int		sprite_height;
 static int		minindex, maxindex;
 static sspan_t	*sprite_spans;
 
-#if	!id386
-
 /*
 =====================
 D_SpriteDrawSpans
+8-bpp horizontal span drawing code for polygons, with transparency.
 =====================
 */
 void D_SpriteDrawSpans (sspan_t *pspan)
@@ -187,9 +186,6 @@ NextSpan:
 
 	} while (pspan->count != DS_SPAN_LIST_END);
 }
-
-#endif
-
 
 /*
 =====================

@@ -57,10 +57,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #if defined(_WIN32) && !defined(WINDED)
 
-#if defined(_M_IX86)
-#define __i386__	1
-#endif
-
 void	VID_LockBuffer (void);
 void	VID_UnlockBuffer (void);
 
@@ -71,19 +67,9 @@ void	VID_UnlockBuffer (void);
 
 #endif
 
-#if defined __i386__
-#define id386	1
-#else
-#define id386	0
-#endif
-
-#if id386
-#define UNALIGNED_OK	1	// set to 0 if unaligned accesses are not supported
-#else
+// set to 0 if unaligned accesses are not supported
 #define UNALIGNED_OK	0
-#endif
 
-// !!! if this is changed, it must be changed in d_ifacea.h too !!!
 #define CACHE_SIZE	32		// used to align key data structures
 
 #define UNUSED(x)	(x = x)	// for pesky compiler / lint warnings

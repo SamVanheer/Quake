@@ -461,8 +461,6 @@ void R_RecursiveWorldNode (mnode_t *node, int clipflags)
 		return;
 
 // cull the clipping planes if not trivial accept
-// FIXME: the compiler is doing a lousy job of optimizing here; it could be
-//  twice as fast in ASM
 	if (clipflags)
 	{
 		for (i=0 ; i<4 ; i++)

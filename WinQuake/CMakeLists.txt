@@ -9,7 +9,6 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 project(WinQuake LANGUAGES C CXX)
 
-add_subdirectory(src/gas2masm)
 add_subdirectory(src/winquake)
 
 # Set Visual Studio starting project

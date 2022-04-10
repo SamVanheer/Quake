@@ -1,37 +1,26 @@
 target_sources(winquake
 	PRIVATE
-		d_draw.s
-		d_draw16.s
 		d_edge.cpp
 		d_fill.cpp
 		d_iface.h
 		d_init.cpp
 		d_modech.cpp
 		d_part.cpp
-		d_parta.s
-		d_polysa.s
 		d_polyse.cpp
 		d_scan.cpp
-		d_scana.s
 		d_sky.cpp
-		d_spr8.s
 		d_sprite.cpp
 		d_surf.cpp
 		d_vars.cpp
-		d_varsa.s
 		d_zpoint.cpp
 		draw.cpp
 		model.cpp
 		model.h
 		r_aclip.cpp
-		r_aclipa.s
 		r_alias.cpp
-		r_aliasa.s
 		r_bsp.cpp
 		r_draw.cpp
-		r_drawa.s
 		r_edge.cpp
-		r_edgea.s
 		r_efrag.cpp
 		r_light.cpp
 		r_local.h
@@ -42,8 +31,5 @@ target_sources(winquake
 		r_sprite.cpp
 		r_surf.cpp
 		r_vars.cpp
-		r_varsa.s
 		screen.cpp
-		surf8.s
-		surf16.s
 		vid_win.cpp)

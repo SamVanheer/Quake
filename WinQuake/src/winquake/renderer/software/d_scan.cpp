@@ -92,12 +92,10 @@ void D_WarpScreen (void)
 	}
 }
 
-
-#if	!id386
-
 /*
 =============
 D_DrawTurbulent8Span
+
 =============
 */
 void D_DrawTurbulent8Span (void)
@@ -113,9 +111,6 @@ void D_DrawTurbulent8Span (void)
 		r_turb_t += r_turb_tstep;
 	} while (--r_turb_spancount > 0);
 }
-
-#endif	// !id386
-
 
 /*
 =============
@@ -249,12 +244,13 @@ void Turbulent8 (espan_t *pspan)
 	} while ((pspan = pspan->pnext) != NULL);
 }
 
-
-#if	!id386
-
 /*
 =============
 D_DrawSpans8
+8-bpp horizontal span drawing code for polygons, with no transparency.
+
+Assumes there is at least one span in pspans, and that every span
+contains at least one pixel
 =============
 */
 void D_DrawSpans8 (espan_t *pspan)
@@ -385,14 +381,13 @@ void D_DrawSpans8 (espan_t *pspan)
 	} while ((pspan = pspan->pnext) != NULL);
 }
 
-#endif
-
-
-#if	!id386
-
 /*
 =============
 D_DrawZSpans
+8-bpp horizontal span z drawing codefor polygons, with no transparency.
+
+Assumes there is at least one span in pzspans, and that every span
+contains at least one pixel
 =============
 */
 void D_DrawZSpans (espan_t *pspan)
@@ -447,6 +442,3 @@ void D_DrawZSpans (espan_t *pspan)
 
 	} while ((pspan = pspan->pnext) != NULL);
 }
-
-#endif
-

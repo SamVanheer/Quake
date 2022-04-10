@@ -44,12 +44,10 @@ void D_StartParticles (void)
 // not used by software driver
 }
 
-
-#if	!id386
-
 /*
 ==============
 D_DrawParticle
+8-bpp particle queueing code.
 ==============
 */
 void D_DrawParticle (particle_t *pparticle)
@@ -202,6 +200,3 @@ void D_DrawParticle (particle_t *pparticle)
 		break;
 	}
 }
-
-#endif	// !id386
-

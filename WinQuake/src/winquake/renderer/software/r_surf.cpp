@@ -32,7 +32,7 @@ int				lightright, lightleftstep, lightrightstep, blockdivshift;
 unsigned		blockdivmask;
 void			*prowdestbase;
 unsigned char	*pbasesource;
-int				surfrowbytes;	// used by ASM files
+int				surfrowbytes;
 unsigned		*r_lightptr;
 int				r_stepback;
 int				r_lightwidth;
@@ -336,11 +336,10 @@ void R_DrawSurface (void)
 
 //=============================================================================
 
-#if	!id386
-
 /*
 ================
 R_DrawSurfaceBlock8_mip0
+Surface block drawer for mip level 0
 ================
 */
 void R_DrawSurfaceBlock8_mip0 (void)
@@ -349,12 +348,12 @@ void R_DrawSurfaceBlock8_mip0 (void)
 	unsigned char	pix, *psource, *prowdest;
 
 	psource = pbasesource;
-	prowdest = prowdestbase;
+	prowdest = reinterpret_cast<unsigned char*>(prowdestbase);
 
 	for (v=0 ; v<r_numvblocks ; v++)
 	{
 	// FIXME: make these locals?
-	// FIXME: use delta rather than both right and left, like ASM?
+	// FIXME: use delta rather than both right and left?
 		lightleft = r_lightptr[0];
 		lightright = r_lightptr[1];
 		r_lightptr += r_lightwidth;
@@ -399,12 +398,12 @@ void R_DrawSurfaceBlock8_mip1 (void)
 	unsigned char	pix, *psource, *prowdest;
 
 	psource = pbasesource;
-	prowdest = prowdestbase;
+	prowdest = reinterpret_cast<unsigned char*>(prowdestbase);
 
 	for (v=0 ; v<r_numvblocks ; v++)
 	{
 	// FIXME: make these locals?
-	// FIXME: use delta rather than both right and left, like ASM?
+	// FIXME: use delta rather than both right and left?
 		lightleft = r_lightptr[0];
 		lightright = r_lightptr[1];
 		r_lightptr += r_lightwidth;
@@ -449,12 +448,12 @@ void R_DrawSurfaceBlock8_mip2 (void)
 	unsigned char	pix, *psource, *prowdest;
 
 	psource = pbasesource;
-	prowdest = prowdestbase;
+	prowdest = reinterpret_cast<unsigned char*>(prowdestbase);
 
 	for (v=0 ; v<r_numvblocks ; v++)
 	{
 	// FIXME: make these locals?
-	// FIXME: use delta rather than both right and left, like ASM?
+	// FIXME: use delta rather than both right and left?
 		lightleft = r_lightptr[0];
 		lightright = r_lightptr[1];
 		r_lightptr += r_lightwidth;
@@ -499,12 +498,12 @@ void R_DrawSurfaceBlock8_mip3 (void)
 	unsigned char	pix, *psource, *prowdest;
 
 	psource = pbasesource;
-	prowdest = prowdestbase;
+	prowdest = reinterpret_cast<unsigned char*>(prowdestbase);
 
 	for (v=0 ; v<r_numvblocks ; v++)
 	{
 	// FIXME: make these locals?
-	// FIXME: use delta rather than both right and left, like ASM?
+	// FIXME: use delta rather than both right and left?
 		lightleft = r_lightptr[0];
 		lightright = r_lightptr[1];
 		r_lightptr += r_lightwidth;
@@ -541,6 +540,7 @@ void R_DrawSurfaceBlock8_mip3 (void)
 /*
 ================
 R_DrawSurfaceBlock16
+Surface block drawer
 
 FIXME: make this work
 ================
@@ -584,9 +584,6 @@ void R_DrawSurfaceBlock16 (void)
 
 	prowdestbase = prowdest;
 }
-
-#endif
-
 
 //============================================================================
 

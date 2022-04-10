@@ -83,7 +83,6 @@ extern cvar_t	r_numedges;
 
 #define	DIST_NOT_SET	98765
 
-// !!! if this is changed, it must be changed in asm_draw.h too !!!
 typedef struct clipplane_s
 {
 	vec3_t		normal;
@@ -140,19 +139,8 @@ extern "C" void R_DrawSurfaceBlock16 (void);
 void R_DrawSurfaceBlock8 (void);
 texture_t *R_TextureAnimation (texture_t *base);
 
-#if	id386
-
-extern "C" void R_DrawSurfaceBlock8_mip0 (void);
-extern "C" void R_DrawSurfaceBlock8_mip1 (void);
-extern "C" void R_DrawSurfaceBlock8_mip2 (void);
-extern "C" void R_DrawSurfaceBlock8_mip3 (void);
-
-#endif
-
 void R_GenSkyTile (void *pdest);
 void R_GenSkyTile16 (void *pdest);
-extern "C" void R_Surf8Patch (void);
-extern "C" void R_Surf16Patch (void);
 void R_DrawSubmodelPolygons (model_t *pmodel, int clipflags);
 void R_DrawSolidClippedSubmodelPolygons (model_t *pmodel);
 
@@ -183,7 +171,6 @@ extern	model_t		*cl_worldmodel;
 
 extern int		*pfrustum_indexes[4];
 
-// !!! if this is changed, it must be changed in asm_draw.h too !!!
 #define	NEAR_CLIP	0.01
 
 extern "C"	int			ubasestep, errorterm, erroradjustup, erroradjustdown;
@@ -251,7 +238,6 @@ void R_DrawParticles (void);
 void R_InitParticles (void);
 void R_ClearParticles (void);
 void R_ReadPointFile_f (void);
-extern "C" void R_SurfacePatch (void);
 
 extern int		r_amodels_drawn;
 extern edge_t	*auxedges;
@@ -267,7 +253,7 @@ extern	"C"	int	screenwidth;
 extern	"C"	edge_t	edge_head;
 extern	"C"	edge_t	edge_tail;
 extern	"C"	edge_t	edge_aftertail;
-extern	"C"	int		r_bmodelactive;
+extern int		r_bmodelactive;
 extern vrect_t	*pconupdate;
 
 extern "C"	float		aliasxscale, aliasyscale, aliasxcenter, aliasycenter;

@@ -480,8 +480,6 @@ POINT TESTING IN HULLS
 ===============================================================================
 */
 
-#if	!id386
-
 /*
 ==================
 SV_HullPointContents
@@ -514,9 +512,6 @@ int SV_HullPointContents (hull_t *hull, int num, vec3_t p)
 	
 	return num;
 }
-
-#endif	// !id386
-
 
 /*
 ==================
