@@ -661,9 +661,14 @@ int WINAPI WinMain (_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	int				t;
 	RECT			rect;
 
-    /* previous instances do not exist in Win32 */
-    if (hPrevInstance)
-        return 0;
+	HANDLE mutex;
+
+	mutex = CreateMutexA(nullptr, TRUE, "Quake1Mutex");
+
+	if (mutex == nullptr || GetLastError() == ERROR_ALREADY_EXISTS)
+	{
+		Sys_Error("Could not launch game.\nOnly one instance of this game can be run at a time.");
+	}
 
 	global_hInstance = hInstance;
 	global_nCmdShow = nCmdShow;
@@ -848,6 +853,9 @@ int WINAPI WinMain (_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		Host_Frame (time);
 		oldtime = newtime;
 	}
+
+	ReleaseMutex(mutex);
+	mutex = nullptr;
 
     /* return success of application */
     return TRUE;
