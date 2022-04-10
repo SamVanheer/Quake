@@ -649,7 +649,6 @@ HINSTANCE	global_hInstance;
 int			global_nCmdShow;
 char		*argv[MAX_NUM_ARGVS];
 static char	*empty_string = "";
-HWND		hwnd_dialog;
 
 
 int WINAPI WinMain (_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
@@ -659,7 +658,6 @@ int WINAPI WinMain (_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	MEMORYSTATUS	lpBuffer;
 	static	char	cwd[1024];
 	int				t;
-	RECT			rect;
 
 	HANDLE mutex;
 
@@ -718,29 +716,6 @@ int WINAPI WinMain (_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	parms.argv = com_argv;
 
 	isDedicated = (COM_CheckParm ("-dedicated") != 0);
-
-	if (!isDedicated)
-	{
-		hwnd_dialog = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), NULL, NULL);
-
-		if (hwnd_dialog)
-		{
-			if (GetWindowRect (hwnd_dialog, &rect))
-			{
-				if (rect.left > (rect.top * 2))
-				{
-					SetWindowPos (hwnd_dialog, 0,
-						(rect.left / 2) - ((rect.right - rect.left) / 2),
-						rect.top, 0, 0,
-						SWP_NOZORDER | SWP_NOSIZE);
-				}
-			}
-
-			ShowWindow (hwnd_dialog, SW_SHOWDEFAULT);
-			UpdateWindow (hwnd_dialog);
-			SetForegroundWindow (hwnd_dialog);
-		}
-	}
 
 // take the greater of all the available memory or half the total memory,
 // but at least 8 Mb and no more than 16 Mb, unless they explicitly

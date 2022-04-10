@@ -1790,8 +1790,6 @@ void	VID_Init (unsigned char *palette)
 	vid.colormap = host_colormap;
 	vid.fullbright = 256 - LittleLong (*((int *)vid.colormap + 2048));
 
-	DestroyWindow (hwnd_dialog);
-
 	Check_Gamma(palette);
 	VID_SetPalette (palette);
 
