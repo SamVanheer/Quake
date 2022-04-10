@@ -390,13 +390,13 @@ typedef struct _DIMOUSESTATE {
     BYTE    rgbButtons[4];
 } DIMOUSESTATE, *LPDIMOUSESTATE;
 
-#define DIMOFS_X        FIELD_OFFSET(DIMOUSESTATE, lX)
-#define DIMOFS_Y        FIELD_OFFSET(DIMOUSESTATE, lY)
-#define DIMOFS_Z        FIELD_OFFSET(DIMOUSESTATE, lZ)
-#define DIMOFS_BUTTON0 (FIELD_OFFSET(DIMOUSESTATE, rgbButtons) + 0)
-#define DIMOFS_BUTTON1 (FIELD_OFFSET(DIMOUSESTATE, rgbButtons) + 1)
-#define DIMOFS_BUTTON2 (FIELD_OFFSET(DIMOUSESTATE, rgbButtons) + 2)
-#define DIMOFS_BUTTON3 (FIELD_OFFSET(DIMOUSESTATE, rgbButtons) + 3)
+#define DIMOFS_X        offsetof(DIMOUSESTATE, lX)
+#define DIMOFS_Y        offsetof(DIMOUSESTATE, lY)
+#define DIMOFS_Z        offsetof(DIMOUSESTATE, lZ)
+#define DIMOFS_BUTTON0 (offsetof(DIMOUSESTATE, rgbButtons) + 0)
+#define DIMOFS_BUTTON1 (offsetof(DIMOUSESTATE, rgbButtons) + 1)
+#define DIMOFS_BUTTON2 (offsetof(DIMOUSESTATE, rgbButtons) + 2)
+#define DIMOFS_BUTTON3 (offsetof(DIMOUSESTATE, rgbButtons) + 3)
 
 /****************************************************************************
  *
