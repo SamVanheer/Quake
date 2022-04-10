@@ -29,10 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define FULLY_CLIPPED_CACHED	0x80000000
 #define FRAMECOUNT_MASK			0x7FFFFFFF
 
-extern "C"
-{
 unsigned int	cacheoffset;
-}
 
 int			c_faceclip;					// number of faces clipped
 
@@ -46,26 +43,17 @@ clipplane_t	*entity_clipplanes;
 clipplane_t	view_clipplanes[4];
 clipplane_t	world_clipplanes[16];
 
-extern "C"
-{
 medge_t			*r_pedge;
 
 qboolean		r_leftclipped, r_rightclipped;
-}
 static qboolean	makeleftedge, makerightedge;
-extern "C"
-{
 qboolean		r_nearzionly;
-}
 
 int		sintable[SIN_BUFFER_SIZE];
 int		intsintable[SIN_BUFFER_SIZE];
 
-extern "C"
-{
 mvertex_t	r_leftenter, r_leftexit;
 mvertex_t	r_rightenter, r_rightexit;
-}
 
 typedef struct
 {
@@ -73,15 +61,12 @@ typedef struct
 	int		ceilv;
 } evert_t;
 
-extern "C"
-{
 int				r_emitted;
 float			r_nearzi;
 float			r_u1, r_v1, r_lzi1;
 int				r_ceilv1;
 
 qboolean	r_lastvertvalid;
-}
 
 /*
 ================

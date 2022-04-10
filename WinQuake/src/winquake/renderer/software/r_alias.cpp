@@ -32,19 +32,13 @@ affinetridesc_t	r_affinetridesc;
 
 void *			acolormap;	// FIXME: should go away
 
-extern "C"
-{
 trivertx_t		*r_apverts;
-}
 
 // TODO: these probably will go away with optimized rasterization
 mdl_t				*pmdl;
-extern "C"
-{
 vec3_t				r_plightvec;
 int					r_ambientlight;
 float				r_shadelight;
-}
 aliashdr_t			*paliashdr;
 finalvert_t			*pfinalverts;
 auxvert_t			*pauxverts;
@@ -57,12 +51,9 @@ static maliasskindesc_t	*pskindesc;
 
 int				r_amodels_drawn;
 int				a_skinwidth;
-extern "C"
-{
 int				r_anumverts;
 
 float	aliastransform[ 3 ][ 4 ];
-}
 
 typedef struct {
 	int	index0;
@@ -77,17 +68,14 @@ static aedge_t	aedges[12] = {
 
 #define NUMVERTEXNORMALS	162
 
-extern "C"
-{
 #pragma warning( push )
 #pragma warning( disable: 4838 4305 )
-float	r_avertexnormals[ NUMVERTEXNORMALS ][ 3 ] = {
+extern float	r_avertexnormals[NUMVERTEXNORMALS][3] = {
 #include "anorms.h"
 };
 #pragma warning( pop )
-}
 
-extern "C" void R_AliasTransformAndProjectFinalVerts (finalvert_t *fv,
+extern void R_AliasTransformAndProjectFinalVerts (finalvert_t *fv,
 	stvert_t *pstverts);
 void R_AliasSetUpTransform (int trivial_accept);
 void R_AliasTransformVector (vec3_t in, vec3_t out);

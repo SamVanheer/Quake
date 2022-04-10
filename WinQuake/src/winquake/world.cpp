@@ -42,7 +42,7 @@ typedef struct
 } moveclip_t;
 
 
-extern "C" int SV_HullPointContents (hull_t *hull, int num, vec3_t p);
+extern int SV_HullPointContents (hull_t *hull, int num, vec3_t p);
 
 /*
 ===============================================================================

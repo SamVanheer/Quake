@@ -24,10 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 //define	PASSAGES
 
-extern "C"
-{
 void		*colormap;
-}
 vec3_t		viewlightvec;
 alight_t	r_viewlighting = {128, 192, viewlightvec};
 float		r_time1;

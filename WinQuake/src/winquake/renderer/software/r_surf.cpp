@@ -24,8 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 drawsurf_t	r_drawsurf;
 
-extern "C"
-{
 int				lightleft, sourcesstep, blocksize, sourcetstep;
 int				lightdelta, lightdeltastep;
 int				lightright, lightleftstep, lightrightstep, blockdivshift;
@@ -38,7 +36,6 @@ int				r_stepback;
 int				r_lightwidth;
 int				r_numhblocks, r_numvblocks;
 unsigned char	*r_source, *r_sourcemax;
-}
 
 void R_DrawSurfaceBlock8_mip0 (void);
 void R_DrawSurfaceBlock8_mip1 (void);

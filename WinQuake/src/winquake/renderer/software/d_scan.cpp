@@ -25,15 +25,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "r_local.h"
 #include "d_local.h"
 
-extern "C"
-{
 unsigned char	*r_turb_pbase, *r_turb_pdest;
 fixed16_t		r_turb_s, r_turb_t, r_turb_sstep, r_turb_tstep;
 int				*r_turb_turb;
 int				r_turb_spancount;
-}
 
-extern "C" void D_DrawTurbulent8Span (void);
+extern void D_DrawTurbulent8Span (void);
 
 
 /*

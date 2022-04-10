@@ -48,13 +48,10 @@ typedef struct {
 	int		*prightedgevert2;
 } edgetable;
 
-extern "C"
-{
 int	r_p0[6], r_p1[6], r_p2[6];
 
 byte		*d_pcolormap;
 int			d_xdenom;
-}
 
 int			d_aflatcolor;
 
@@ -76,18 +73,13 @@ edgetable	edgetables[12] = {
 };
 
 // FIXME: some of these can become statics
-extern "C"
-{
 int				a_sstepxfrac, a_tstepxfrac, r_lstepx, a_ststepxwhole;
 int				r_sstepx, r_tstepx, r_lstepy, r_sstepy, r_tstepy;
 int				r_zistepx, r_zistepy;
 int				d_aspancount, d_countextrastep;
-}
 
 static int				ystart;
 
-extern "C"
-{
 spanpackage_t			*a_spans;
 spanpackage_t			*d_pedgespanpackage;
 byte					*d_pdest, *d_ptex;
@@ -99,7 +91,6 @@ int						d_lightbasestep, d_pdestbasestep, d_ptexbasestep;
 int						d_sfracbasestep, d_tfracbasestep;
 int						d_ziextrastep, d_zibasestep;
 int						d_pzextrastep, d_pzbasestep;
-}
 
 typedef struct {
 	int		quotient;
@@ -110,21 +101,18 @@ static adivtab_t	adivtab[32*32] = {
 #include "adivtab.h"
 };
 
-extern "C"
-{
 byte	*skintable[ MAX_LBM_HEIGHT ];
-}
 int		skinwidth;
 byte	*skinstart;
 
-extern "C" void D_PolysetDrawSpans8 (spanpackage_t *pspanpackage);
-extern "C" void D_PolysetCalcGradients (int skinwidth);
+extern void D_PolysetDrawSpans8 (spanpackage_t *pspanpackage);
+extern void D_PolysetCalcGradients (int skinwidth);
 void D_DrawSubdiv (void);
 void D_DrawNonSubdiv (void);
 void D_PolysetRecursiveTriangle (int *p1, int *p2, int *p3);
-extern "C" void D_PolysetSetEdgeTable (void);
-extern "C" void D_RasterizeAliasPolySmooth (void);
-extern "C" void D_PolysetScanLeftEdge (int height);
+extern void D_PolysetSetEdgeTable (void);
+extern void D_RasterizeAliasPolySmooth (void);
+extern void D_PolysetScanLeftEdge (int height);
 
 /*
 ================
