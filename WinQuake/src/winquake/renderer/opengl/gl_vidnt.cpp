@@ -1354,140 +1354,74 @@ VID_InitFullDIB
 */
 void VID_InitFullDIB (HINSTANCE hInstance)
 {
-	DEVMODE	devmode;
-	int		i, modenum, originalnummodes, existingmode, numlowresmodes;
-	int		j, bpp, done;
-	BOOL	stat;
-
 // enumerate >8 bpp modes
-	originalnummodes = nummodes;
-	modenum = 0;
+	const int originalnummodes = nummodes;
 
-	do
+	//TODO: support multiple displays.
+	const int candidateCount = SDL_GetNumDisplayModes(0);
+
+	for (int modenum = 0; modenum < candidateCount; ++modenum)
 	{
-		stat = EnumDisplaySettings (NULL, modenum, &devmode);
+		SDL_DisplayMode devmode;
 
-		if ((devmode.dmBitsPerPel >= 15) &&
-			(devmode.dmPelsWidth <= MAXWIDTH) &&
-			(devmode.dmPelsHeight <= MAXHEIGHT) &&
+		if (SDL_GetDisplayMode(0, modenum, &devmode) < 0)
+		{
+			Sys_Error("Error getting display mode: %s", SDL_GetError());
+		}
+
+		const int bpp = SDL_BITSPERPIXEL(devmode.format);
+
+		if ((bpp >= 15) &&
+			(devmode.w <= MAXWIDTH) &&
+			(devmode.h <= MAXHEIGHT) &&
 			(nummodes < MAX_MODE_LIST))
 		{
-			devmode.dmFields = DM_BITSPERPEL |
-							   DM_PELSWIDTH |
-							   DM_PELSHEIGHT;
-
-			if (ChangeDisplaySettings (&devmode, CDS_TEST | CDS_FULLSCREEN) ==
-					DISP_CHANGE_SUCCESSFUL)
-			{
-				modelist[nummodes].type = MS_FULLDIB;
-				modelist[nummodes].width = devmode.dmPelsWidth;
-				modelist[nummodes].height = devmode.dmPelsHeight;
-				modelist[nummodes].modenum = 0;
-				modelist[nummodes].halfscreen = 0;
-				modelist[nummodes].dib = 1;
-				modelist[nummodes].fullscreen = 1;
-				modelist[nummodes].bpp = devmode.dmBitsPerPel;
-				sprintf (modelist[nummodes].modedesc, "%dx%dx%d",
-						 devmode.dmPelsWidth, devmode.dmPelsHeight,
-						 devmode.dmBitsPerPel);
+			modelist[nummodes].type = MS_FULLDIB;
+			modelist[nummodes].width = devmode.w;
+			modelist[nummodes].height = devmode.h;
+			modelist[nummodes].modenum = 0;
+			modelist[nummodes].halfscreen = 0;
+			modelist[nummodes].dib = 1;
+			modelist[nummodes].fullscreen = 1;
+			modelist[nummodes].bpp = bpp;
+			sprintf(modelist[nummodes].modedesc, "%dx%dx%d", devmode.w, devmode.h, bpp);
 
 			// if the width is more than twice the height, reduce it by half because this
 			// is probably a dual-screen monitor
-				if (!COM_CheckParm("-noadjustaspect"))
-				{
-					if (modelist[nummodes].width > (modelist[nummodes].height << 1))
-					{
-						modelist[nummodes].width >>= 1;
-						modelist[nummodes].halfscreen = 1;
-						sprintf (modelist[nummodes].modedesc, "%dx%dx%d",
-								 modelist[nummodes].width,
-								 modelist[nummodes].height,
-								 modelist[nummodes].bpp);
-					}
-				}
-
-				for (i=originalnummodes, existingmode = 0 ; i<nummodes ; i++)
-				{
-					if ((modelist[nummodes].width == modelist[i].width)   &&
-						(modelist[nummodes].height == modelist[i].height) &&
-						(modelist[nummodes].bpp == modelist[i].bpp))
-					{
-						existingmode = 1;
-						break;
-					}
-				}
-
-				if (!existingmode)
-				{
-					nummodes++;
-				}
-			}
-		}
-
-		modenum++;
-	} while (stat);
-
-// see if there are any low-res modes that aren't being reported
-	numlowresmodes = sizeof(lowresmodes) / sizeof(lowresmodes[0]);
-	bpp = 16;
-	done = 0;
-
-	do
-	{
-		for (j=0 ; (j<numlowresmodes) && (nummodes < MAX_MODE_LIST) ; j++)
-		{
-			devmode.dmBitsPerPel = bpp;
-			devmode.dmPelsWidth = lowresmodes[j].width;
-			devmode.dmPelsHeight = lowresmodes[j].height;
-			devmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
-
-			if (ChangeDisplaySettings (&devmode, CDS_TEST | CDS_FULLSCREEN) ==
-					DISP_CHANGE_SUCCESSFUL)
+			if (!COM_CheckParm("-noadjustaspect"))
 			{
-				modelist[nummodes].type = MS_FULLDIB;
-				modelist[nummodes].width = devmode.dmPelsWidth;
-				modelist[nummodes].height = devmode.dmPelsHeight;
-				modelist[nummodes].modenum = 0;
-				modelist[nummodes].halfscreen = 0;
-				modelist[nummodes].dib = 1;
-				modelist[nummodes].fullscreen = 1;
-				modelist[nummodes].bpp = devmode.dmBitsPerPel;
-				sprintf (modelist[nummodes].modedesc, "%dx%dx%d",
-						 devmode.dmPelsWidth, devmode.dmPelsHeight,
-						 devmode.dmBitsPerPel);
-
-				for (i=originalnummodes, existingmode = 0 ; i<nummodes ; i++)
+				if (modelist[nummodes].width > (modelist[nummodes].height << 1))
 				{
-					if ((modelist[nummodes].width == modelist[i].width)   &&
-						(modelist[nummodes].height == modelist[i].height) &&
-						(modelist[nummodes].bpp == modelist[i].bpp))
-					{
-						existingmode = 1;
-						break;
-					}
-				}
-
-				if (!existingmode)
-				{
-					nummodes++;
+					modelist[nummodes].width >>= 1;
+					modelist[nummodes].halfscreen = 1;
+					sprintf(modelist[nummodes].modedesc, "%dx%dx%d",
+						modelist[nummodes].width,
+						modelist[nummodes].height,
+						modelist[nummodes].bpp);
 				}
 			}
-		}
-		switch (bpp)
-		{
-			case 16:
-				bpp = 32;
-				break;
 
-			case 32:
-				bpp = 24;
-				break;
+			bool existingmode = false;
 
-			case 24:
-				done = 1;
-				break;
+			for (int i = originalnummodes; i < nummodes; i++)
+			{
+				if ((modelist[nummodes].width == modelist[i].width) &&
+					(modelist[nummodes].height == modelist[i].height) &&
+					(modelist[nummodes].bpp == modelist[i].bpp))
+				{
+					existingmode = true;
+					break;
+				}
+			}
+
+			if (!existingmode)
+			{
+				nummodes++;
+			}
 		}
-	} while (!done);
+	}
+
+	//Low-res mode search removed because SDL2 does not provide APIs to test for them.
 
 	if (nummodes == originalnummodes)
 		Con_SafePrintf ("No fullscreen DIB modes found\n");
@@ -1565,7 +1499,7 @@ VID_Init
 */
 void	VID_Init (unsigned char *palette)
 {
-	int		i, existingmode;
+	int		i;
 	int		basenummodes, width, height, bpp, findbpp, done;
 	char	gldir[MAX_OSPATH];
 	HDC		hdc;
@@ -1687,13 +1621,15 @@ void	VID_Init (unsigned char *palette)
 							 devmode.dmPelsWidth, devmode.dmPelsHeight,
 							 devmode.dmBitsPerPel);
 
-					for (i=nummodes, existingmode = 0 ; i<nummodes ; i++)
+					bool existingmode = false;
+
+					for (i=nummodes; i<nummodes ; i++)
 					{
 						if ((modelist[nummodes].width == modelist[i].width)   &&
 							(modelist[nummodes].height == modelist[i].height) &&
 							(modelist[nummodes].bpp == modelist[i].bpp))
 						{
-							existingmode = 1;
+							existingmode = true;
 							break;
 						}
 					}
