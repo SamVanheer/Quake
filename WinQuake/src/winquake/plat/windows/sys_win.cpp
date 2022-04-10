@@ -26,7 +26,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "conproc.h"
 #include <VersionHelpers.h>
 
+#define SDL_MAIN_HANDLED
+#include <SDL.h>
 #include <SDL_events.h>
+#include <SDL_main.h>
 
 #define MINIMUM_WIN_MEMORY		0x0880000
 #define MAXIMUM_WIN_MEMORY		0x1000000
@@ -656,6 +659,9 @@ int WINAPI WinMain (_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	static	char	cwd[1024];
 	int				t;
 
+	//TODO: need to rework this so SDL2's setup code is used instead.
+	SDL_SetMainReady();
+
 	HANDLE mutex;
 
 	mutex = CreateMutexA(nullptr, TRUE, "Quake1Mutex");
@@ -823,6 +829,8 @@ int WINAPI WinMain (_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 	ReleaseMutex(mutex);
 	mutex = nullptr;
+
+	SDL_Quit();
 
     /* return success of application */
     return TRUE;
