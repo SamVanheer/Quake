@@ -48,7 +48,6 @@ typedef struct surfcache_s
 	byte				data[4];	// width*height elements
 } surfcache_t;
 
-// !!! if this is changed, it must be changed in asm_draw.h too !!!
 typedef struct sspan_s
 {
 	int				u, v, count;
