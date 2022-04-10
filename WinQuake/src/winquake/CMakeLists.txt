@@ -4,6 +4,10 @@
 
 find_package(OpenGL REQUIRED)
 
+add_subdirectory(../../external/SDL2
+	SDL2-binary-dir
+	EXCLUDE_FROM_ALL)
+
 set(WINQUAKE_RENDERER "OpenGL" CACHE STRING "Renderer to use")
 set_property(CACHE WINQUAKE_RENDERER PROPERTY STRINGS Software OpenGL)
 
@@ -121,7 +125,8 @@ target_link_libraries(winquake PRIVATE
 	$<$<CXX_COMPILER_ID:MSVC>:winmm>
 	$<$<CXX_COMPILER_ID:MSVC>:wsock32>
 	$<$<CXX_COMPILER_ID:MSVC>:comctl32>
-	$<$<CXX_COMPILER_ID:MSVC>:${CMAKE_SOURCE_DIR}/external/dxsdk/sdk/lib/dxguid.lib>)
+	$<$<CXX_COMPILER_ID:MSVC>:${CMAKE_SOURCE_DIR}/external/dxsdk/sdk/lib/dxguid.lib>
+	SDL2::SDL2)
 
 if(RENDERER_IS_SOFTWARE)
 	target_link_libraries(winquake PRIVATE
@@ -165,6 +170,9 @@ if (UNIX)
 		PRIVATE
 			-Wno-write-strings)
 endif()
+
+install(TARGETS SDL2
+	RUNTIME DESTINATION .)
 
 install(TARGETS winquake
 	RUNTIME DESTINATION .)
