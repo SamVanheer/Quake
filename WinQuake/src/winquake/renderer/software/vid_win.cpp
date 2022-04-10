@@ -2142,9 +2142,6 @@ void	VID_Init (unsigned char *palette)
 		vid_default = windowed_default;
 	}
 
-	if (hwnd_dialog)
-		DestroyWindow (hwnd_dialog);
-
 // sound initialization has to go here, preceded by a windowed mode set,
 // so there's a window for DirectSound to work with but we're not yet
 // fullscreen so the "hardware already in use" dialog is visible if it
@@ -2187,9 +2184,6 @@ void	VID_Shutdown (void)
 		DestroyDIBWindow ();
 		DestroyFullscreenWindow ();
 		DestroyFullDIBWindow ();
-
-		if (hwnd_dialog)
-			DestroyWindow (hwnd_dialog);
 
 		if (mainwindow)
 			DestroyWindow(mainwindow);
