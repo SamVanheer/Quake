@@ -24,6 +24,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "resource.h"
 #include <commctrl.h>
 
+#include <SDL.h>
+
 #define MAX_MODE_LIST	30
 #define VID_ROW_SIZE	3
 #define WARP_WIDTH		320
@@ -1570,6 +1572,11 @@ void	VID_Init (unsigned char *palette)
 	DEVMODE	devmode;
 
 	memset(&devmode, 0, sizeof(devmode));
+
+	if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
+	{
+		Sys_Error("Couldn't initialize video subsystem: %s", SDL_GetError());
+	}
 
 	Cvar_RegisterVariable (&vid_mode);
 	Cvar_RegisterVariable (&vid_wait);

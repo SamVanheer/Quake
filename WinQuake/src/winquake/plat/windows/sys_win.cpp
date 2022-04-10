@@ -26,6 +26,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "conproc.h"
 #include <VersionHelpers.h>
 
+#include <SDL_events.h>
+
 #define MINIMUM_WIN_MEMORY		0x0880000
 #define MAXIMUM_WIN_MEMORY		0x1000000
 
@@ -48,7 +50,6 @@ HANDLE				hinput, houtput;
 
 static char			*tracking_tag = "Clams & Mooses";
 
-static HANDLE	tevent;
 static HANDLE	hFile;
 static HANDLE	heventParent;
 static HANDLE	heventChild;
@@ -413,9 +414,6 @@ void Sys_Quit (void)
 
 	Host_Shutdown();
 
-	if (tevent)
-		CloseHandle (tevent);
-
 	if (isDedicated)
 		FreeConsole ();
 
@@ -635,8 +633,7 @@ WinMain
 */
 void SleepUntilInput (int time)
 {
-
-	MsgWaitForMultipleObjects(1, &tevent, FALSE, time, QS_ALLINPUT);
+	SDL_WaitEventTimeout(nullptr, time);
 }
 
 
@@ -745,11 +742,6 @@ int WINAPI WinMain (_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		Sys_Error ("Not enough memory free; check disk space\n");
 
 	Sys_PageIn (parms.membase, parms.memsize);
-
-	tevent = CreateEvent(NULL, FALSE, FALSE, NULL);
-
-	if (!tevent)
-		Sys_Error ("Couldn't create event");
 
 	if (isDedicated)
 	{
