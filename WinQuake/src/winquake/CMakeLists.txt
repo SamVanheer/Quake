@@ -53,6 +53,7 @@ target_sources(winquake
 		menu.cpp
 		menu.h
 		modelgen.h
+		quakedef.h
 		pr_cmds.cpp
 		pr_comp.h
 		pr_edict.cpp

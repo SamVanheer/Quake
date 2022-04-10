@@ -45,7 +45,7 @@ extern void	R_DrawLine (polyvert_t *polyvert0, polyvert_t *polyvert1);
 
 extern int		cachewidth;
 extern pixel_t	*cacheblock;
-extern "C"	int		screenwidth;
+extern int		screenwidth;
 
 extern	float	pixelAspect;
 
@@ -96,7 +96,7 @@ typedef struct surf_s
 	int			pad[2];				// to 64 bytes
 } surf_t;
 
-extern	"C"	surf_t	*surfaces, *surface_p, *surf_max;
+extern surf_t	*surfaces, *surface_p, *surf_max;
 
 // surfaces are generated in back to front order by the bsp, so if a surf
 // pointer is greater than another one, it should be drawn in front
@@ -109,23 +109,23 @@ extern	"C"	surf_t	*surfaces, *surface_p, *surf_max;
 extern vec3_t	sxformaxis[4];	// s axis transformed into viewspace
 extern vec3_t	txformaxis[4];	// t axis transformed into viewspac
 
-extern "C"	vec3_t	modelorg, base_modelorg;
+extern vec3_t	modelorg, base_modelorg;
 
-extern	"C"	float	xcenter, ycenter;
-extern	"C"	float	xscale, yscale;
+extern float	xcenter, ycenter;
+extern float	xscale, yscale;
 extern	float	xscaleinv, yscaleinv;
 extern	float	xscaleshrink, yscaleshrink;
 
 extern	int d_lightstylevalue[256]; // 8.8 frac of base light value
 
-extern "C" void TransformVector (vec3_t in, vec3_t out);
+extern void TransformVector (vec3_t in, vec3_t out);
 extern void SetUpForLineScan(fixed8_t startvertu, fixed8_t startvertv,
 	fixed8_t endvertu, fixed8_t endvertv);
 
 extern int	r_skymade;
 extern void R_MakeSky (void);
 
-extern "C"	int	ubasestep, errorterm, erroradjustup, erroradjustdown;
+extern int	ubasestep, errorterm, erroradjustup, erroradjustdown;
 
 // flags in finalvert_t.flags
 #define ALIAS_LEFT_CLIP				0x0001

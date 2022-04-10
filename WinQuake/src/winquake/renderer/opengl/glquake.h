@@ -162,15 +162,15 @@ extern	int		c_brush_polys, c_alias_polys;
 //
 // view origin
 //
-extern	"C"	vec3_t	vup;
-extern	"C"	vec3_t	vpn;
-extern	"C"	vec3_t	vright;
-extern	"C"	vec3_t	r_origin;
+extern vec3_t	vup;
+extern vec3_t	vpn;
+extern vec3_t	vright;
+extern vec3_t	r_origin;
 
 //
 // screen size info
 //
-extern	"C"	refdef_t	r_refdef;
+extern refdef_t	r_refdef;
 extern	mleaf_t		*r_viewleaf, *r_oldviewleaf;
 extern	texture_t	*r_notexture_mip;
 extern	int		d_lightstylevalue[256];	// 8.8 fraction of base light value
