@@ -22,7 +22,6 @@ target_sources(winquake
 		anorm_dots.h
 		anorms.h
 		bspfile.h
-		cdaudio.h
 		chase.cpp
 		client.h
 		cmd.cpp
@@ -42,16 +41,11 @@ target_sources(winquake
 		draw.h
 		host.cpp
 		host_cmd.cpp
-		$<$<CXX_COMPILER_ID:MSVC>:
-			in_win.cpp
-		>
 		input.h
 		keys.cpp
 		keys.h
 		mathlib.cpp
 		mathlib.h
-		menu.cpp
-		menu.h
 		modelgen.h
 		quakedef.h
 		pr_cmds.cpp
@@ -62,16 +56,7 @@ target_sources(winquake
 		progs.h
 		protocol.h
 		quakedef.h
-		r_part.cpp
-		render.h
-		sbar.cpp
-		sbar.h
-		screen.h
 		server.h
-		snd_dma.cpp
-		snd_mem.cpp
-		snd_mix.cpp
-		sound.h
 		spritegn.h
 		sys.h
 		vid.h
@@ -86,21 +71,20 @@ target_sources(winquake
 		zone.h
 		progdefs.q1
 		progdefs.q2
-		$<$<CXX_COMPILER_ID:MSVC>:
-			cd_win.cpp
-			snd_win.cpp
-			sys_win.cpp
-			winquake.rc
-		>
-		$<$<PLATFORM_ID:Linux>:
-			cd_linux.cpp
-			snd_linux.cpp
-			sys_linux.cpp
-		>)
+		renderer/r_part.cpp
+		renderer/render.h
+		renderer/screen.h
+		$<$<CXX_COMPILER_ID:MSVC>:winquake.rc>)
 
 add_subdirectory(client)
 add_subdirectory(net)
 add_subdirectory(server)
+
+if (MSVC)
+	add_subdirectory(plat/windows)
+else()
+	add_subdirectory(plat/linux)
+endif()
 
 if(RENDERER_IS_SOFTWARE)
 	add_subdirectory(renderer/software)

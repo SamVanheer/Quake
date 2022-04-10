@@ -4,4 +4,13 @@ target_sources(winquake
 		cl_input.cpp
 		cl_main.cpp
 		cl_parse.cpp
-		cl_tent.cpp)
+		cl_tent.cpp
+		sound/cdaudio.h
+		sound/snd_dma.cpp
+		sound/snd_mem.cpp
+		sound/snd_mix.cpp
+		sound/sound.h
+		ui/menu.cpp
+		ui/menu.h
+		ui/sbar.cpp
+		ui/sbar.h)
