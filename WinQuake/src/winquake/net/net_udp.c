@@ -29,10 +29,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <sys/ioctl.h>
 #include <errno.h>
 
-#ifdef __sun__
-#include <sys/filio.h>
-#endif
-
 #ifdef NeXT
 #include <libc.h>
 #endif

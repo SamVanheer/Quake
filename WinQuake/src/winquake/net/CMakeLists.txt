@@ -6,7 +6,6 @@ target_sources(winquake
 		net_loop.cpp
 		net_loop.h
 		net_main.cpp
-		net_ser.h
 		net_vcr.cpp
 		net_vcr.h
 		$<$<CXX_COMPILER_ID:MSVC>:

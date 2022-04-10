@@ -39,7 +39,6 @@ target_sources(winquake
 		crc.h
 		cvar.cpp
 		cvar.h
-		dosisms.h
 		draw.h
 		host.cpp
 		host_cmd.cpp
