@@ -34,7 +34,7 @@ cvar_t	m_filter = {"m_filter","0"};
 
 int			mouse_buttons;
 int			mouse_oldbuttonstate;
-POINT		current_pos;
+Point		current_pos;
 int			mouse_x, mouse_y, old_mouse_x, old_mouse_y, mx_accum, my_accum;
 
 static qboolean	restore_spi;
@@ -165,8 +165,10 @@ void IN_ActivateMouse (void)
 
 	if (mouseinitialized)
 	{
+#ifdef WIN32
 		if (mouseparmsvalid)
 			restore_spi = SystemParametersInfo (SPI_SETMOUSE, 0, newmouseparms, 0);
+#endif
 
 		SDL_WarpMouseInWindow(mainwindow, window_center_x, window_center_y);
 		SDL_CaptureMouse(SDL_TRUE);
@@ -200,8 +202,10 @@ void IN_DeactivateMouse (void)
 
 	if (mouseinitialized)
 	{
+#ifdef WIN32
 		if (restore_spi)
 			SystemParametersInfo (SPI_SETMOUSE, 0, originalmouseparms, 0);
+#endif
 
 		SDL_CaptureMouse(SDL_FALSE);
 
@@ -241,7 +245,9 @@ void IN_StartupMouse (void)
 
 	mouseinitialized = true;
 
+#ifdef WIN32
 	mouseparmsvalid = SystemParametersInfo (SPI_GETMOUSE, 0, originalmouseparms, 0);
+#endif
 
 	if (mouseparmsvalid)
 	{
@@ -366,7 +372,7 @@ void IN_MouseMove (usercmd_t *cmd)
 	if (!mouseactive)
 		return;
 
-	SDL_GetMouseState(reinterpret_cast<int*>(&current_pos.x), reinterpret_cast<int*>(&current_pos.y));
+	SDL_GetMouseState(&current_pos.x, &current_pos.y);
 	mx = current_pos.x - window_center_x + mx_accum;
 	my = current_pos.y - window_center_y + my_accum;
 	mx_accum = 0;
@@ -450,7 +456,7 @@ void IN_Accumulate (void)
 {
 	if (mouseactive)
 	{
-		SDL_GetMouseState(reinterpret_cast<int*>(&current_pos.x), reinterpret_cast<int*>(&current_pos.y));
+		SDL_GetMouseState(&current_pos.x, &current_pos.y);
 
 		mx_accum += current_pos.x - window_center_x;
 		my_accum += current_pos.y - window_center_y;
