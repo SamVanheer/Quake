@@ -195,7 +195,11 @@ int	Sys_FileTime (char *path)
 
 void Sys_mkdir (char *path)
 {
-	mkdir(path);
+#ifdef WIN32
+	_mkdir(path);
+#else
+	mkdir(path, 0777);
+#endif
 }
 
 
