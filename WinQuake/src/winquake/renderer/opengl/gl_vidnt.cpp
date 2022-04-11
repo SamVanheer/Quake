@@ -408,27 +408,14 @@ BINDTEXFUNCPTR bindTexFunc;
 
 void CheckTextureExtensions (void)
 {
-	char		*tmp;
-	HINSTANCE	hInstGL;
-
-	bool texture_ext = false;
 	/* check for texture extension */
-	tmp = (char *)glGetString(GL_EXTENSIONS);
-	while (*tmp)
-	{
-		if (strncmp((const char*)tmp, TEXTURE_EXT_STRING, strlen(TEXTURE_EXT_STRING)) == 0)
-			texture_ext = true;
-		tmp++;
-	}
+	auto tmp = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
+
+	const bool texture_ext = strstr(tmp, TEXTURE_EXT_STRING) != nullptr;
 
 	if (!texture_ext || COM_CheckParm ("-gl11") )
 	{
-		hInstGL = LoadLibrary("opengl32.dll");
-		
-		if (hInstGL == NULL)
-			Sys_Error ("Couldn't load opengl32.dll\n");
-
-		bindTexFunc = reinterpret_cast<decltype( bindTexFunc )>( GetProcAddress(hInstGL,"glBindTexture") );
+		bindTexFunc = reinterpret_cast<decltype( bindTexFunc )>(SDL_GL_GetProcAddress("glBindTexture") );
 
 		if (!bindTexFunc)
 			Sys_Error ("No texture objects!");
@@ -437,7 +424,7 @@ void CheckTextureExtensions (void)
 
 /* load library and get procedure adresses for texture extension API */
 	if ((bindTexFunc = (BINDTEXFUNCPTR)
-		SDL_GL_GetProcAddress((LPCSTR) "glBindTextureEXT")) == NULL)
+		SDL_GL_GetProcAddress("glBindTextureEXT")) == NULL)
 	{
 		Sys_Error ("GetProcAddress for BindTextureEXT failed");
 		return;
@@ -1180,7 +1167,7 @@ void VID_DescribeModes_f (void)
 }
 
 
-void VID_InitDIB (HINSTANCE hInstance)
+void VID_InitDIB ()
 {
 	modelist[0].type = MS_WINDOWED;
 
@@ -1230,7 +1217,7 @@ void VID_InitDIB (HINSTANCE hInstance)
 VID_InitFullDIB
 =================
 */
-void VID_InitFullDIB (HINSTANCE hInstance)
+void VID_InitFullDIB ()
 {
 // enumerate >8 bpp modes
 	const int originalnummodes = nummodes;
@@ -1374,10 +1361,10 @@ void	VID_Init (unsigned char *palette)
 	//TODO: replace
 	//hIcon = LoadIcon (global_hInstance, MAKEINTRESOURCE (IDI_ICON2));
 
-	VID_InitDIB (global_hInstance);
+	VID_InitDIB ();
 	basenummodes = nummodes = 1;
 
-	VID_InitFullDIB (global_hInstance);
+	VID_InitFullDIB ();
 
 	if (COM_CheckParm("-window"))
 	{
