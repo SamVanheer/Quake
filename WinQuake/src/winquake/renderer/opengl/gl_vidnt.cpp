@@ -274,9 +274,6 @@ qboolean VID_CreateWindow(int modenum, bool windowed)
 
 int VID_SetMode (int modenum, unsigned char *palette)
 {
-	int				original_mode, temp;
-	qboolean		stat;
-
 	if ((windowed && (modenum != 0)) ||
 		(!windowed && (modenum < 1)) ||
 		(!windowed && (modenum >= nummodes)))
@@ -285,15 +282,12 @@ int VID_SetMode (int modenum, unsigned char *palette)
 	}
 
 // so Con_Printfs don't mess us up by forcing vid and snd updates
-	temp = scr_disabled_for_loading;
+	const int temp = scr_disabled_for_loading;
 	scr_disabled_for_loading = true;
 
 	CDAudio_Pause ();
 
-	if (vid_modenum == NO_MODE)
-		original_mode = windowed_default;
-	else
-		original_mode = vid_modenum;
+	qboolean stat;
 
 	// Set either the fullscreen or windowed mode
 	if (modelist[modenum].type == MS_WINDOWED)
@@ -374,7 +368,6 @@ VID_UpdateWindowStatus
 */
 void VID_UpdateWindowStatus (void)
 {
-
 	window_rect.left = window_x;
 	window_rect.top = window_y;
 	window_rect.right = window_x + window_width;
@@ -514,20 +507,15 @@ void GL_EndRendering (void)
 
 void	VID_SetPalette (unsigned char *palette)
 {
-	byte	*pal;
 	unsigned r,g,b;
 	unsigned v;
-	int     r1,g1,b1;
-	int		j,k,l;
-	unsigned short i;
-	unsigned	*table;
 
 //
 // 8 8 8 encoding
 //
-	pal = palette;
-	table = d_8to24table;
-	for (i=0 ; i<256 ; i++)
+	byte* pal = palette;
+	unsigned* table = d_8to24table;
+	for (int i=0 ; i<256 ; i++)
 	{
 		r = pal[0];
 		g = pal[1];
@@ -541,9 +529,12 @@ void	VID_SetPalette (unsigned char *palette)
 	}
 	d_8to24table[255] &= 0xffffff;	// 255 is transparent
 
+	int r1, g1, b1;
+	int j, k, l;
+
 	// JACK: 3D distance calcs - k is last closest, l is the distance.
 	// FIXME: Precalculate this and cache to disk.
-	for (i=0; i < (1<<15); i++) {
+	for (unsigned short i=0; i < (1<<15); i++) {
 		/* Maps
 			000000000000000
 			000000000011111 = Red  = 0x1F
@@ -712,10 +703,8 @@ ClearAllStates
 */
 void ClearAllStates (void)
 {
-	int		i;
-	
 // send an up event for each key, to make sure the server clears them all
-	for (i=0 ; i<256 ; i++)
+	for (int i=0 ; i<256 ; i++)
 	{
 		Key_Event (i, false);
 	}
@@ -953,27 +942,20 @@ VID_GetModeDescription
 */
 char *VID_GetModeDescription (int mode)
 {
-	char		*pinfo;
-	vmode_t		*pv;
-	static char	temp[100];
-
 	if ((mode < 0) || (mode >= nummodes))
 		return NULL;
 
 	if (!leavecurrentmode)
 	{
-		pv = VID_GetModePtr (mode);
-		pinfo = pv->modedesc;
-	}
-	else
-	{
-		sprintf (temp, "Desktop resolution (%dx%d)",
-				 modelist[MODE_FULLSCREEN_DEFAULT].width,
-				 modelist[MODE_FULLSCREEN_DEFAULT].height);
-		pinfo = temp;
+		auto pv = VID_GetModePtr (mode);
+		return pv->modedesc;
 	}
 
-	return pinfo;
+	static char	temp[100];
+	sprintf (temp, "Desktop resolution (%dx%d)",
+				modelist[MODE_FULLSCREEN_DEFAULT].width,
+				modelist[MODE_FULLSCREEN_DEFAULT].height);
+	return temp;
 }
 
 
@@ -981,13 +963,12 @@ char *VID_GetModeDescription (int mode)
 
 char *VID_GetExtModeDescription (int mode)
 {
-	static char	pinfo[40];
-	vmode_t		*pv;
-
 	if ((mode < 0) || (mode >= nummodes))
 		return NULL;
 
-	pv = VID_GetModePtr (mode);
+	static char	pinfo[40];
+
+	auto pv = VID_GetModePtr (mode);
 	if (modelist[mode].type == MS_FULLDIB)
 	{
 		if (!leavecurrentmode)
@@ -1046,11 +1027,9 @@ VID_DescribeMode_f
 */
 void VID_DescribeMode_f (void)
 {
-	int		t, modenum;
-	
-	modenum = Q_atoi (Cmd_Argv(1));
+	const int modenum = Q_atoi (Cmd_Argv(1));
 
-	t = leavecurrentmode;
+	const qboolean t = leavecurrentmode;
 	leavecurrentmode = 0;
 
 	Con_Printf ("%s\n", VID_GetExtModeDescription (modenum));
@@ -1066,19 +1045,14 @@ VID_DescribeModes_f
 */
 void VID_DescribeModes_f (void)
 {
-	int			i, lnummodes, t;
-	char		*pinfo;
-	vmode_t		*pv;
+	const int lnummodes = VID_NumModes ();
 
-	lnummodes = VID_NumModes ();
-
-	t = leavecurrentmode;
+	const qboolean t = leavecurrentmode;
 	leavecurrentmode = 0;
 
-	for (i=1 ; i<lnummodes ; i++)
+	for (int i=1 ; i<lnummodes ; i++)
 	{
-		pv = VID_GetModePtr (i);
-		pinfo = VID_GetExtModeDescription (i);
+		auto pinfo = VID_GetExtModeDescription (i);
 		Con_Printf ("%2d: %s\n", i, pinfo);
 	}
 
@@ -1217,11 +1191,7 @@ qboolean VID_Is8bit() {
 
 static void Check_Gamma (unsigned char *pal)
 {
-	float	f, inf;
-	unsigned char	palette[768];
-	int		i;
-
-	if ((i = COM_CheckParm("-gamma")) == 0) {
+	if (int i = COM_CheckParm("-gamma"); i == 0) {
 		if ((gl_renderer && strstr(gl_renderer, "Voodoo")) ||
 			(gl_vendor && strstr(gl_vendor, "3Dfx")))
 			vid_gamma = 1;
@@ -1230,7 +1200,10 @@ static void Check_Gamma (unsigned char *pal)
 	} else
 		vid_gamma = Q_atof(com_argv[i+1]);
 
-	for (i=0 ; i<768 ; i++)
+	float	f, inf;
+	unsigned char	palette[768];
+
+	for (int i=0 ; i<768 ; i++)
 	{
 		f = pow ( (pal[i]+1)/256.0 , vid_gamma );
 		inf = f*255 + 0.5;
@@ -1565,23 +1538,17 @@ VID_MenuDraw
 */
 void VID_MenuDraw (void)
 {
-	qpic_t		*p;
-	char		*ptr;
-	int			lnummodes, i, k, column, row;
-	vmode_t		*pv;
-
-	p = Draw_CachePic ("gfx/vidmodes.lmp");
+	auto p = Draw_CachePic ("gfx/vidmodes.lmp");
 	M_DrawPic ( (320-p->width)/2, 4, p);
 
 	vid_wmodes = 0;
-	lnummodes = VID_NumModes ();
+	const int lnummodes = VID_NumModes ();
 	
-	for (i=1 ; (i<lnummodes) && (vid_wmodes < MAX_MODEDESCS) ; i++)
+	for (int i=1 ; (i<lnummodes) && (vid_wmodes < MAX_MODEDESCS) ; i++)
 	{
-		ptr = VID_GetModeDescription (i);
-		pv = VID_GetModePtr (i);
+		auto ptr = VID_GetModeDescription (i);
 
-		k = vid_wmodes;
+		const int k = vid_wmodes;
 
 		modedescs[k].modenum = i;
 		modedescs[k].desc = ptr;
@@ -1598,10 +1565,10 @@ void VID_MenuDraw (void)
 	{
 		M_Print (2*8, 36+0*8, "Fullscreen Modes (WIDTHxHEIGHTxBPP)");
 
-		column = 8;
-		row = 36+2*8;
+		int column = 8;
+		int row = 36+2*8;
 
-		for (i=0 ; i<vid_wmodes ; i++)
+		for (int i=0 ; i<vid_wmodes ; i++)
 		{
 			if (modedescs[i].iscur)
 				M_PrintWhite (column, row, modedescs[i].desc);
