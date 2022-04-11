@@ -56,8 +56,6 @@ extern qboolean	mouseinitialized;
 
 extern HANDLE	hinput, houtput;
 
-void VID_SetDefaultMode (void);
-
 extern int (PASCAL FAR *pWSAStartup)(WORD wVersionRequired, LPWSADATA lpWSAData);
 extern int (PASCAL FAR *pWSACleanup)(void);
 extern int (PASCAL FAR *pWSAGetLastError)(void);
