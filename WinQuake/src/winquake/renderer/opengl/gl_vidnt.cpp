@@ -214,6 +214,18 @@ static void ClearWindowToBlack(SDL_Window* window)
 
 qboolean VID_CreateWindow(int modenum, bool windowed)
 {
+	//Configure OpenGL parameters.
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
+
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+
 	modestate = windowed ? MS_WINDOWED : MS_FULLDIB;
 
 	WindowRect.top = WindowRect.left = 0;
@@ -1091,27 +1103,6 @@ void VID_InitDIB ()
 
 	nummodes = 1;
 
-	//Configure OpenGL parameters.
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-}
-
-
-/*
-=================
-VID_InitFullDIB
-=================
-*/
-void VID_InitFullDIB ()
-{
 	// enumerate >=24 bpp modes
 	const int originalnummodes = nummodes;
 
@@ -1182,7 +1173,7 @@ void VID_InitFullDIB ()
 	//Low-res mode search removed because SDL2 does not provide APIs to test for them.
 
 	if (nummodes == originalnummodes)
-		Con_SafePrintf ("No fullscreen DIB modes found\n");
+		Con_SafePrintf("No fullscreen DIB modes found\n");
 }
 
 qboolean VID_Is8bit() {
@@ -1247,7 +1238,6 @@ void	VID_Init (unsigned char *palette)
 	Cmd_AddCommand ("vid_describemodes", VID_DescribeModes_f);
 
 	VID_InitDIB ();
-	VID_InitFullDIB ();
 
 	if (COM_CheckParm("-window"))
 	{
