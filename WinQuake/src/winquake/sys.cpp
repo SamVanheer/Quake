@@ -96,55 +96,39 @@ int		findhandle (void)
 filelength
 ================
 */
-int filelength (FILE *f)
+long filelength (FILE *f)
 {
-	int		pos;
-	int		end;
-
-	pos = ftell (f);
+	const long pos = ftell (f);
 	fseek (f, 0, SEEK_END);
-	end = ftell (f);
+	const long end = ftell (f);
 	fseek (f, pos, SEEK_SET);
 
 	return end;
 }
 
-int Sys_FileOpenRead (char *path, int *hndl)
+long Sys_FileOpenRead (char *path, int *hndl)
 {
-	FILE	*f;
-	int		i, retval;
+	const int i = findhandle ();
 
-	i = findhandle ();
-
-	f = fopen(path, "rb");
-
-	if (!f)
-	{
-		*hndl = -1;
-		retval = -1;
-	}
-	else
+	if (auto f = fopen(path, "rb"); f)
 	{
 		sys_handles[i] = f;
 		*hndl = i;
-		retval = filelength(f);
+		return filelength(f);
 	}
 
-	return retval;
+	*hndl = -1;
+	return -1;
 }
 
 int Sys_FileOpenWrite (char *path)
 {
-	FILE	*f;
-	int		i;
-	
-	i = findhandle ();
+	const int i = findhandle ();
 
-	f = fopen(path, "wb");
+	auto f = fopen(path, "wb");
 	if (!f)
 		Sys_Error ("Error opening %s: %s", path,strerror(errno));
 	sys_handles[i] = f;
-
 
 	return i;
 }
@@ -162,18 +146,12 @@ void Sys_FileSeek (int handle, int position)
 
 int Sys_FileRead (int handle, void *dest, int count)
 {
-	int		x;
-
-	x = fread (dest, 1, count, sys_handles[handle]);
-	return x;
+	return fread (dest, 1, count, sys_handles[handle]);
 }
 
 int Sys_FileWrite (int handle, const void *data, int count)
 {
-	int		x;
-
-	x = fwrite (data, 1, count, sys_handles[handle]);
-	return x;
+	return fwrite (data, 1, count, sys_handles[handle]);
 }
 
 time_t Sys_FileTime (char *path)
@@ -326,6 +304,7 @@ void Sys_Quit (void)
 	DeinitConProc ();
 #endif
 
+	fflush(stdout);
 	exit (0);
 }
 
