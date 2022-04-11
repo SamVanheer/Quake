@@ -73,8 +73,6 @@ extern qboolean	mouseinitialized;
 
 extern HANDLE	hinput, houtput;
 
-void IN_UpdateClipCursor (void);
-
 void S_BlockSound (void);
 void S_UnblockSound (void);
 

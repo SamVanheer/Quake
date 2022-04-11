@@ -24,6 +24,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "winquake.h"
 
+#include <SDL_mouse.h>
+
 // mouse variables
 cvar_t	m_filter = {"m_filter","0"};
 
@@ -35,7 +37,6 @@ int			mouse_x, mouse_y, old_mouse_x, old_mouse_y, mx_accum, my_accum;
 static qboolean	restore_spi;
 static int		originalmouseparms[3], newmouseparms[3] = {0, 0, 1};
 
-unsigned int uiWheelMessage;
 qboolean	mouseactive;
 qboolean		mouseinitialized;
 static qboolean	mouseparmsvalid, mouseactivatetoggle;
@@ -117,6 +118,8 @@ void IN_StartupJoystick (void);
 void Joy_AdvancedUpdate_f (void);
 void IN_JoyMove (usercmd_t *cmd);
 
+//TODO: clip mouse in window somehow
+
 
 /*
 ===========
@@ -128,22 +131,6 @@ void Force_CenterView_f (void)
 	cl.viewangles[PITCH] = 0;
 }
 
-
-/*
-===========
-IN_UpdateClipCursor
-===========
-*/
-void IN_UpdateClipCursor (void)
-{
-
-	if (mouseinitialized && mouseactive)
-	{
-		ClipCursor (&window_rect);
-	}
-}
-
-
 /*
 ===========
 IN_ShowMouse
@@ -154,7 +141,7 @@ void IN_ShowMouse (void)
 
 	if (!mouseshowtoggle)
 	{
-		ShowCursor (TRUE);
+		SDL_ShowCursor(SDL_ENABLE);
 		mouseshowtoggle = 1;
 	}
 }
@@ -170,7 +157,7 @@ void IN_HideMouse (void)
 
 	if (mouseshowtoggle)
 	{
-		ShowCursor (FALSE);
+		SDL_ShowCursor(SDL_DISABLE);
 		mouseshowtoggle = 0;
 	}
 }
@@ -191,9 +178,8 @@ void IN_ActivateMouse (void)
 		if (mouseparmsvalid)
 			restore_spi = SystemParametersInfo (SPI_SETMOUSE, 0, newmouseparms, 0);
 
-		SetCursorPos (window_center_x, window_center_y);
+		SDL_WarpMouseInWindow(mainwindow, window_center_x, window_center_y);
 		SDL_CaptureMouse(SDL_TRUE);
-		ClipCursor (&window_rect);
 
 		mouseactive = true;
 	}
@@ -227,8 +213,7 @@ void IN_DeactivateMouse (void)
 		if (restore_spi)
 			SystemParametersInfo (SPI_SETMOUSE, 0, originalmouseparms, 0);
 
-		ClipCursor (NULL);
-		ReleaseCapture ();
+		SDL_CaptureMouse(SDL_FALSE);
 
 		mouseactive = false;
 	}
@@ -250,8 +235,8 @@ void IN_RestoreOriginalMouseState (void)
 
 // try to redraw the cursor so it gets reinitialized, because sometimes it
 // has garbage after the mode switch
-	ShowCursor (TRUE);
-	ShowCursor (FALSE);
+	SDL_ShowCursor(SDL_ENABLE);
+	SDL_ShowCursor(SDL_DISABLE);
 }
 
 /*
@@ -330,8 +315,6 @@ void IN_Init (void)
 	Cmd_AddCommand ("force_centerview", Force_CenterView_f);
 	Cmd_AddCommand ("joyadvancedupdate", Joy_AdvancedUpdate_f);
 
-	uiWheelMessage = RegisterWindowMessage ( "MSWHEEL_ROLLMSG" );
-
 	IN_StartupMouse ();
 	IN_StartupJoystick ();
 }
@@ -393,7 +376,7 @@ void IN_MouseMove (usercmd_t *cmd)
 	if (!mouseactive)
 		return;
 
-	GetCursorPos (&current_pos);
+	SDL_GetMouseState(reinterpret_cast<int*>(&current_pos.x), reinterpret_cast<int*>(&current_pos.y));
 	mx = current_pos.x - window_center_x + mx_accum;
 	my = current_pos.y - window_center_y + my_accum;
 	mx_accum = 0;
@@ -447,7 +430,7 @@ void IN_MouseMove (usercmd_t *cmd)
 // if the mouse has moved, force it to the center, so there's room to move
 	if (mx || my)
 	{
-		SetCursorPos (window_center_x, window_center_y);
+		SDL_WarpMouseInWindow(mainwindow, window_center_x, window_center_y);
 	}
 }
 
@@ -477,13 +460,13 @@ void IN_Accumulate (void)
 {
 	if (mouseactive)
 	{
-		GetCursorPos (&current_pos);
+		SDL_GetMouseState(reinterpret_cast<int*>(&current_pos.x), reinterpret_cast<int*>(&current_pos.y));
 
 		mx_accum += current_pos.x - window_center_x;
 		my_accum += current_pos.y - window_center_y;
 
 	// force the mouse to the center, so there's room to move
-		SetCursorPos (window_center_x, window_center_y);
+		SDL_WarpMouseInWindow(mainwindow, window_center_x, window_center_y);
 	}
 }
 
