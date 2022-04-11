@@ -32,6 +32,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "winquake.h"
 #include "conproc.h"
 #include <VersionHelpers.h>
+#else
+#include <signal.h>
 #endif
 
 #define SDL_MAIN_HANDLED
@@ -55,12 +57,10 @@ static double curtime = 0.0;
 static double lastcurtime = 0.0;
 
 qboolean			isDedicated;
-static qboolean		sc_return_on_enter = false;
 
 static char			*tracking_tag = "Clams & Mooses";
 
 #ifdef WIN32
-static HANDLE hinput, houtput;
 static HANDLE hFile;
 static HANDLE heventParent;
 static HANDLE heventChild;
@@ -239,10 +239,12 @@ void Sys_Error (char *error, ...)
 		fwrite(text3, sizeof(char), strlen (text3), stdout);
 		fwrite(text4, sizeof(char), strlen (text4), stdout);
 
-		const double starttime = Sys_FloatTime ();
-		sc_return_on_enter = true;	// so Enter will get us out of here
+		fflush(stdout);
 
-		while (!Sys_ConsoleInput () &&
+		const double starttime = Sys_FloatTime ();
+
+		// accept empty input so Enter will get us out of here
+		while (!Sys_ConsoleInput (true) &&
 				((Sys_FloatTime () - starttime) < CONSOLE_ERROR_TIMEOUT))
 		{
 		}
@@ -378,87 +380,58 @@ void Sys_InitFloatTime (void)
 	lastcurtime = curtime;
 }
 
-#ifdef WIN32
-char *Sys_ConsoleInput (void)
+char* Sys_ConsoleInput(bool acceptEmptyInput)
 {
-	static char	text[256];
-	static int		len;
-	INPUT_RECORD	recs;
-	int		ch;
-	DWORD dummy;
-	DWORD numread, numevents;
-
 	if (!isDedicated)
-		return NULL;
+		return nullptr;
 
+	static char	text[256]{};
+	static size_t len = 0;
 
-	for ( ;; )
 	{
-		if (!GetNumberOfConsoleInputEvents (hinput, &numevents))
-			Sys_Error ("Error getting # of console events");
+		char* buffer = text;
+		size_t count = sizeof(text);
 
-		if (numevents <= 0)
-			break;
-
-		if (!ReadConsoleInput(hinput, &recs, 1, &numread))
-			Sys_Error ("Error reading console input");
-
-		if (numread != 1)
-			Sys_Error ("Couldn't read console input");
-
-		if (recs.EventType == KEY_EVENT)
+		if (len > 0)
 		{
-			if (!recs.Event.KeyEvent.bKeyDown)
-			{
-				ch = recs.Event.KeyEvent.uChar.AsciiChar;
+			//Previous unterminated input still in the buffer, try to read additional text.
+			buffer += len;
+			count -= len;
+		}
 
-				switch (ch)
-				{
-					case '\r':
-						WriteFile(houtput, "\r\n", 2, &dummy, NULL);	
-
-						if (len)
-						{
-							text[len] = 0;
-							len = 0;
-							return text;
-						}
-						else if (sc_return_on_enter)
-						{
-						// special case to allow exiting from the error handler on Enter
-							text[0] = '\r';
-							len = 0;
-							return text;
-						}
-
-						break;
-
-					case '\b':
-						WriteFile(houtput, "\b \b", 3, &dummy, NULL);	
-						if (len)
-						{
-							len--;
-						}
-						break;
-
-					default:
-						if (ch >= ' ')
-						{
-							WriteFile(houtput, &ch, 1, &dummy, NULL);	
-							text[len] = ch;
-							len = (len + 1) & 0xff;
-						}
-
-						break;
-
-				}
-			}
+		if (!fgets(buffer, count, stdin))
+		{
+			//No input was read, or some error occurred.
+			return nullptr;
 		}
 	}
 
-	return NULL;
+	len = strlen(text);
+
+	if (const char end = text[len - 1]; end == '\n' || end == '\r')
+	{
+		//It's a complete line. Return command and clear buffer for next input.
+		text[len - 1] = '\0';
+		len = 0;
+
+		if (text[0] != '\0' || acceptEmptyInput)
+		{
+			return text;
+		}
+
+		return nullptr;
+	}
+
+	if (len + 1 >= sizeof(text))
+	{
+		//Input too large, wipe contents and start over. (matches original behavior on Windows)
+		memset(text, 0, sizeof(text));
+		len = 0;
+	}
+
+	//Incomplete line.
+	return nullptr;
 }
-#endif
 
 void Sys_Sleep (void)
 {
@@ -559,8 +532,13 @@ int EngineMain (int argc, char* argv[])
 			Sys_Error ("Couldn't create dedicated server console");
 		}
 
-		hinput = GetStdHandle (STD_INPUT_HANDLE);
-		houtput = GetStdHandle (STD_OUTPUT_HANDLE);
+		//Since we're allocating the console ourselves in a GUI program
+		//we need to re-open these streams so we can use the handles.
+		{
+			FILE* stream;
+			freopen_s(&stream, "CONOUT$", "w", stdout);
+			freopen_s(&stream, "CONIN$", "r", stdin);
+		}
 
 	// give QHOST a chance to hook into the console
 		if (int t = COM_CheckParm("-HFILE"); t > 0)
@@ -605,7 +583,10 @@ int EngineMain (int argc, char* argv[])
 			newtime = Sys_FloatTime ();
 			time = newtime - oldtime;
 
-			while (time < sys_ticrate.value )
+			extern int vcrFile;
+			extern int recording;
+
+			while (time < sys_ticrate.value && (vcrFile == -1 || recording))
 			{
 				Sys_Sleep();
 				newtime = Sys_FloatTime ();
@@ -684,5 +665,35 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 	//Translate regular main return values to WinMain return values.
 	return result != 0 ? 0 : 1;
+}
+#else
+void signal_handler(int sig)
+{
+	printf("Received signal %d, exiting...\n", sig);
+	Sys_Quit();
+	exit(0);
+}
+
+void InitSig()
+{
+	signal(SIGHUP, signal_handler);
+	signal(SIGINT, signal_handler);
+	signal(SIGQUIT, signal_handler);
+	signal(SIGILL, signal_handler);
+	signal(SIGTRAP, signal_handler);
+	signal(SIGIOT, signal_handler);
+	signal(SIGBUS, signal_handler);
+	signal(SIGFPE, signal_handler);
+	signal(SIGSEGV, signal_handler);
+	signal(SIGTERM, signal_handler);
+}
+
+int main(int argc, char* argv[])
+{
+	InitSig();
+
+	const int result = EngineMain(argc, argv);
+
+	return result;
 }
 #endif

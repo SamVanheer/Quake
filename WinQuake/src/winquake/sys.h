@@ -51,7 +51,7 @@ void Sys_Quit (void);
 
 double Sys_FloatTime (void);
 
-char *Sys_ConsoleInput (void);
+char *Sys_ConsoleInput (bool acceptEmptyInput = false);
 
 void Sys_Sleep (void);
 // called to yield for a little bit so as
