@@ -388,36 +388,6 @@ void VID_UpdateWindowStatus (void)
 
 //====================================
 
-BINDTEXFUNCPTR bindTexFunc;
-
-#define TEXTURE_EXT_STRING "GL_EXT_texture_object"
-
-
-void CheckTextureExtensions (void)
-{
-	/* check for texture extension */
-	auto tmp = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
-
-	const bool texture_ext = strstr(tmp, TEXTURE_EXT_STRING) != nullptr;
-
-	if (!texture_ext || COM_CheckParm ("-gl11") )
-	{
-		bindTexFunc = reinterpret_cast<decltype( bindTexFunc )>(SDL_GL_GetProcAddress("glBindTexture") );
-
-		if (!bindTexFunc)
-			Sys_Error ("No texture objects!");
-		return;
-	}
-
-/* load library and get procedure adresses for texture extension API */
-	if ((bindTexFunc = (BINDTEXFUNCPTR)
-		SDL_GL_GetProcAddress("glBindTextureEXT")) == NULL)
-	{
-		Sys_Error ("GetProcAddress for BindTextureEXT failed");
-		return;
-	}
-}
-
 //int		texture_mode = GL_NEAREST;
 //int		texture_mode = GL_NEAREST_MIPMAP_NEAREST;
 //int		texture_mode = GL_NEAREST_MIPMAP_LINEAR;
@@ -469,7 +439,6 @@ void GL_Init (void)
     if (strnicmp(gl_renderer,"Permedia",8)==0)
          isPermedia = true;
 
-	CheckTextureExtensions ();
 	CheckMultiTextureExtensions ();
 
 	glClearColor (1,0,0,0);
