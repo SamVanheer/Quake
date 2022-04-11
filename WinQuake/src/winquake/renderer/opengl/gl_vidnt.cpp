@@ -89,7 +89,7 @@ extern qboolean	mouseactive;  // from in_win.c
 int			DIBWidth, DIBHeight;
 RECT		WindowRect;
 
-SDL_Window*	mainwindow, * dibwindow;
+SDL_Window*	mainwindow;
 
 int			vid_modenum = NO_MODE;
 int			vid_realmode;
@@ -247,19 +247,19 @@ qboolean VID_CreateWindow(int modenum, bool windowed)
 		flags |= SDL_WINDOW_FULLSCREEN;
 	}
 
-	dibwindow = SDL_CreateWindow("GLQuake", rect.left, rect.top, width, height, flags);
+	mainwindow = SDL_CreateWindow("GLQuake", rect.left, rect.top, width, height, flags);
 
-	if (!dibwindow)
+	if (!mainwindow)
 		Sys_Error("Couldn't create DIB window");
 
 	if (windowed)
 	{
-		CenterWindow(dibwindow);
+		CenterWindow(mainwindow);
 	}
 
-	SDL_ShowWindow(dibwindow);
+	SDL_ShowWindow(mainwindow);
 
-	ClearWindowToBlack(dibwindow);
+	ClearWindowToBlack(mainwindow);
 
 	if (vid.conheight > static_cast<unsigned int>(modelist[modenum].height))
 		vid.conheight = modelist[modenum].height;
@@ -276,8 +276,6 @@ qboolean VID_CreateWindow(int modenum, bool windowed)
 		window_x = 0;
 		window_y = 0;
 	}
-
-	mainwindow = dibwindow;
 
 	return true;
 }
