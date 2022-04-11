@@ -68,6 +68,8 @@ extern modestate_t	modestate;
 extern SDL_Window* mainwindow;
 extern qboolean		ActiveApp, Minimized;
 
+extern int		window_center_x, window_center_y;
+
 void	VID_SetPalette (unsigned char *palette);
 // called at startup and after any gamma correction
 
