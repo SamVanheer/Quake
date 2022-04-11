@@ -131,7 +131,7 @@ void FreeSound (void)
 
 	if (pDS)
 	{
-		pDS->lpVtbl->SetCooperativeLevel (pDS, mainwindow, DSSCL_NORMAL);
+		pDS->lpVtbl->SetCooperativeLevel (pDS, VID_GetWindowHandle(), DSSCL_NORMAL);
 		pDS->lpVtbl->Release(pDS);
 	}
 
@@ -263,7 +263,7 @@ sndinitstat SNDDMA_InitDirect (void)
 		return SIS_FAILURE;
 	}
 
-	if (DS_OK != pDS->lpVtbl->SetCooperativeLevel (pDS, mainwindow, DSSCL_EXCLUSIVE))
+	if (DS_OK != pDS->lpVtbl->SetCooperativeLevel (pDS, VID_GetWindowHandle(), DSSCL_EXCLUSIVE))
 	{
 		Con_SafePrintf ("Set coop level failed\n");
 		FreeSound ();
@@ -338,7 +338,7 @@ sndinitstat SNDDMA_InitDirect (void)
 	}
 	else
 	{
-		if (DS_OK != pDS->lpVtbl->SetCooperativeLevel (pDS, mainwindow, DSSCL_WRITEPRIMARY))
+		if (DS_OK != pDS->lpVtbl->SetCooperativeLevel (pDS, VID_GetWindowHandle(), DSSCL_WRITEPRIMARY))
 		{
 			Con_SafePrintf ("Set coop level failed\n");
 			FreeSound ();

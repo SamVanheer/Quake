@@ -24,6 +24,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <windows.h>
 #define WM_MOUSEWHEEL                   0x020A
 
+#include <SDL_video.h>
+
 #ifndef SERVERONLY
 #include <ddraw.h>
 #include <dsound.h>
@@ -58,7 +60,7 @@ typedef enum {MS_WINDOWED, MS_FULLSCREEN, MS_FULLDIB, MS_UNINIT} modestate_t;
 
 extern modestate_t	modestate;
 
-extern HWND			mainwindow;
+extern SDL_Window* mainwindow;
 extern qboolean		ActiveApp, Minimized;
 
 extern qboolean	WinNT;
@@ -74,6 +76,8 @@ void IN_RestoreOriginalMouseState (void);
 void IN_SetQuakeMouseState (void);
 void IN_MouseEvent (int mstate);
 
+HWND VID_GetWindowHandle();
+
 extern qboolean	winsock_lib_initialized;
 
 extern cvar_t		_windowed_mouse;
@@ -86,7 +90,6 @@ extern qboolean	mouseinitialized;
 extern HANDLE	hinput, houtput;
 
 void IN_UpdateClipCursor (void);
-void CenterWindow(HWND hWndCenter, int width, int height, BOOL lefttopjustify);
 
 void S_BlockSound (void);
 void S_UnblockSound (void);

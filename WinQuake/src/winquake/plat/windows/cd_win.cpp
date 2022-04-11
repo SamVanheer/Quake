@@ -23,7 +23,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <windows.h>
 #include "quakedef.h"
 
-extern	HWND	mainwindow;
+#include "winquake.h"
+
 extern	cvar_t	bgmvolume;
 
 static qboolean cdValid = false;
@@ -158,7 +159,7 @@ void CDAudio_Play(byte track, qboolean looping)
 
     mciPlayParms.dwFrom = MCI_MAKE_TMSF(track, 0, 0, 0);
 	mciPlayParms.dwTo = (mciStatusParms.dwReturn << 8) | track;
-    mciPlayParms.dwCallback = (DWORD)mainwindow;
+    mciPlayParms.dwCallback = (DWORD)VID_GetWindowHandle();
     dwReturn = mciSendCommand(wDeviceID, MCI_PLAY, MCI_NOTIFY | MCI_FROM | MCI_TO, (DWORD)(LPVOID) &mciPlayParms);
 	if (dwReturn)
 	{
@@ -204,7 +205,7 @@ void CDAudio_Pause(void)
 	if (!playing)
 		return;
 
-	mciGenericParms.dwCallback = (DWORD)mainwindow;
+	mciGenericParms.dwCallback = (DWORD)VID_GetWindowHandle();
     if ( ( dwReturn = mciSendCommand(wDeviceID, MCI_PAUSE, 0, (DWORD)(LPVOID) &mciGenericParms) ) != 0 )
 		Con_DPrintf("MCI_PAUSE failed (%i)", dwReturn);
 
@@ -229,7 +230,7 @@ void CDAudio_Resume(void)
 	
     mciPlayParms.dwFrom = MCI_MAKE_TMSF(playTrack, 0, 0, 0);
     mciPlayParms.dwTo = MCI_MAKE_TMSF(playTrack + 1, 0, 0, 0);
-    mciPlayParms.dwCallback = (DWORD)mainwindow;
+    mciPlayParms.dwCallback = (DWORD)VID_GetWindowHandle();
     dwReturn = mciSendCommand(wDeviceID, MCI_PLAY, MCI_TO | MCI_NOTIFY, (DWORD)(LPVOID) &mciPlayParms);
 	if (dwReturn)
 	{

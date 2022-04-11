@@ -25,6 +25,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <commctrl.h>
 
 #include <SDL.h>
+#include <SDL_syswm.h>
+#include <SDL_version.h>
+#include <SDL_video.h>
 
 #define MAX_MODE_LIST	30
 #define VID_ROW_SIZE	3
@@ -76,20 +79,19 @@ static int		nummodes;
 static vmode_t	*pcurrentmode;
 static vmode_t	badmode;
 
-static DEVMODE	gdevmode;
 static qboolean	vid_initialized = false;
 static qboolean	windowed, leavecurrentmode;
 static qboolean vid_canalttab = false;
 static qboolean vid_wassuspended = false;
 static int		windowed_mouse;
 extern qboolean	mouseactive;  // from in_win.c
-static HICON	hIcon;
+//TODO: replace
+//static HICON	hIcon;
 
 int			DIBWidth, DIBHeight;
 RECT		WindowRect;
-DWORD		WindowStyle, ExWindowStyle;
 
-HWND	mainwindow, dibwindow;
+SDL_Window*	mainwindow, * dibwindow;
 
 int			vid_modenum = NO_MODE;
 int			vid_realmode;
@@ -100,14 +102,11 @@ static qboolean fullsbardraw = false;
 
 static float vid_gamma = 1.0;
 
-HGLRC	baseRC;
-HDC		maindc;
+SDL_GLContext GLContext = nullptr;
 
 glvert_t glv;
 
 cvar_t	gl_ztrick = {"gl_ztrick","1"};
-
-HWND WINAPI InitializeWindow (HINSTANCE hInstance, int nCmdShow);
 
 unsigned short	d_8to16table[256];
 unsigned	d_8to24table[256];
@@ -120,17 +119,16 @@ modestate_t	modestate = MS_UNINIT;
 void VID_MenuDraw (void);
 void VID_MenuKey (int key);
 
-LONG WINAPI MainWndProc (HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-void AppActivate(BOOL fActive, BOOL minimize);
+void AppActivate(bool fActive, bool minimize);
 char *VID_GetModeDescription (int mode);
 void ClearAllStates (void);
 void VID_UpdateWindowStatus (void);
 void GL_Init (void);
 
-PROC glArrayElementEXT;
-PROC glColorPointerEXT;
-PROC glTexCoordPointerEXT;
-PROC glVertexPointerEXT;
+void* glArrayElementEXT;
+void* glColorPointerEXT;
+void* glTexCoordPointerEXT;
+void* glVertexPointerEXT;
 
 typedef void (APIENTRY *lp3DFXFUNC) (int, int, int, int, int, const void*);
 lp3DFXFUNC glColorTableEXT;
@@ -155,6 +153,15 @@ cvar_t		_windowed_mouse = {"_windowed_mouse","1", true};
 
 int			window_center_x, window_center_y, window_x, window_y, window_width, window_height;
 RECT		window_rect;
+
+HWND VID_GetWindowHandle()
+{
+	SDL_SysWMinfo wmInfo{};
+	SDL_VERSION(&wmInfo.version);
+	SDL_GetWindowWMInfo(mainwindow, &wmInfo);
+
+	return wmInfo.info.win.window;
+}
 
 // direct draw software compatability stuff
 
@@ -188,119 +195,33 @@ void D_EndDirectRect (int x, int y, int width, int height)
 }
 
 
-void CenterWindow(HWND hWndCenter, int width, int height, BOOL lefttopjustify)
+void CenterWindow(SDL_Window* hWndCenter)
 {
-    int     CenterX, CenterY;
-
-	CenterX = (GetSystemMetrics(SM_CXSCREEN) - width) / 2;
-	CenterY = (GetSystemMetrics(SM_CYSCREEN) - height) / 2;
-	if (CenterX > CenterY*2)
-		CenterX >>= 1;	// dual screens
-	CenterX = (CenterX < 0) ? 0: CenterX;
-	CenterY = (CenterY < 0) ? 0: CenterY;
-	SetWindowPos (hWndCenter, NULL, CenterX, CenterY, 0, 0,
-			SWP_NOSIZE | SWP_NOZORDER | SWP_SHOWWINDOW | SWP_DRAWFRAME);
+	SDL_SetWindowPosition(hWndCenter, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 }
 
-qboolean VID_SetWindowedMode (int modenum)
+static void ClearWindowToBlack(SDL_Window* window)
 {
-	HDC				hdc;
-	int				lastmodestate, width, height;
-	RECT			rect;
+	// because we have set the background brush for the window to NULL
+	// (to avoid flickering when re-sizing the window on the desktop),
+	// we clear the window to black when created, otherwise it will be
+	// empty while Quake starts up.
+	auto renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
 
-	lastmodestate = modestate;
-
-	WindowRect.top = WindowRect.left = 0;
-
-	WindowRect.right = modelist[modenum].width;
-	WindowRect.bottom = modelist[modenum].height;
-
-	DIBWidth = modelist[modenum].width;
-	DIBHeight = modelist[modenum].height;
-
-	WindowStyle = WS_OVERLAPPED | WS_BORDER | WS_CAPTION | WS_SYSMENU |
-				  WS_MINIMIZEBOX;
-	ExWindowStyle = 0;
-
-	rect = WindowRect;
-	AdjustWindowRectEx(&rect, WindowStyle, FALSE, 0);
-
-	width = rect.right - rect.left;
-	height = rect.bottom - rect.top;
-
-	// Create the DIB window
-	dibwindow = CreateWindowEx (
-		 ExWindowStyle,
-		 "WinQuake",
-		 "GLQuake",
-		 WindowStyle,
-		 rect.left, rect.top,
-		 width,
-		 height,
-		 NULL,
-		 NULL,
-		 global_hInstance,
-		 NULL);
-
-	if (!dibwindow)
-		Sys_Error ("Couldn't create DIB window");
-
-	// Center and show the DIB window
-	CenterWindow(dibwindow, WindowRect.right - WindowRect.left,
-				 WindowRect.bottom - WindowRect.top, false);
-
-	ShowWindow (dibwindow, SW_SHOWDEFAULT);
-	UpdateWindow (dibwindow);
-
-	modestate = MS_WINDOWED;
-
-// because we have set the background brush for the window to NULL
-// (to avoid flickering when re-sizing the window on the desktop),
-// we clear the window to black when created, otherwise it will be
-// empty while Quake starts up.
-	hdc = GetDC(dibwindow);
-	PatBlt(hdc,0,0,WindowRect.right,WindowRect.bottom,BLACKNESS);
-	ReleaseDC(dibwindow, hdc);
-
-	if (vid.conheight > static_cast<unsigned int>( modelist[modenum].height ) )
-		vid.conheight = modelist[modenum].height;
-	if (vid.conwidth > static_cast<unsigned int>( modelist[modenum].width ) )
-		vid.conwidth = modelist[modenum].width;
-	vid.width = vid.conwidth;
-	vid.height = vid.conheight;
-
-	vid.numpages = 2;
-
-	mainwindow = dibwindow;
-
-	SendMessage (mainwindow, WM_SETICON, (WPARAM)TRUE, (LPARAM)hIcon);
-	SendMessage (mainwindow, WM_SETICON, (WPARAM)FALSE, (LPARAM)hIcon);
-
-	return true;
-}
-
-
-qboolean VID_SetFullDIBMode (int modenum)
-{
-	HDC				hdc;
-	int				lastmodestate, width, height;
-	RECT			rect;
-
-	if (!leavecurrentmode)
+	if (!renderer)
 	{
-		gdevmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
-		gdevmode.dmBitsPerPel = modelist[modenum].bpp;
-		gdevmode.dmPelsWidth = modelist[modenum].width <<
-							   modelist[modenum].halfscreen;
-		gdevmode.dmPelsHeight = modelist[modenum].height;
-		gdevmode.dmSize = sizeof (gdevmode);
-
-		if (ChangeDisplaySettings (&gdevmode, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
-			Sys_Error ("Couldn't set fullscreen DIB mode");
+		Sys_Error("Couldn't create renderer to clear window: %s", SDL_GetError());
 	}
 
-	lastmodestate = modestate;
-	modestate = MS_FULLDIB;
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+	SDL_RenderClear(renderer);
+	SDL_RenderPresent(renderer);
+	SDL_DestroyRenderer(renderer);
+}
+
+qboolean VID_CreateWindow(int modenum, bool windowed)
+{
+	modestate = windowed ? MS_WINDOWED : MS_FULLDIB;
 
 	WindowRect.top = WindowRect.left = 0;
 
@@ -310,70 +231,64 @@ qboolean VID_SetFullDIBMode (int modenum)
 	DIBWidth = modelist[modenum].width;
 	DIBHeight = modelist[modenum].height;
 
-	WindowStyle = WS_POPUP;
-	ExWindowStyle = 0;
+	RECT rect = WindowRect;
 
-	rect = WindowRect;
-	AdjustWindowRectEx(&rect, WindowStyle, FALSE, 0);
-
-	width = rect.right - rect.left;
-	height = rect.bottom - rect.top;
+	const int width = rect.right - rect.left;
+	const int height = rect.bottom - rect.top;
 
 	// Create the DIB window
-	dibwindow = CreateWindowEx (
-		 ExWindowStyle,
-		 "WinQuake",
-		 "GLQuake",
-		 WindowStyle,
-		 rect.left, rect.top,
-		 width,
-		 height,
-		 NULL,
-		 NULL,
-		 global_hInstance,
-		 NULL);
+	Uint32 flags = SDL_WINDOW_OPENGL;
+
+	if (!windowed)
+	{
+		flags |= SDL_WINDOW_FULLSCREEN;
+	}
+
+	dibwindow = SDL_CreateWindow("GLQuake", rect.left, rect.top, width, height, flags);
 
 	if (!dibwindow)
-		Sys_Error ("Couldn't create DIB window");
+		Sys_Error("Couldn't create DIB window");
 
-	ShowWindow (dibwindow, SW_SHOWDEFAULT);
-	UpdateWindow (dibwindow);
+	if (windowed)
+	{
+		CenterWindow(dibwindow);
+	}
 
-	// Because we have set the background brush for the window to NULL
-	// (to avoid flickering when re-sizing the window on the desktop), we
-	// clear the window to black when created, otherwise it will be
-	// empty while Quake starts up.
-	hdc = GetDC(dibwindow);
-	PatBlt(hdc,0,0,WindowRect.right,WindowRect.bottom,BLACKNESS);
-	ReleaseDC(dibwindow, hdc);
+	SDL_ShowWindow(dibwindow);
 
-	if (vid.conheight > static_cast<unsigned int>( modelist[modenum].height ) )
+	ClearWindowToBlack(dibwindow);
+
+	if (vid.conheight > static_cast<unsigned int>(modelist[modenum].height))
 		vid.conheight = modelist[modenum].height;
-	if (vid.conwidth > static_cast<unsigned int>( modelist[modenum].width ) )
+	if (vid.conwidth > static_cast<unsigned int>(modelist[modenum].width))
 		vid.conwidth = modelist[modenum].width;
 	vid.width = vid.conwidth;
 	vid.height = vid.conheight;
 
 	vid.numpages = 2;
 
-// needed because we're not getting WM_MOVE messages fullscreen on NT
-	window_x = 0;
-	window_y = 0;
+	if (!windowed)
+	{
+		// needed because we're not getting WM_MOVE messages fullscreen on NT
+		window_x = 0;
+		window_y = 0;
+	}
 
 	mainwindow = dibwindow;
 
+	//TODO: load icon from disk, set on window
+	/*
 	SendMessage (mainwindow, WM_SETICON, (WPARAM)TRUE, (LPARAM)hIcon);
 	SendMessage (mainwindow, WM_SETICON, (WPARAM)FALSE, (LPARAM)hIcon);
+	*/
 
 	return true;
 }
-
 
 int VID_SetMode (int modenum, unsigned char *palette)
 {
 	int				original_mode, temp;
 	qboolean		stat;
-    MSG				msg;
 
 	if ((windowed && (modenum != 0)) ||
 		(!windowed && (modenum < 1)) ||
@@ -398,7 +313,7 @@ int VID_SetMode (int modenum, unsigned char *palette)
 	{
 		if (_windowed_mouse.value && key_dest == key_game)
 		{
-			stat = VID_SetWindowedMode(modenum);
+			stat = VID_CreateWindow(modenum, true);
 			IN_ActivateMouse ();
 			IN_HideMouse ();
 		}
@@ -406,12 +321,12 @@ int VID_SetMode (int modenum, unsigned char *palette)
 		{
 			IN_DeactivateMouse ();
 			IN_ShowMouse ();
-			stat = VID_SetWindowedMode(modenum);
+			stat = VID_CreateWindow(modenum, true);
 		}
 	}
 	else if (modelist[modenum].type == MS_FULLDIB)
 	{
-		stat = VID_SetFullDIBMode(modenum);
+		stat = VID_CreateWindow(modenum, false);
 		IN_ActivateMouse ();
 		IN_HideMouse ();
 	}
@@ -438,24 +353,18 @@ int VID_SetMode (int modenum, unsigned char *palette)
 // to let messages finish bouncing around the system, then we put
 // ourselves at the top of the z order, then grab the foreground again,
 // Who knows if it helps, but it probably doesn't hurt
-	SetForegroundWindow (mainwindow);
+	SDL_RaiseWindow (mainwindow);
 	VID_SetPalette (palette);
 	vid_modenum = modenum;
 	Cvar_SetValue ("vid_mode", (float)vid_modenum);
 
-	while (PeekMessage (&msg, NULL, 0, 0, PM_REMOVE))
-	{
-      	TranslateMessage (&msg);
-      	DispatchMessage (&msg);
-	}
+	Sys_SendKeyEvents();
 
 	Sleep (100);
 
-	SetWindowPos (mainwindow, HWND_TOP, 0, 0, 0, 0,
-				  SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW |
-				  SWP_NOCOPYBITS);
+	//SDL_SetWindowPosition(mainwindow, 0, 0);
 
-	SetForegroundWindow (mainwindow);
+	SDL_RaiseWindow(mainwindow);
 
 // fix the leftover Alt from any Alt-Tab or the like that switched us away
 	ClearAllStates ();
@@ -500,16 +409,15 @@ BINDTEXFUNCPTR bindTexFunc;
 void CheckTextureExtensions (void)
 {
 	char		*tmp;
-	qboolean	texture_ext;
 	HINSTANCE	hInstGL;
 
-	texture_ext = FALSE;
+	bool texture_ext = false;
 	/* check for texture extension */
 	tmp = (char *)glGetString(GL_EXTENSIONS);
 	while (*tmp)
 	{
 		if (strncmp((const char*)tmp, TEXTURE_EXT_STRING, strlen(TEXTURE_EXT_STRING)) == 0)
-			texture_ext = TRUE;
+			texture_ext = true;
 		tmp++;
 	}
 
@@ -529,7 +437,7 @@ void CheckTextureExtensions (void)
 
 /* load library and get procedure adresses for texture extension API */
 	if ((bindTexFunc = (BINDTEXFUNCPTR)
-		wglGetProcAddress((LPCSTR) "glBindTextureEXT")) == NULL)
+		SDL_GL_GetProcAddress((LPCSTR) "glBindTextureEXT")) == NULL)
 	{
 		Sys_Error ("GetProcAddress for BindTextureEXT failed");
 		return;
@@ -547,10 +455,10 @@ void CheckArrayExtensions (void)
 		if (strncmp((const char*)tmp, "GL_EXT_vertex_array", strlen("GL_EXT_vertex_array")) == 0)
 		{
 			if (
-((glArrayElementEXT = wglGetProcAddress("glArrayElementEXT")) == NULL) ||
-((glColorPointerEXT = wglGetProcAddress("glColorPointerEXT")) == NULL) ||
-((glTexCoordPointerEXT = wglGetProcAddress("glTexCoordPointerEXT")) == NULL) ||
-((glVertexPointerEXT = wglGetProcAddress("glVertexPointerEXT")) == NULL) )
+((glArrayElementEXT = SDL_GL_GetProcAddress("glArrayElementEXT")) == NULL) ||
+((glColorPointerEXT = SDL_GL_GetProcAddress("glColorPointerEXT")) == NULL) ||
+((glTexCoordPointerEXT = SDL_GL_GetProcAddress("glTexCoordPointerEXT")) == NULL) ||
+((glVertexPointerEXT = SDL_GL_GetProcAddress("glVertexPointerEXT")) == NULL) )
 			{
 				Sys_Error ("GetProcAddress for vertex extension failed");
 				return;
@@ -577,8 +485,8 @@ void CheckMultiTextureExtensions(void)
 {
 	if (strstr(gl_extensions, "GL_SGIS_multitexture ") && !COM_CheckParm("-nomtex")) {
 		Con_Printf("Multitexture extensions found.\n");
-		qglMTexCoord2fSGIS = reinterpret_cast<decltype( qglMTexCoord2fSGIS )>( wglGetProcAddress("glMTexCoord2fSGIS") );
-		qglSelectTextureSGIS = reinterpret_cast<decltype( qglSelectTextureSGIS )>( wglGetProcAddress("glSelectTextureSGIS") );
+		qglMTexCoord2fSGIS = reinterpret_cast<decltype( qglMTexCoord2fSGIS )>(SDL_GL_GetProcAddress("glMTexCoord2fSGIS") );
+		qglSelectTextureSGIS = reinterpret_cast<decltype( qglSelectTextureSGIS )>(SDL_GL_GetProcAddress("glSelectTextureSGIS") );
 		gl_mtexable = true;
 	}
 }
@@ -662,8 +570,8 @@ void GL_BeginRendering (int *x, int *y, int *width, int *height)
 	*width = WindowRect.right - WindowRect.left;
 	*height = WindowRect.bottom - WindowRect.top;
 
-//    if (!wglMakeCurrent( maindc, baseRC ))
-//		Sys_Error ("wglMakeCurrent failed");
+//    if (!SDL_GL_MakeCurrent( mainwindow, GLContext ))
+//		Sys_Error ("SDL_GL_MakeCurrent failed");
 
 //	glViewport (*x, *y, *width, *height);
 }
@@ -672,7 +580,7 @@ void GL_BeginRendering (int *x, int *y, int *width, int *height)
 void GL_EndRendering (void)
 {
 	if (!scr_skipupdate || block_drawing)
-		SwapBuffers(maindc);
+		SDL_GL_SwapWindow(mainwindow);
 
 // handle the mouse state when windowed if that's changed
 	if (modestate == MS_WINDOWED)
@@ -754,7 +662,7 @@ void	VID_SetPalette (unsigned char *palette)
 	}
 }
 
-BOOL	gammaworks;
+bool	gammaworks;
 
 void	VID_ShiftPalette (unsigned char *palette)
 {
@@ -762,7 +670,7 @@ void	VID_ShiftPalette (unsigned char *palette)
 	
 //	VID_SetPalette (palette);
 
-//	gammaworks = SetDeviceGammaRamp (maindc, ramps);
+//	gammaworks = SetDeviceGammaRamp (maindc, ramps) != FALSE;
 }
 
 
@@ -774,28 +682,17 @@ void VID_SetDefaultMode (void)
 
 void	VID_Shutdown (void)
 {
-   	HGLRC hRC;
-   	HDC	  hDC;
-
 	if (vid_initialized)
 	{
 		vid_canalttab = false;
-		hRC = wglGetCurrentContext();
-    	hDC = wglGetCurrentDC();
 
-    	wglMakeCurrent(NULL, NULL);
+		SDL_GL_MakeCurrent(nullptr, nullptr);
 
-    	if (hRC)
-    	    wglDeleteContext(hRC);
-
-		if (hDC && dibwindow)
-			ReleaseDC(dibwindow, hDC);
-
-		if (modestate == MS_FULLDIB)
-			ChangeDisplaySettings (NULL, 0);
-
-		if (maindc && dibwindow)
-			ReleaseDC (dibwindow, maindc);
+		if (GLContext)
+		{
+			SDL_GL_DeleteContext(GLContext);
+			GLContext = nullptr;
+		}
 
 		AppActivate(false, false);
 	}
@@ -804,93 +701,6 @@ void	VID_Shutdown (void)
 
 //==========================================================================
 
-
-BOOL bSetupPixelFormat(HDC hDC)
-{
-    static PIXELFORMATDESCRIPTOR pfd = {
-	sizeof(PIXELFORMATDESCRIPTOR),	// size of this pfd
-	1,				// version number
-	PFD_DRAW_TO_WINDOW 		// support window
-	|  PFD_SUPPORT_OPENGL 	// support OpenGL
-	|  PFD_DOUBLEBUFFER ,	// double buffered
-	PFD_TYPE_RGBA,			// RGBA type
-	24,				// 24-bit color depth
-	0, 0, 0, 0, 0, 0,		// color bits ignored
-	0,				// no alpha buffer
-	0,				// shift bit ignored
-	0,				// no accumulation buffer
-	0, 0, 0, 0, 			// accum bits ignored
-	32,				// 32-bit z-buffer	
-	0,				// no stencil buffer
-	0,				// no auxiliary buffer
-	PFD_MAIN_PLANE,			// main layer
-	0,				// reserved
-	0, 0, 0				// layer masks ignored
-    };
-    int pixelformat;
-
-    if ( (pixelformat = ChoosePixelFormat(hDC, &pfd)) == 0 )
-    {
-        MessageBox(NULL, "ChoosePixelFormat failed", "Error", MB_OK);
-        return FALSE;
-    }
-
-    if (SetPixelFormat(hDC, pixelformat, &pfd) == FALSE)
-    {
-        MessageBox(NULL, "SetPixelFormat failed", "Error", MB_OK);
-        return FALSE;
-    }
-
-    return TRUE;
-}
-
-
-
-byte        scantokey[128] = 
-					{ 
-//  0           1       2       3       4       5       6       7 
-//  8           9       A       B       C       D       E       F 
-	0  ,    27,     '1',    '2',    '3',    '4',    '5',    '6', 
-	'7',    '8',    '9',    '0',    '-',    '=',    K_BACKSPACE, 9, // 0 
-	'q',    'w',    'e',    'r',    't',    'y',    'u',    'i', 
-	'o',    'p',    '[',    ']',    13 ,    K_CTRL,'a',  's',      // 1 
-	'd',    'f',    'g',    'h',    'j',    'k',    'l',    ';', 
-	'\'' ,    '`',    K_SHIFT,'\\',  'z',    'x',    'c',    'v',      // 2 
-	'b',    'n',    'm',    ',',    '.',    '/',    K_SHIFT,'*', 
-	K_ALT,' ',   0  ,    K_F1, K_F2, K_F3, K_F4, K_F5,   // 3 
-	K_F6, K_F7, K_F8, K_F9, K_F10, K_PAUSE  ,    0  , K_HOME, 
-	K_UPARROW,K_PGUP,'-',K_LEFTARROW,'5',K_RIGHTARROW,'+',K_END, //4 
-	K_DOWNARROW,K_PGDN,K_INS,K_DEL,0,0,             0,              K_F11, 
-	K_F12,0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 5 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 6 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0         // 7 
-					}; 
-
-byte        shiftscantokey[128] = 
-					{ 
-//  0           1       2       3       4       5       6       7 
-//  8           9       A       B       C       D       E       F 
-	0  ,    27,     '!',    '@',    '#',    '$',    '%',    '^', 
-	'&',    '*',    '(',    ')',    '_',    '+',    K_BACKSPACE, 9, // 0 
-	'Q',    'W',    'E',    'R',    'T',    'Y',    'U',    'I', 
-	'O',    'P',    '{',    '}',    13 ,    K_CTRL,'A',  'S',      // 1 
-	'D',    'F',    'G',    'H',    'J',    'K',    'L',    ':', 
-	'"' ,    '~',    K_SHIFT,'|',  'Z',    'X',    'C',    'V',      // 2 
-	'B',    'N',    'M',    '<',    '>',    '?',    K_SHIFT,'*', 
-	K_ALT,' ',   0  ,    K_F1, K_F2, K_F3, K_F4, K_F5,   // 3 
-	K_F6, K_F7, K_F8, K_F9, K_F10, K_PAUSE  ,    0  , K_HOME, 
-	K_UPARROW,K_PGUP,'_',K_LEFTARROW,'%',K_RIGHTARROW,'+',K_END, //4 
-	K_DOWNARROW,K_PGDN,K_INS,K_DEL,0,0,             0,              K_F11, 
-	K_F12,0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 5 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0,        // 6 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0, 
-	0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0  ,    0         // 7 
-					}; 
-
-
 /*
 =======
 MapKey
@@ -898,14 +708,87 @@ MapKey
 Map from windows to quake keynums
 =======
 */
-int MapKey (int key)
+int MapKey (SDL_Keycode key)
 {
-	key = (key>>16)&255;
-	if (key > 127)
-		return 0;
-	if (scantokey[key] == 0)
+	if (key >= SDLK_a && key <= SDLK_z)
+	{
+		return 'a' + (key - SDLK_a);
+	}
+
+	if (key >= SDLK_F1 && key <= SDLK_F12)
+	{
+		return K_F1 + (key - SDLK_F1);
+	}
+
+	switch (key)
+	{
+	case SDLK_UNKNOWN: return 0;
+	case SDL_KeyCode::SDLK_ESCAPE: return 27;
+
+	case SDLK_1: return '1';
+	case SDLK_2: return '2';
+	case SDLK_3: return '3';
+	case SDLK_4: return '4';
+	case SDLK_5: return '5';
+	case SDLK_6: return '6';
+	case SDLK_7: return '7';
+	case SDLK_8: return '8';
+	case SDLK_9: return '9';
+	case SDLK_0: return '0';
+
+	case SDLK_MINUS: return '-';
+	case SDLK_EQUALS: return '=';
+	case SDLK_BACKSPACE: return K_BACKSPACE;
+
+		//case SDLK_: return 9; //No horizontal tab key in SDL2.
+
+	case SDLK_RETURN: return '\r';
+
+	case SDLK_LCTRL: return K_CTRL;
+	case SDLK_RCTRL: return K_CTRL;
+
+	case SDLK_LSHIFT: return K_SHIFT;
+	case SDLK_RSHIFT: return K_SHIFT;
+
+	case SDLK_LALT: return K_ALT;
+	case SDLK_RALT: return K_ALT;
+
+	case SDLK_SEMICOLON: return ';';
+	case SDLK_COMMA: return ',';
+	case SDLK_PERIOD: return '.';
+
+	case SDLK_QUOTE: return '\'';
+	case SDLK_BACKQUOTE: return '`';
+	case SDLK_BACKSLASH: return '\\';
+	case SDLK_SLASH: return '/';
+
+	case SDLK_KP_MULTIPLY: return '*';
+	case SDLK_PLUS: return '+';
+
+	case SDLK_SPACE: return ' ';
+
+	case SDLK_INSERT: return K_INS;
+	case SDLK_DELETE: return K_DEL;
+
+	case SDLK_HOME: return K_HOME;
+	case SDLK_END: return K_END;
+
+	case SDLK_PAGEUP: return K_PGUP;
+	case SDLK_PAGEDOWN: return K_PGDN;
+
+	case SDLK_PAUSE: return K_PAUSE;
+
+	case SDLK_UP: return K_UPARROW;
+	case SDLK_DOWN: return K_DOWNARROW;
+	case SDLK_RIGHT: return K_RIGHTARROW;
+	case SDLK_LEFT: return K_LEFTARROW;
+
+	default:
+	{
 		Con_DPrintf("key 0x%02x has no translation\n", key);
-	return scantokey[key];
+		return 0;
+	}
+	}
 }
 
 /*
@@ -935,7 +818,7 @@ void ClearAllStates (void)
 	IN_ClearStates ();
 }
 
-void AppActivate(BOOL fActive, BOOL minimize)
+void AppActivate(bool fActive, bool minimize)
 /****************************************************************************
 *
 * Function:     AppActivate
@@ -947,7 +830,7 @@ void AppActivate(BOOL fActive, BOOL minimize)
 *
 ****************************************************************************/
 {
-	static BOOL	sound_active;
+	static bool	sound_active;
 
 	ActiveApp = fActive;
 	Minimized = minimize;
@@ -972,8 +855,7 @@ void AppActivate(BOOL fActive, BOOL minimize)
 			IN_HideMouse ();
 			if (vid_canalttab && vid_wassuspended) {
 				vid_wassuspended = false;
-				ChangeDisplaySettings (&gdevmode, CDS_FULLSCREEN);
-				ShowWindow(mainwindow, SW_SHOWNORMAL);
+				SDL_ShowWindow(mainwindow);
 			}
 		}
 		else if ((modestate == MS_WINDOWED) && _windowed_mouse.value && key_dest == key_game)
@@ -990,7 +872,6 @@ void AppActivate(BOOL fActive, BOOL minimize)
 			IN_DeactivateMouse ();
 			IN_ShowMouse ();
 			if (vid_canalttab) { 
-				ChangeDisplaySettings (NULL, 0);
 				vid_wassuspended = true;
 			}
 		}
@@ -1002,132 +883,134 @@ void AppActivate(BOOL fActive, BOOL minimize)
 	}
 }
 
-LONG CDAudio_MessageHandler( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
-
-/* main window procedure */
-LONG WINAPI MainWndProc (
-    HWND    hWnd,
-    UINT    uMsg,
-    WPARAM  wParam,
-    LPARAM  lParam)
+void VID_ProcessEvent(SDL_Event& event)
 {
-    LONG    lRet = 1;
-	int		fActive, fMinimized, temp;
-	extern unsigned int uiWheelMessage;
+	switch (event.type)
+	{
+	case SDL_WINDOWEVENT:
+	{
+		switch (event.window.event)
+		{
+		case SDL_WINDOWEVENT_MOVED:
+		{
+			window_x = event.window.data1;
+			window_y = event.window.data2;
+			VID_UpdateWindowStatus();
+			break;
+		}
 
-	if ( uMsg == uiWheelMessage )
-		uMsg = WM_MOUSEWHEEL;
-
-    switch (uMsg)
-    {
-		case WM_KILLFOCUS:
-			if (modestate == MS_FULLDIB)
-				ShowWindow(mainwindow, SW_SHOWMINNOACTIVE);
+		case SDL_WINDOWEVENT_RESIZED:
 			break;
 
-		case WM_CREATE:
-			break;
+		case SDL_WINDOWEVENT_FOCUS_GAINED:
+		case SDL_WINDOWEVENT_FOCUS_LOST:
+		{
+			const bool fActive = event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED;
+			const bool fMinimized = false;// (BOOL)HIWORD(wParam); //TODO: figure out if this is even needed.
 
-		case WM_MOVE:
-			window_x = (int) LOWORD(lParam);
-			window_y = (int) HIWORD(lParam);
-			VID_UpdateWindowStatus ();
-			break;
+			if (!fActive)
+				SDL_MinimizeWindow(mainwindow);
 
-		case WM_KEYDOWN:
-		case WM_SYSKEYDOWN:
-			Key_Event (MapKey(lParam), true);
-			break;
-			
-		case WM_KEYUP:
-		case WM_SYSKEYUP:
-			Key_Event (MapKey(lParam), false);
-			break;
+			AppActivate(fActive, fMinimized);
 
-		case WM_SYSCHAR:
-		// keep Alt-Space from happening
-			break;
-
-	// this is complicated because Win32 seems to pack multiple mouse events into
-	// one update sometimes, so we always check all states and look for events
-		case WM_LBUTTONDOWN:
-		case WM_LBUTTONUP:
-		case WM_RBUTTONDOWN:
-		case WM_RBUTTONUP:
-		case WM_MBUTTONDOWN:
-		case WM_MBUTTONUP:
-		case WM_MOUSEMOVE:
-			temp = 0;
-
-			if (wParam & MK_LBUTTON)
-				temp |= 1;
-
-			if (wParam & MK_RBUTTON)
-				temp |= 2;
-
-			if (wParam & MK_MBUTTON)
-				temp |= 4;
-
-			IN_MouseEvent (temp);
+			// fix the leftover Alt from any Alt-Tab or the like that switched us away
+			ClearAllStates();
 
 			break;
+		}
+
+		case SDL_WINDOWEVENT_CLOSE:
+		{
+			constexpr int YesId = 1;
+			constexpr int NoId = 0;
+
+			const SDL_MessageBoxButtonData buttons[2] =
+			{
+				{SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT | SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, NoId, "No"},
+				{0, YesId, "Yes"}
+			};
+
+			const SDL_MessageBoxData data
+			{
+				SDL_MESSAGEBOX_INFORMATION,
+				mainwindow,
+				"Confirm Exit",
+				"Are you sure you want to quit?",
+				sizeof(buttons) / sizeof(buttons[0]),
+				buttons,
+				nullptr
+			};
+
+			int buttonId;
+
+			if (SDL_ShowMessageBox(&data, &buttonId) < 0)
+			{
+				Sys_Error("Error displaying message box: %s", SDL_GetError());
+			}
+
+			if (buttonId == YesId)
+			{
+				Sys_Quit();
+			}
+
+			break;
+		}
+		}
+	}
+
+	case SDL_KEYDOWN:
+		Key_Event(MapKey(event.key.keysym.sym), true);
+		break;
+
+	case SDL_KEYUP:
+		Key_Event(MapKey(event.key.keysym.sym), false);
+		break;
+
+		// this is complicated because Win32 seems to pack multiple mouse events into
+		// one update sometimes, so we always check all states and look for events
+	case SDL_MOUSEBUTTONDOWN:
+	case SDL_MOUSEBUTTONUP:
+	case SDL_MOUSEMOTION:
+	{
+		int temp = 0;
+
+		if (event.button.button == SDL_BUTTON_LEFT)
+			temp |= 1;
+
+		if (event.button.button == SDL_BUTTON_RIGHT)
+			temp |= 2;
+
+		if (event.button.button == SDL_BUTTON_MIDDLE)
+			temp |= 4;
+
+		IN_MouseEvent(temp);
+
+		break;
+	}
 
 		// JACK: This is the mouse wheel with the Intellimouse
 		// Its delta is either positive or neg, and we generate the proper
 		// Event.
-		case WM_MOUSEWHEEL: 
-			if ((short) HIWORD(wParam) > 0) {
-				Key_Event(K_MWHEELUP, true);
-				Key_Event(K_MWHEELUP, false);
-			} else {
-				Key_Event(K_MWHEELDOWN, true);
-				Key_Event(K_MWHEELDOWN, false);
-			}
-			break;
+	case SDL_MOUSEWHEEL:
+		if (event.wheel.y > 0)
+		{
+			Key_Event(K_MWHEELUP, true);
+			Key_Event(K_MWHEELUP, false);
+		}
+		else
+		{
+			Key_Event(K_MWHEELDOWN, true);
+			Key_Event(K_MWHEELDOWN, false);
+		}
+		break;
 
-    	case WM_SIZE:
-            break;
-
-   	    case WM_CLOSE:
-			if (MessageBox (mainwindow, "Are you sure you want to quit?", "Confirm Exit",
-						MB_YESNO | MB_SETFOREGROUND | MB_ICONQUESTION) == IDYES)
-			{
-				Sys_Quit ();
-			}
-
-	        break;
-
-		case WM_ACTIVATE:
-			fActive = LOWORD(wParam);
-			fMinimized = (BOOL) HIWORD(wParam);
-			AppActivate(!(fActive == WA_INACTIVE), fMinimized);
-
-		// fix the leftover Alt from any Alt-Tab or the like that switched us away
-			ClearAllStates ();
-
-			break;
-
-   	    case WM_DESTROY:
-        {
-			if (dibwindow)
-				DestroyWindow (dibwindow);
-
-            PostQuitMessage (0);
-        }
-        break;
-
-		case MM_MCINOTIFY:
-            lRet = CDAudio_MessageHandler (hWnd, uMsg, wParam, lParam);
-			break;
-
-    	default:
-            /* pass all unhandled messages to DefWindowProc */
-            lRet = DefWindowProc (hWnd, uMsg, wParam, lParam);
-        break;
-    }
-
-    /* return 1 if handled message, 0 if not */
-    return lRet;
+	//TODO
+	/*
+	case MM_MCINOTIFY:
+		lRet = CDAudio_MessageHandler(hWnd, uMsg, wParam, lParam);
+		break;
+		*/
+	}
 }
 
 
@@ -1299,23 +1182,6 @@ void VID_DescribeModes_f (void)
 
 void VID_InitDIB (HINSTANCE hInstance)
 {
-	WNDCLASS		wc;
-
-	/* Register the frame class */
-    wc.style         = 0;
-    wc.lpfnWndProc   = (WNDPROC)MainWndProc;
-    wc.cbClsExtra    = 0;
-    wc.cbWndExtra    = 0;
-    wc.hInstance     = hInstance;
-    wc.hIcon         = 0;
-    wc.hCursor       = LoadCursor (NULL,IDC_ARROW);
-	wc.hbrBackground = NULL;
-    wc.lpszMenuName  = 0;
-    wc.lpszClassName = "WinQuake";
-
-    if (!RegisterClass (&wc) )
-		Sys_Error ("Couldn't register window class");
-
 	modelist[0].type = MS_WINDOWED;
 
 	if (COM_CheckParm("-width"))
@@ -1344,6 +1210,18 @@ void VID_InitDIB (HINSTANCE hInstance)
 	modelist[0].bpp = 0;
 
 	nummodes = 1;
+
+	//Configure OpenGL parameters.
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
+
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 }
 
 
@@ -1442,7 +1320,7 @@ void VID_Init8bitPalette()
 	char thePalette[256*3];
 	char *oldPalette, *newPalette;
 
-	glColorTableEXT = reinterpret_cast<decltype( glColorTableEXT )>( wglGetProcAddress("glColorTableEXT") );
+	glColorTableEXT = reinterpret_cast<decltype( glColorTableEXT )>( SDL_GL_GetProcAddress("glColorTableEXT") );
     if (!glColorTableEXT || strstr(gl_extensions, "GL_EXT_shared_texture_palette") ||
 		COM_CheckParm("-no8bit"))
 		return;
@@ -1500,12 +1378,8 @@ VID_Init
 void	VID_Init (unsigned char *palette)
 {
 	int		i;
-	int		basenummodes, width, height, bpp, findbpp, done;
+	int		basenummodes, width, height, bpp, findbpp;
 	char	gldir[MAX_OSPATH];
-	HDC		hdc;
-	DEVMODE	devmode;
-
-	memset(&devmode, 0, sizeof(devmode));
 
 	if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
 	{
@@ -1529,9 +1403,8 @@ void	VID_Init (unsigned char *palette)
 	Cmd_AddCommand ("vid_describemode", VID_DescribeMode_f);
 	Cmd_AddCommand ("vid_describemodes", VID_DescribeModes_f);
 
-	hIcon = LoadIcon (global_hInstance, MAKEINTRESOURCE (IDI_ICON2));
-
-	InitCommonControls();
+	//TODO: replace
+	//hIcon = LoadIcon (global_hInstance, MAKEINTRESOURCE (IDI_ICON2));
 
 	VID_InitDIB (global_hInstance);
 	basenummodes = nummodes = 1;
@@ -1540,15 +1413,6 @@ void	VID_Init (unsigned char *palette)
 
 	if (COM_CheckParm("-window"))
 	{
-		hdc = GetDC (NULL);
-
-		if (GetDeviceCaps(hdc, RASTERCAPS) & RC_PALETTE)
-		{
-			Sys_Error ("Can't run in non-RGB mode");
-		}
-
-		ReleaseDC (NULL, hdc);
-
 		windowed = true;
 
 		vid_default = MODE_WINDOWED;
@@ -1568,11 +1432,17 @@ void	VID_Init (unsigned char *palette)
 		{
 			if (COM_CheckParm("-current"))
 			{
-				modelist[MODE_FULLSCREEN_DEFAULT].width =
-						GetSystemMetrics (SM_CXSCREEN);
-				modelist[MODE_FULLSCREEN_DEFAULT].height =
-						GetSystemMetrics (SM_CYSCREEN);
+				SDL_Rect rect;
+
+				if (SDL_GetDisplayBounds(0, &rect) < 0)
+				{
+					Sys_Error("Couldn't get display bounds: %s", SDL_GetError());
+				}
+
+				modelist[MODE_FULLSCREEN_DEFAULT].width = rect.w - rect.x;
+				modelist[MODE_FULLSCREEN_DEFAULT].height = rect.h - rect.y;
 				vid_default = MODE_FULLSCREEN_DEFAULT;
+
 				leavecurrentmode = 1;
 			}
 			else
@@ -1617,9 +1487,8 @@ void	VID_Init (unsigned char *palette)
 					modelist[nummodes].dib = 1;
 					modelist[nummodes].fullscreen = 1;
 					modelist[nummodes].bpp = bpp;
-					sprintf (modelist[nummodes].modedesc, "%dx%dx%d",
-							 devmode.dmPelsWidth, devmode.dmPelsHeight,
-							 devmode.dmBitsPerPel);
+					//TODO: the devmode variable was always zero initialized so the parameters are also all 0.
+					sprintf (modelist[nummodes].modedesc, "%dx%dx%d", 0, 0, 0);
 
 					bool existingmode = false;
 
@@ -1640,7 +1509,7 @@ void	VID_Init (unsigned char *palette)
 					}
 				}
 
-				done = 0;
+				bool done = false;
 
 				do
 				{
@@ -1655,7 +1524,7 @@ void	VID_Init (unsigned char *palette)
 								(modelist[i].bpp == bpp))
 							{
 								vid_default = i;
-								done = 1;
+								done = true;
 								break;
 							}
 						}
@@ -1667,7 +1536,7 @@ void	VID_Init (unsigned char *palette)
 							if ((modelist[i].width == width) && (modelist[i].bpp == bpp))
 							{
 								vid_default = i;
-								done = 1;
+								done = true;
 								break;
 							}
 						}
@@ -1689,13 +1558,13 @@ void	VID_Init (unsigned char *palette)
 								bpp = 24;
 								break;
 							case 24:
-								done = 1;
+								done = true;
 								break;
 							}
 						}
 						else
 						{
-							done = 1;
+							done = true;
 						}
 					}
 				} while (!done);
@@ -1738,14 +1607,15 @@ void	VID_Init (unsigned char *palette)
 
 	VID_SetMode (vid_default, palette);
 
-    maindc = GetDC(mainwindow);
-	bSetupPixelFormat(maindc);
+	GLContext = SDL_GL_CreateContext(mainwindow);
 
-    baseRC = wglCreateContext( maindc );
-	if (!baseRC)
-		Sys_Error ("Could not initialize GL (wglCreateContext failed).\n\nMake sure you in are 65535 color mode, and try running -window.");
-    if (!wglMakeCurrent( maindc, baseRC ))
-		Sys_Error ("wglMakeCurrent failed");
+	if (!GLContext)
+		Sys_Error (
+			"Could not initialize GL (SDL_GL_CreateContext failed).\n\nMake sure you in are 16 bit color mode, and try running -window.\n%s",
+			SDL_GetError());
+
+    if (SDL_GL_MakeCurrent(mainwindow, GLContext) < 0)
+		Sys_Error ("SDL_GL_MakeCurrent failed: %s", SDL_GetError());
 
 	GL_Init ();
 
