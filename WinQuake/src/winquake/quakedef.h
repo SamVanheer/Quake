@@ -369,3 +369,11 @@ struct Point
 	int x;
 	int y;
 };
+
+struct Rect
+{
+	int left;
+	int right;
+	int top;
+	int bottom;
+};

@@ -94,7 +94,7 @@ static int		windowed_mouse;
 extern qboolean	mouseactive;  // from in_win.c
 
 int			DIBWidth, DIBHeight;
-RECT		WindowRect;
+Rect		WindowRect;
 
 SDL_Window*	mainwindow;
 
@@ -148,7 +148,7 @@ cvar_t		vid_stretch_by_2 = {"vid_stretch_by_2","1", true};
 cvar_t		_windowed_mouse = {"_windowed_mouse","1", true};
 
 int			window_center_x, window_center_y, window_x, window_y, window_width, window_height;
-RECT		window_rect;
+Rect		window_rect;
 
 HWND VID_GetWindowHandle()
 {
@@ -174,7 +174,7 @@ static byte* rgbsoftwareBuffer;
 
 static bool drawdirecttexture = false;
 
-static RECT directexturerect;
+static Rect directtexturerect;
 
 static int lockcount;
 
@@ -324,8 +324,8 @@ void VID_Update(vrect_t* rects)
 
 	if (drawdirecttexture)
 	{
-		drawTexture(SoftwareDirectTextureId, directexturerect.left, directexturerect.top,
-			directexturerect.right - directexturerect.left, directexturerect.bottom - directexturerect.top);
+		drawTexture(SoftwareDirectTextureId, directtexturerect.left, directtexturerect.top,
+			directtexturerect.right - directtexturerect.left, directtexturerect.bottom - directtexturerect.top);
 	}
 
 	glEnd();
@@ -408,10 +408,10 @@ void D_BeginDirectRect(int x, int y, byte* pbitmap, int width, int height)
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, rgbbuffer);
 
-	directexturerect.left = x;
-	directexturerect.top = y;
-	directexturerect.right = x + width;
-	directexturerect.bottom = y + height;
+	directtexturerect.left = x;
+	directtexturerect.top = y;
+	directtexturerect.right = x + width;
+	directtexturerect.bottom = y + height;
 }
 
 void D_EndDirectRect(int x, int y, int width, int height)
@@ -493,7 +493,7 @@ qboolean VID_CreateWindow(int modenum, bool windowed)
 	DIBWidth = modelist[modenum].width;
 	DIBHeight = modelist[modenum].height;
 
-	RECT rect = WindowRect;
+	Rect rect = WindowRect;
 
 	const int width = rect.right - rect.left;
 	const int height = rect.bottom - rect.top;

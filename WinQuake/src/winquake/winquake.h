@@ -52,7 +52,7 @@ extern qboolean	winsock_lib_initialized;
 extern cvar_t		_windowed_mouse;
 
 extern int		window_center_x, window_center_y;
-extern RECT		window_rect;
+extern Rect		window_rect;
 
 extern qboolean	mouseinitialized;
 
