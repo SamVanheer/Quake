@@ -105,8 +105,13 @@ void S_EndPrecaching (void);
 void S_PaintChannels(int endtime);
 void S_InitPaintChannels (void);
 
+#ifdef WIN32
 void S_BlockSound(void);
 void S_UnblockSound(void);
+#else
+#define S_BlockSound()
+#define S_UnblockSound()
+#endif
 
 // picks a channel based on priorities, empty slots, number of channels
 channel_t *SND_PickChannel(int entnum, int entchannel);
