@@ -29,6 +29,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "winquake.h"
 #include "conproc.h"
 #include <VersionHelpers.h>
+#else
+#include <sys/stat.h>
 #endif
 
 #define SDL_MAIN_HANDLED
