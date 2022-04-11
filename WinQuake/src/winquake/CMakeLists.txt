@@ -128,16 +128,6 @@ target_link_libraries(winquake PRIVATE
 	OpenGL::GLU
 	OpenGL::GL)
 
-if(RENDERER_IS_OPENGL)
-
-	if (UNIX)
-		find_package(svgalib REQUIRED)
-	endif()
-	
-	target_link_libraries(winquake PRIVATE
-		$<$<PLATFORM_ID:Linux>:svgalib>)
-endif()
-
 if(MSVC)	
 	target_compile_options(winquake
 		PRIVATE
