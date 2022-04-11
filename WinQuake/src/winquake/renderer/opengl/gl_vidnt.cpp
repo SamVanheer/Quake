@@ -864,6 +864,7 @@ void VID_ProcessEvent(SDL_Event& event)
 		}
 		}
 	}
+	break;
 
 	case SDL_KEYDOWN:
 		Key_Event(MapKey(event.key.keysym.sym), true);
