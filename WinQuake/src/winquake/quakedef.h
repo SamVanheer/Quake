@@ -59,17 +59,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define strnicmp strncasecmp
 #endif
 
-#if defined(_WIN32) && !defined(WINDED)
-
 void	VID_LockBuffer (void);
 void	VID_UnlockBuffer (void);
-
-#else
-
-#define	VID_LockBuffer()
-#define	VID_UnlockBuffer()
-
-#endif
 
 // set to 0 if unaligned accesses are not supported
 #define UNALIGNED_OK	0

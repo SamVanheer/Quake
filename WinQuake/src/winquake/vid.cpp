@@ -23,6 +23,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 
+#ifdef WIN32
+#include "winquake.h"
+#endif
+
 #ifndef GLQUAKE
 #include "renderer/software/d_local.h"
 #endif
@@ -150,6 +154,7 @@ cvar_t		_windowed_mouse = {"_windowed_mouse","1", true};
 int			window_center_x, window_center_y, window_x, window_y, window_width, window_height;
 Rect		window_rect;
 
+#ifdef WIN32
 HWND VID_GetWindowHandle()
 {
 	SDL_SysWMinfo wmInfo{};
@@ -158,6 +163,7 @@ HWND VID_GetWindowHandle()
 
 	return wmInfo.info.win.window;
 }
+#endif
 
 // direct draw software compatability stuff
 
