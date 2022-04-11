@@ -51,7 +51,7 @@ static unsigned int		mstate_di;
 // where should defines be moved?
 #define JOY_ABSOLUTE_AXIS	0x00000000		// control like a joystick
 #define JOY_RELATIVE_AXIS	0x00000010		// control like a mouse, spinner, trackball
-#define	JOY_MAX_AXES		6				// X, Y, Z, R, U, V
+#define	JOY_MAX_AXES		4				// X, Y, Z, R
 enum JoyAxis
 {
 	JOY_AXIS_FIRST	=	0,
