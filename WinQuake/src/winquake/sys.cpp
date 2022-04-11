@@ -60,33 +60,6 @@ void Sys_InitFloatTime (void);
 
 volatile int					sys_checksum;
 
-
-/*
-================
-Sys_PageIn
-================
-*/
-void Sys_PageIn (void *ptr, int size)
-{
-	byte	*x;
-	int		m, n;
-
-// touch all the memory to make sure it's there. The 16-page skip is to
-// keep Win 95 from thinking we're trying to page ourselves in (we are
-// doing that, of course, but there's no reason we shouldn't)
-	x = (byte *)ptr;
-
-	for (n=0 ; n<4 ; n++)
-	{
-		for (m=0 ; m<(size - 16 * 0x1000) ; m += 4)
-		{
-			sys_checksum += *(int *)&x[m];
-			sys_checksum += *(int *)&x[m + 16 * 0x1000];
-		}
-	}
-}
-
-
 /*
 ===============================================================================
 
@@ -690,8 +663,6 @@ int WINAPI WinMain (_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 	if (!parms.membase)
 		Sys_Error ("Not enough memory free; check disk space\n");
-
-	Sys_PageIn (parms.membase, parms.memsize);
 
 	if (isDedicated)
 	{
