@@ -17,4 +17,6 @@ target_sources(winquake
 		>
 		$<$<PLATFORM_ID:Linux>:
 			net_bsd.cpp
+			net_udp.cpp
+			net_udp.h
 		>)
