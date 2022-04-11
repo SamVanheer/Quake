@@ -48,11 +48,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifdef WIN32
 #include <direct.h> //_mkdir
+#else
+#include <strings.h>
 #endif
 
 #ifdef WIN32
 #define strnicmp _strnicmp
 #define unlink _unlink
+#else
+#define strnicmp strncasecmp
 #endif
 
 #if defined(_WIN32) && !defined(WINDED)
