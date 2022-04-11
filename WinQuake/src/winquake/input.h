@@ -36,3 +36,10 @@ void IN_Accumulate( void );
 void IN_ClearStates (void);
 // restores all button and position states to defaults
 
+void IN_ShowMouse(void);
+void IN_DeactivateMouse(void);
+void IN_HideMouse(void);
+void IN_ActivateMouse(void);
+void IN_RestoreOriginalMouseState(void);
+void IN_SetQuakeMouseState(void);
+void IN_MouseEvent(int mstate);

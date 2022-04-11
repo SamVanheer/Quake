@@ -43,22 +43,7 @@ void	VID_UnlockBuffer (void);
 
 #endif
 
-typedef enum {MS_WINDOWED, MS_FULLSCREEN, MS_FULLDIB, MS_UNINIT} modestate_t;
-
-extern modestate_t	modestate;
-
-extern SDL_Window* mainwindow;
-extern qboolean		ActiveApp, Minimized;
-
 extern qboolean	WinNT;
-
-void IN_ShowMouse (void);
-void IN_DeactivateMouse (void);
-void IN_HideMouse (void);
-void IN_ActivateMouse (void);
-void IN_RestoreOriginalMouseState (void);
-void IN_SetQuakeMouseState (void);
-void IN_MouseEvent (int mstate);
 
 HWND VID_GetWindowHandle();
 
@@ -72,9 +57,6 @@ extern RECT		window_rect;
 extern qboolean	mouseinitialized;
 
 extern HANDLE	hinput, houtput;
-
-void S_BlockSound (void);
-void S_UnblockSound (void);
 
 void VID_SetDefaultMode (void);
 
