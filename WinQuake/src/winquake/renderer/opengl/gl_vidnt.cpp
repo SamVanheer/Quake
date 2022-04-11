@@ -87,8 +87,6 @@ static qboolean vid_canalttab = false;
 static qboolean vid_wassuspended = false;
 static int		windowed_mouse;
 extern qboolean	mouseactive;  // from in_win.c
-//TODO: replace
-//static HICON	hIcon;
 
 int			DIBWidth, DIBHeight;
 RECT		WindowRect;
@@ -270,12 +268,6 @@ qboolean VID_CreateWindow(int modenum, bool windowed)
 	}
 
 	mainwindow = dibwindow;
-
-	//TODO: load icon from disk, set on window
-	/*
-	SendMessage (mainwindow, WM_SETICON, (WPARAM)TRUE, (LPARAM)hIcon);
-	SendMessage (mainwindow, WM_SETICON, (WPARAM)FALSE, (LPARAM)hIcon);
-	*/
 
 	return true;
 }
@@ -1315,9 +1307,6 @@ void	VID_Init (unsigned char *palette)
 	Cmd_AddCommand ("vid_describecurrentmode", VID_DescribeCurrentMode_f);
 	Cmd_AddCommand ("vid_describemode", VID_DescribeMode_f);
 	Cmd_AddCommand ("vid_describemodes", VID_DescribeModes_f);
-
-	//TODO: replace
-	//hIcon = LoadIcon (global_hInstance, MAKEINTRESOURCE (IDI_ICON2));
 
 	VID_InitDIB ();
 	basenummodes = nummodes = 1;
