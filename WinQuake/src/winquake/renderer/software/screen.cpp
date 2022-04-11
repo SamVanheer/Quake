@@ -58,7 +58,6 @@ vrect_t		scr_vrect;
 qboolean	scr_disabled_for_loading;
 qboolean	scr_drawloading;
 float		scr_disabled_time;
-qboolean	scr_skipupdate;
 
 qboolean	block_drawing;
 

@@ -31,5 +31,4 @@ target_sources(winquake
 		r_sprite.cpp
 		r_surf.cpp
 		r_vars.cpp
-		screen.cpp
-		vid_win.cpp)
+		screen.cpp)

@@ -254,6 +254,40 @@ typedef struct
 #include "crc.h"
 #include "client/sound/cdaudio.h"
 
+//GL stuff begin
+
+//TODO: resolve conflicts between GL and Software modes so this doesn't need to be in here.
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
+#include <GL/gl.h>
+#include <GL/glu.h>
+
+// Multitexture
+#define    TEXTURE0_SGIS				0x835E
+#define    TEXTURE1_SGIS				0x835F
+
+#ifndef _WIN32
+//Could be defined by GL.h
+#ifndef APIENTRY
+#define APIENTRY /* */
+#endif
+#endif
+
+typedef void (APIENTRY* lpMTexFUNC) (GLenum, GLfloat, GLfloat);
+typedef void (APIENTRY* lpSelTexFUNC) (GLenum);
+extern lpMTexFUNC qglMTexCoord2fSGIS;
+extern lpSelTexFUNC qglSelectTextureSGIS;
+
+extern qboolean gl_mtexable;
+
+void GL_DisableMultitexture(void);
+void GL_EnableMultitexture(void);
+
+//GL stuff end
+
 #ifdef GLQUAKE
 #include "renderer/opengl/glquake.h"
 #endif

@@ -50,8 +50,6 @@ typedef struct
 	float	r, g, b;
 } glvert_t;
 
-extern glvert_t glv;
-
 extern	int glx, gly, glwidth, glheight;
 
 // r_local.h -- private refresh defs
@@ -255,24 +253,3 @@ void R_RotateForEntity( entity_t *e );
 void R_StoreEfrags( efrag_t **ppefrag );
 
 void GL_Set2D( void );
-
-// Multitexture
-#define    TEXTURE0_SGIS				0x835E
-#define    TEXTURE1_SGIS				0x835F
-
-#ifndef _WIN32
-//Could be defined by GL.h
-#ifndef APIENTRY
-#define APIENTRY /* */
-#endif
-#endif
-
-typedef void (APIENTRY *lpMTexFUNC) (GLenum, GLfloat, GLfloat);
-typedef void (APIENTRY *lpSelTexFUNC) (GLenum);
-extern lpMTexFUNC qglMTexCoord2fSGIS;
-extern lpSelTexFUNC qglSelectTextureSGIS;
-
-extern qboolean gl_mtexable;
-
-void GL_DisableMultitexture(void);
-void GL_EnableMultitexture(void);

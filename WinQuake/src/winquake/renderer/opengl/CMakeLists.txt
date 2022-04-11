@@ -11,9 +11,6 @@ target_sources(winquake
 		gl_rsurf.cpp
 		gl_screen.cpp
 		gl_test.cpp
-		$<$<CXX_COMPILER_ID:MSVC>:
-			gl_vidnt.cpp
-		>
 		$<$<PLATFORM_ID:Linux>:
 			gl_vidlinux.cpp
 		>

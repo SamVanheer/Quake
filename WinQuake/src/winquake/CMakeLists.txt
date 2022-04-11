@@ -105,11 +105,6 @@ target_include_directories(winquake PRIVATE
 	$<$<CXX_COMPILER_ID:MSVC>:${CMAKE_SOURCE_DIR}/external/dxsdk/sdk/inc>
 )
 
-if(RENDERER_IS_SOFTWARE)
-	target_include_directories(winquake PRIVATE
-		${CMAKE_SOURCE_DIR}/external/scitech/include)
-endif()
-
 target_compile_definitions(winquake PRIVATE
 	$<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>
 	$<$<CXX_COMPILER_ID:MSVC>:$<$<CONFIG:Debug>:_DEBUG>>
@@ -126,12 +121,9 @@ target_link_libraries(winquake PRIVATE
 	$<$<CXX_COMPILER_ID:MSVC>:wsock32>
 	$<$<CXX_COMPILER_ID:MSVC>:comctl32>
 	$<$<CXX_COMPILER_ID:MSVC>:${CMAKE_SOURCE_DIR}/external/dxsdk/sdk/lib/dxguid.lib>
-	SDL2::SDL2)
-
-if(RENDERER_IS_SOFTWARE)
-	target_link_libraries(winquake PRIVATE
-		${CMAKE_SOURCE_DIR}/external/scitech/lib/win32/vc/mgllt.lib)
-endif()
+	SDL2::SDL2
+	OpenGL::GLU
+	OpenGL::GL)
 
 if(RENDERER_IS_OPENGL)
 
@@ -140,8 +132,6 @@ if(RENDERER_IS_OPENGL)
 	endif()
 	
 	target_link_libraries(winquake PRIVATE
-		OpenGL::GLU
-		OpenGL::GL
 		$<$<PLATFORM_ID:Linux>:svgalib>)
 endif()
 
@@ -155,14 +145,6 @@ if(MSVC)
 			# Disable warning 4459: declaration of 'local variable' hides global declaration
 			# Disable warning 4611: interaction between '_setjmp' and C++ object destruction is non-portable TODO remove setjmp and use proper error handling
 			/W4 /wd4805 /wd4244 /wd4100 /wd4459 /wd4611)
-	
-	if (RENDERER_IS_SOFTWARE)
-		target_link_options(winquake
-			PRIVATE
-				# /SAFESEH:NO is needed because of mgllt.
-				# Software mode tries to link with LIBC, but it doesn't exist in new versions of MSVC
-				/SAFESEH:NO /NODEFAULTLIB:LIBC.lib)
-	endif()
 endif()
 
 if (UNIX)

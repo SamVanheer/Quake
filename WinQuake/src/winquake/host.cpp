@@ -896,10 +896,8 @@ void Host_Init (quakeparms_t *parms)
 		S_Init ();
 #else
 
-#ifdef	GLQUAKE
 	// FIXME: doesn't use the new one-window approach yet
 		S_Init ();
-#endif
 
 #endif	// _WIN32
 		CDAudio_Init ();

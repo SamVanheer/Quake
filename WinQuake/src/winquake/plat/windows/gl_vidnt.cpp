@@ -19,10 +19,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // gl_vidnt.c -- NT GL vid component
 
+#include <thread>
+
 #include "quakedef.h"
 #include "winquake.h"
 
-#include <thread>
+#ifndef GLQUAKE
+#include "renderer/software/d_local.h"
+#endif
 
 #include <SDL.h>
 #include <SDL_syswm.h>
@@ -33,8 +37,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define VID_ROW_SIZE	3
 #define WARP_WIDTH		320
 #define WARP_HEIGHT		200
+
+//Software mode sets these to a lower limit.
+#ifndef MAXWIDTH
 #define MAXWIDTH		10000
 #define MAXHEIGHT		10000
+#endif
+
 #define BASEWIDTH		320
 #define BASEHEIGHT		200
 
@@ -102,8 +111,6 @@ static float vid_gamma = 1.0;
 
 SDL_GLContext GLContext = nullptr;
 
-glvert_t glv;
-
 cvar_t	gl_ztrick = {"gl_ztrick","1"};
 
 unsigned short	d_8to16table[256];
@@ -156,35 +163,289 @@ HWND VID_GetWindowHandle()
 
 // direct draw software compatability stuff
 
-void VID_HandlePause (qboolean pause)
+#ifndef GLQUAKE
+static byte* vid_surfcache;
+static int vid_surfcachesize;
+static int VID_highhunkmark;
+
+static GLuint SoftwareTextureId;
+static GLuint SoftwareDirectTextureId;
+
+static byte* softwarebuffer;
+static byte* rgbsoftwareBuffer;
+
+static bool drawdirecttexture = false;
+
+static RECT directexturerect;
+
+static int lockcount;
+
+/*
+================
+VID_AllocBuffers
+================
+*/
+qboolean VID_AllocBuffers(int width, int height)
+{
+	int		tsize, tbuffersize;
+
+	tbuffersize = width * height * sizeof(*d_pzbuffer);
+
+	tsize = D_SurfaceCacheForRes(width, height);
+
+	tbuffersize += tsize;
+
+	// see if there's enough memory, allowing for the normal mode 0x13 pixel,
+	// z, and surface buffers
+	if ((host_parms.memsize - tbuffersize + SURFCACHE_SIZE_AT_320X200 +
+		0x10000 * 3) < minimum_memory)
+	{
+		Con_SafePrintf("Not enough memory for video mode\n");
+		return false;		// not enough memory for mode
+	}
+
+	vid_surfcachesize = tsize;
+
+	if (d_pzbuffer)
+	{
+		D_FlushCaches();
+		Hunk_FreeToHighMark(VID_highhunkmark);
+		d_pzbuffer = NULL;
+	}
+
+	VID_highhunkmark = Hunk_HighMark();
+
+	d_pzbuffer = reinterpret_cast<short*>(Hunk_HighAllocName(tbuffersize, "video"));
+
+	vid_surfcache = (byte*)d_pzbuffer +
+		width * height * sizeof(*d_pzbuffer);
+
+	//Set up Software mode buffer.
+	const int bytesPerPixel = sizeof(pixel_t) * 1;
+	const int bytesPerRow = bytesPerPixel * vid.width;
+
+	vid.buffer = vid.conbuffer = vid.direct = softwarebuffer = reinterpret_cast<pixel_t*>(malloc(bytesPerRow * vid.height));
+	vid.rowbytes = vid.conrowbytes = bytesPerRow;
+	vid.numpages = 1;
+	vid.maxwarpwidth = WARP_WIDTH;
+	vid.maxwarpheight = WARP_HEIGHT;
+	vid.aspect = ((float)vid.height / (float)vid.width) *
+		(320.0 / 240.0);
+
+	rgbsoftwareBuffer = reinterpret_cast<byte*>(malloc(vid.width * vid.height * 3));
+
+	//Create texture to blit to.
+	glGenTextures(1, &SoftwareTextureId);
+	glGenTextures(1, &SoftwareDirectTextureId);
+
+	glBindTexture(GL_TEXTURE_2D, SoftwareTextureId);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+
+	glBindTexture(GL_TEXTURE_2D, SoftwareDirectTextureId);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	D_InitCaches(vid_surfcache, vid_surfcachesize);
+
+	return true;
+}
+
+static void VID_FreeBuffers()
+{
+	free(rgbsoftwareBuffer);
+	rgbsoftwareBuffer = nullptr;
+
+	free(softwarebuffer);
+	softwarebuffer = nullptr;
+}
+
+static void Convert8To24(const byte* input, byte* output, unsigned int width, unsigned int height)
+{
+	for (unsigned int y = 0; y < height; ++y)
+	{
+		for (unsigned int x = 0; x < width; ++x, ++input)
+		{
+			auto rgb = &output[((width * y) + x) * 3];
+
+			auto color = &d_8to24table[*input];
+
+			memcpy(rgb, color, 3);
+		}
+	}
+}
+
+void VID_Update(vrect_t* rects)
+{
+	//Ignore input; blit frame to texture and update.
+
+	//Convert from indexed to RGB.
+	Convert8To24(softwarebuffer, rgbsoftwareBuffer, vid.width, vid.height);
+
+	glBindTexture(GL_TEXTURE_2D, SoftwareTextureId);
+
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, vid.width, vid.height, GL_RGB, GL_UNSIGNED_BYTE, rgbsoftwareBuffer);
+
+	glClearColor(0, 0, 0, 1);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	glOrtho(0, vid.width, vid.height, 0, 0, 1);
+
+	glEnable(GL_TEXTURE_2D);
+
+	auto drawTexture = [](GLuint texture, int x, int y, int width, int height)
+	{
+		glBindTexture(GL_TEXTURE_2D, texture);
+
+		glBegin(GL_TRIANGLE_STRIP);
+
+		glTexCoord2f(1, 0);
+		glVertex2f(x + width, y);
+
+		glTexCoord2f(0, 0);
+		glVertex2f(x, y);
+
+		glTexCoord2f(1, 1);
+		glVertex2f(x + width, y + height);
+
+		glTexCoord2f(0, 1);
+		glVertex2f(x, y + height);
+
+		glEnd();
+	};
+
+	drawTexture(SoftwareTextureId, 0, 0, vid.width, vid.height);
+
+	if (drawdirecttexture)
+	{
+		drawTexture(SoftwareDirectTextureId, directexturerect.left, directexturerect.top,
+			directexturerect.right - directexturerect.left, directexturerect.bottom - directexturerect.top);
+	}
+
+	glEnd();
+	SDL_GL_SwapWindow(mainwindow);
+
+	// handle the mouse state when windowed if that's changed
+	if (modestate == MS_WINDOWED)
+	{
+		if ((int)_windowed_mouse.value != windowed_mouse)
+		{
+			if (_windowed_mouse.value)
+			{
+				IN_ActivateMouse();
+				IN_HideMouse();
+			}
+			else
+			{
+				IN_DeactivateMouse();
+				IN_ShowMouse();
+			}
+
+			windowed_mouse = (int)_windowed_mouse.value;
+		}
+	}
+}
+
+void VID_LockBuffer(void)
+{
+	lockcount++;
+
+	if (lockcount > 1)
+		return;
+
+	// Update surface pointer for linear access modes
+	vid.buffer = vid.conbuffer = vid.direct = reinterpret_cast<pixel_t*>(softwarebuffer);
+	vid.rowbytes = vid.conrowbytes = sizeof(pixel_t) * 1 * vid.width;
+
+	if (r_dowarp)
+		d_viewbuffer = r_warpbuffer;
+	else
+		d_viewbuffer = vid.buffer;
+
+	if (r_dowarp)
+		screenwidth = WARP_WIDTH;
+	else
+		screenwidth = vid.rowbytes;
+
+	if (lcd_x.value)
+		screenwidth <<= 1;
+}
+
+void VID_UnlockBuffer(void)
+{
+	lockcount--;
+
+	if (lockcount > 0)
+		return;
+
+	if (lockcount < 0)
+		Sys_Error("Unbalanced unlock");
+
+	// to turn up any unlocked accesses
+	vid.buffer = vid.conbuffer = vid.direct = d_viewbuffer = NULL;
+}
+
+void D_BeginDirectRect(int x, int y, byte* pbitmap, int width, int height)
+{
+	static byte rgbbuffer[3 * 256 * 256];
+
+	if (width * height * 3 >= sizeof(rgbbuffer))
+	{
+		Sys_Error("D_BeginDirectRect image too large");
+	}
+
+	drawdirecttexture = true;
+
+	Convert8To24(pbitmap, rgbbuffer, width, height);
+
+	glBindTexture(GL_TEXTURE_2D, SoftwareDirectTextureId);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, rgbbuffer);
+
+	directexturerect.left = x;
+	directexturerect.top = y;
+	directexturerect.right = x + width;
+	directexturerect.bottom = y + height;
+}
+
+void D_EndDirectRect(int x, int y, int width, int height)
+{
+	drawdirecttexture = false;
+}
+#else
+qboolean VID_AllocBuffers(int width, int height)
+{
+	return true;
+}
+
+static void VID_FreeBuffers()
 {
 }
 
-void VID_ForceLockState (int lk)
+void VID_LockBuffer(void)
 {
 }
 
-void VID_LockBuffer (void)
+void VID_UnlockBuffer(void)
 {
 }
 
-void VID_UnlockBuffer (void)
+void D_BeginDirectRect(int x, int y, byte* pbitmap, int width, int height)
 {
 }
 
-int VID_ForceUnlockedAndReturnState (void)
-{
-	return 0;
-}
-
-void D_BeginDirectRect (int x, int y, byte *pbitmap, int width, int height)
+void D_EndDirectRect(int x, int y, int width, int height)
 {
 }
-
-void D_EndDirectRect (int x, int y, int width, int height)
-{
-}
-
+#endif
 
 void CenterWindow(SDL_Window* hWndCenter)
 {
@@ -247,7 +508,15 @@ qboolean VID_CreateWindow(int modenum, bool windowed)
 		flags |= SDL_WINDOW_FULLSCREEN;
 	}
 
-	mainwindow = SDL_CreateWindow("GLQuake", rect.left, rect.top, width, height, flags);
+	const char* title =
+#ifdef GLQUAKE
+		"GLQuake"
+#else
+		"WinQuake"
+#endif
+		;
+
+	mainwindow = SDL_CreateWindow(title, rect.left, rect.top, width, height, flags);
 
 	if (!mainwindow)
 		Sys_Error("Couldn't create DIB window");
@@ -276,6 +545,16 @@ qboolean VID_CreateWindow(int modenum, bool windowed)
 		window_x = 0;
 		window_y = 0;
 	}
+
+	GLContext = SDL_GL_CreateContext(mainwindow);
+
+	if (!GLContext)
+		Sys_Error(
+			"Could not initialize GL (SDL_GL_CreateContext failed).\n\nMake sure you in are 16 bit color mode, and try running -window.\n%s",
+			SDL_GetError());
+
+	if (SDL_GL_MakeCurrent(mainwindow, GLContext) < 0)
+		Sys_Error("SDL_GL_MakeCurrent failed: %s", SDL_GetError());
 
 	return true;
 }
@@ -347,6 +626,11 @@ int VID_SetMode (int modenum, unsigned char *palette)
 	vid_modenum = modenum;
 	Cvar_SetValue ("vid_mode", (float)vid_modenum);
 
+	if (!VID_AllocBuffers(vid.width, vid.height))
+	{
+		Sys_Error("Couldn't allocate memory for Software mode");
+	}
+
 	Sys_SendKeyEvents();
 
 	std::this_thread::sleep_for(std::chrono::milliseconds{100});
@@ -397,6 +681,9 @@ int		texture_mode = GL_LINEAR;
 //int		texture_mode = GL_LINEAR_MIPMAP_LINEAR;
 
 int		texture_extension_number = 1;
+
+lpMTexFUNC qglMTexCoord2fSGIS = NULL;
+lpSelTexFUNC qglSelectTextureSGIS = NULL;
 
 #ifdef _WIN32
 void CheckMultiTextureExtensions(void) 
@@ -590,6 +877,8 @@ void	VID_Shutdown (void)
 	if (vid_initialized)
 	{
 		vid_canalttab = false;
+
+		VID_FreeBuffers();
 
 		SDL_GL_MakeCurrent(nullptr, nullptr);
 
@@ -1462,16 +1751,6 @@ void	VID_Init (unsigned char *palette)
 	VID_SetPalette (palette);
 
 	VID_SetMode (vid_default, palette);
-
-	GLContext = SDL_GL_CreateContext(mainwindow);
-
-	if (!GLContext)
-		Sys_Error (
-			"Could not initialize GL (SDL_GL_CreateContext failed).\n\nMake sure you in are 16 bit color mode, and try running -window.\n%s",
-			SDL_GetError());
-
-    if (SDL_GL_MakeCurrent(mainwindow, GLContext) < 0)
-		Sys_Error ("SDL_GL_MakeCurrent failed: %s", SDL_GetError());
 
 	GL_Init ();
 

@@ -28,9 +28,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef SERVERONLY
 #include <ddraw.h>
 #include <dsound.h>
-#ifndef GLQUAKE
-#include <mgraph.h>
-#endif
 #endif
 
 extern	HINSTANCE	global_hInstance;
@@ -63,9 +60,6 @@ extern SDL_Window* mainwindow;
 extern qboolean		ActiveApp, Minimized;
 
 extern qboolean	WinNT;
-
-int VID_ForceUnlockedAndReturnState (void);
-void VID_ForceLockState (int lk);
 
 void IN_ShowMouse (void);
 void IN_DeactivateMouse (void);
