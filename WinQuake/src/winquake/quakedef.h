@@ -55,6 +55,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifdef WIN32
 #define strnicmp _strnicmp
 #define unlink _unlink
+#define mkdir _mkdir
+#define getcwd _getcwd
 #else
 #define strnicmp strncasecmp
 #endif
@@ -295,7 +297,7 @@ void GL_EnableMultitexture(void);
 
 typedef struct
 {
-	char	*basedir;
+	const char	*basedir;
 	char	*cachedir;		// for development over ISDN lines
 	int		argc;
 	char	**argv;

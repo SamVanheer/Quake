@@ -20,17 +20,23 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // sys.cpp -- system interface code
 
 #include <chrono>
+#include <filesystem>
 #include <thread>
 
 #include "quakedef.h"
 #include "winquake.h"
+
+#ifdef WIN32
 #include "conproc.h"
+#endif
+
 #include <VersionHelpers.h>
 
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
 #include <SDL_events.h>
 #include <SDL_main.h>
+#include <SDL_messagebox.h>
 
 #define MINIMUM_WIN_MEMORY		0x0880000
 #define MAXIMUM_WIN_MEMORY		0x1000000
@@ -48,13 +54,15 @@ static double lastcurtime = 0.0;
 
 qboolean			isDedicated;
 static qboolean		sc_return_on_enter = false;
-HANDLE				hinput, houtput;
 
 static char			*tracking_tag = "Clams & Mooses";
 
-static HANDLE	hFile;
-static HANDLE	heventParent;
-static HANDLE	heventChild;
+#ifdef WIN32
+static HANDLE hinput, houtput;
+static HANDLE hFile;
+static HANDLE heventParent;
+static HANDLE heventChild;
+#endif
 
 void Sys_InitFloatTime (void);
 
@@ -188,7 +196,7 @@ int	Sys_FileTime (char *path)
 
 void Sys_mkdir (char *path)
 {
-	_mkdir (path);
+	mkdir(path);
 }
 
 
@@ -222,42 +230,38 @@ void Sys_Init (void)
 
 void Sys_Error (char *error, ...)
 {
-	va_list		argptr;
-	char		text[1024], text2[1024];
-	char		*text3 = "Press Enter to exit\n";
-	char		*text4 = "***********************************\n";
-	char		*text5 = "\n";
-	DWORD		dummy;
-	double		starttime;
-	static int	in_sys_error0 = 0;
-	static int	in_sys_error1 = 0;
-	static int	in_sys_error2 = 0;
-	static int	in_sys_error3 = 0;
+	static bool in_sys_error0 = false;
+	static bool in_sys_error1 = false;
+	static bool in_sys_error2 = false;
+	static bool in_sys_error3 = false;
 
 	if (!in_sys_error3)
 	{
-		in_sys_error3 = 1;
+		in_sys_error3 = true;
 	}
 
+	va_list argptr;
 	va_start (argptr, error);
+	char text[1024];
 	vsprintf (text, error, argptr);
 	va_end (argptr);
 
 	if (isDedicated)
 	{
-		va_start (argptr, error);
-		vsprintf (text, error, argptr);
-		va_end (argptr);
+		const char* text3 = "Press Enter to exit\n";
+		const char* text4 = "***********************************\n";
+		const char* text5 = "\n";
 
+		char text2[1024];
 		sprintf (text2, "ERROR: %s\n", text);
-		WriteFile (houtput, text5, strlen (text5), &dummy, NULL);
-		WriteFile (houtput, text4, strlen (text4), &dummy, NULL);
-		WriteFile (houtput, text2, strlen (text2), &dummy, NULL);
-		WriteFile (houtput, text3, strlen (text3), &dummy, NULL);
-		WriteFile (houtput, text4, strlen (text4), &dummy, NULL);
 
+		fwrite(text5, sizeof(char), strlen (text5), stdout);
+		fwrite(text4, sizeof(char), strlen (text4), stdout);
+		fwrite(text2, sizeof(char), strlen (text2), stdout);
+		fwrite(text3, sizeof(char), strlen (text3), stdout);
+		fwrite(text4, sizeof(char), strlen (text4), stdout);
 
-		starttime = Sys_FloatTime ();
+		const double starttime = Sys_FloatTime ();
 		sc_return_on_enter = true;	// so Enter will get us out of here
 
 		while (!Sys_ConsoleInput () &&
@@ -271,47 +275,42 @@ void Sys_Error (char *error, ...)
 	// tried that and failed
 		if (!in_sys_error0)
 		{
-			in_sys_error0 = 1;
-			VID_SetDefaultMode ();
-			MessageBox(NULL, text, "Quake Error",
-					   MB_OK | MB_SETFOREGROUND | MB_ICONSTOP);
+			in_sys_error0 = true;
+			VID_SetDefaultMode();
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Quake Error", text, nullptr);
 		}
 		else
 		{
-			MessageBox(NULL, text, "Double Quake Error",
-					   MB_OK | MB_SETFOREGROUND | MB_ICONSTOP);
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Double Quake Error", text, nullptr);
 		}
 	}
 
 	if (!in_sys_error1)
 	{
-		in_sys_error1 = 1;
+		in_sys_error1 = true;
 		Host_Shutdown ();
 	}
 
+#ifdef WIN32
 // shut down QHOST hooks if necessary
 	if (!in_sys_error2)
 	{
-		in_sys_error2 = 1;
+		in_sys_error2 = true;
 		DeinitConProc ();
 	}
+#endif
 
-	exit (1);
+	exit(1);
 }
 
 void Sys_Printf (char *fmt, ...)
 {
-	va_list		argptr;
-	char		text[1024];
-	DWORD		dummy;
-	
 	if (isDedicated)
 	{
+		va_list argptr;
 		va_start (argptr,fmt);
-		vsprintf (text, fmt, argptr);
+		vfprintf(stdout, fmt, argptr);
 		va_end (argptr);
-
-		WriteFile(houtput, text, strlen (text), &dummy, NULL);	
 	}
 }
 
@@ -319,11 +318,13 @@ void Sys_Quit (void)
 {
 	Host_Shutdown();
 
+#ifdef WIN32
 	if (isDedicated)
-		FreeConsole ();
+		FreeConsole();
 
 // shut down QHOST hooks if necessary
 	DeinitConProc ();
+#endif
 
 	exit (0);
 }
@@ -398,6 +399,7 @@ void Sys_InitFloatTime (void)
 	lastcurtime = curtime;
 }
 
+#ifdef WIN32
 char *Sys_ConsoleInput (void)
 {
 	static char	text[256];
@@ -477,6 +479,7 @@ char *Sys_ConsoleInput (void)
 
 	return NULL;
 }
+#endif
 
 void Sys_Sleep (void)
 {
@@ -525,91 +528,38 @@ void SleepUntilInput (int time)
 WinMain
 ==================
 */
-char		*argv[MAX_NUM_ARGVS];
-static char	*empty_string = "";
 
-
-int WINAPI WinMain (_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
+int EngineMain (int argc, char* argv[])
 {
-	quakeparms_t	parms;
-	double			time, oldtime, newtime;
-	MEMORYSTATUS	lpBuffer;
-	static	char	cwd[1024];
-	int				t;
-
 	//TODO: need to rework this so SDL2's setup code is used instead.
 	SDL_SetMainReady();
 
-	HANDLE mutex;
+	std::string cwd = std::filesystem::current_path().u8string();
 
-	mutex = CreateMutexA(nullptr, TRUE, "Quake1Mutex");
-
-	if (mutex == nullptr || GetLastError() == ERROR_ALREADY_EXISTS)
-	{
-		Sys_Error("Could not launch game.\nOnly one instance of this game can be run at a time.");
-	}
-
-	lpBuffer.dwLength = sizeof(MEMORYSTATUS);
-	GlobalMemoryStatus (&lpBuffer);
-
-	if (!GetCurrentDirectory (sizeof(cwd), cwd))
+	if (cwd.empty())
 		Sys_Error ("Couldn't determine current directory");
 
-	if (cwd[Q_strlen(cwd)-1] == '/')
-		cwd[Q_strlen(cwd)-1] = 0;
-
-	parms.basedir = cwd;
-	parms.cachedir = NULL;
-
-	parms.argc = 1;
-	argv[0] = empty_string;
-
-	while (*lpCmdLine && (parms.argc < MAX_NUM_ARGVS))
+	if (cwd.back() == '/')
 	{
-		while (*lpCmdLine && ((*lpCmdLine <= 32) || (*lpCmdLine > 126)))
-			lpCmdLine++;
-
-		if (*lpCmdLine)
-		{
-			argv[parms.argc] = lpCmdLine;
-			parms.argc++;
-
-			while (*lpCmdLine && ((*lpCmdLine > 32) && (*lpCmdLine <= 126)))
-				lpCmdLine++;
-
-			if (*lpCmdLine)
-			{
-				*lpCmdLine = 0;
-				lpCmdLine++;
-			}
-			
-		}
+		cwd.resize(cwd.size() - 1);
 	}
 
-	parms.argv = argv;
+	quakeparms_t parms{};
+	parms.basedir = cwd.c_str();
+	parms.cachedir = NULL;
 
-	COM_InitArgv (parms.argc, parms.argv);
+	COM_InitArgv (argc, argv);
 
 	parms.argc = com_argc;
 	parms.argv = com_argv;
 
 	isDedicated = (COM_CheckParm ("-dedicated") != 0);
 
-// take the greater of all the available memory or half the total memory,
-// but at least 8 Mb and no more than 16 Mb, unless they explicitly
+// take 16 Mb, unless they explicitly
 // request otherwise
-	parms.memsize = lpBuffer.dwAvailPhys;
+	parms.memsize = MAXIMUM_WIN_MEMORY;
 
-	if (parms.memsize < MINIMUM_WIN_MEMORY)
-		parms.memsize = MINIMUM_WIN_MEMORY;
-
-	if (static_cast<decltype( lpBuffer.dwTotalPhys )>( parms.memsize ) < (lpBuffer.dwTotalPhys >> 1))
-		parms.memsize = lpBuffer.dwTotalPhys >> 1;
-
-	if (parms.memsize > MAXIMUM_WIN_MEMORY)
-		parms.memsize = MAXIMUM_WIN_MEMORY;
-
-	if (COM_CheckParm ("-heapsize"))
+	if (int t = COM_CheckParm ("-heapsize"); t != 0)
 	{
 		t = COM_CheckParm("-heapsize") + 1;
 
@@ -624,6 +574,7 @@ int WINAPI WinMain (_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 	if (isDedicated)
 	{
+#ifdef WIN32
 		if (!AllocConsole ())
 		{
 			Sys_Error ("Couldn't create dedicated server console");
@@ -633,25 +584,26 @@ int WINAPI WinMain (_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		houtput = GetStdHandle (STD_OUTPUT_HANDLE);
 
 	// give QHOST a chance to hook into the console
-		if ((t = COM_CheckParm ("-HFILE")) > 0)
+		if (int t = COM_CheckParm("-HFILE"); t > 0)
 		{
 			if (t < com_argc)
 				hFile = (HANDLE)Q_atoi (com_argv[t+1]);
 		}
 			
-		if ((t = COM_CheckParm ("-HPARENT")) > 0)
+		if (int t = COM_CheckParm ("-HPARENT"); t > 0)
 		{
 			if (t < com_argc)
 				heventParent = (HANDLE)Q_atoi (com_argv[t+1]);
 		}
 			
-		if ((t = COM_CheckParm ("-HCHILD")) > 0)
+		if (int t = COM_CheckParm ("-HCHILD"); t > 0)
 		{
 			if (t < com_argc)
 				heventChild = (HANDLE)Q_atoi (com_argv[t+1]);
 		}
 
 		InitConProc (hFile, heventParent, heventChild);
+#endif
 	}
 
 	Sys_Init ();
@@ -662,7 +614,9 @@ int WINAPI WinMain (_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	Sys_Printf ("Host_Init\n");
 	Host_Init (&parms);
 
-	oldtime = Sys_FloatTime ();
+	double oldtime = Sys_FloatTime ();
+
+	double time, newtime;
 
     /* main window message loop */
 	while (1)
@@ -700,12 +654,56 @@ int WINAPI WinMain (_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		oldtime = newtime;
 	}
 
-	ReleaseMutex(mutex);
-	mutex = nullptr;
-
 	SDL_Quit();
 
     /* return success of application */
-    return TRUE;
+    return 0;
 }
 
+#ifdef WIN32
+char* argv[MAX_NUM_ARGVS];
+static char* empty_string = "";
+
+int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
+{
+	HANDLE mutex = CreateMutexA(nullptr, TRUE, "Quake1Mutex");
+
+	if (mutex == nullptr || GetLastError() == ERROR_ALREADY_EXISTS)
+	{
+		Sys_Error("Could not launch game.\nOnly one instance of this game can be run at a time.");
+	}
+
+	int argc = 1;
+	argv[0] = empty_string;
+
+	while (*lpCmdLine && (argc < MAX_NUM_ARGVS))
+	{
+		while (*lpCmdLine && ((*lpCmdLine <= 32) || (*lpCmdLine > 126)))
+			lpCmdLine++;
+
+		if (*lpCmdLine)
+		{
+			argv[argc] = lpCmdLine;
+			argc++;
+
+			while (*lpCmdLine && ((*lpCmdLine > 32) && (*lpCmdLine <= 126)))
+				lpCmdLine++;
+
+			if (*lpCmdLine)
+			{
+				*lpCmdLine = 0;
+				lpCmdLine++;
+			}
+
+		}
+	}
+
+	const int result = EngineMain(argc, argv);
+
+	ReleaseMutex(mutex);
+	mutex = nullptr;
+
+	//Translate regular main return values to WinMain return values.
+	return result != 0 ? 0 : 1;
+}
+#endif

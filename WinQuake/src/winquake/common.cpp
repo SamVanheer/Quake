@@ -1122,7 +1122,7 @@ void COM_InitArgv (int argc, char **argv)
 COM_Init
 ================
 */
-void COM_Init (char *basedir)
+void COM_Init (const char *basedir)
 {
 	byte    swaptest[2] = {1,0};
 
