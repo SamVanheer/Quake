@@ -25,12 +25,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #ifdef WIN32
 #include "winquake.h"
 #include "conproc.h"
 #include <VersionHelpers.h>
-#else
-#include <sys/stat.h>
 #endif
 
 #define SDL_MAIN_HANDLED
@@ -175,24 +176,16 @@ int Sys_FileWrite (int handle, const void *data, int count)
 	return x;
 }
 
-int	Sys_FileTime (char *path)
+time_t Sys_FileTime (char *path)
 {
-	FILE	*f;
-	int		retval;
-	
-	f = fopen(path, "rb");
+	struct stat buf;
 
-	if (f)
+	if (stat(path, &buf) == -1)
 	{
-		fclose(f);
-		retval = 1;
-	}
-	else
-	{
-		retval = -1;
+		return -1;
 	}
 
-	return retval;
+	return buf.st_mtime;
 }
 
 void Sys_mkdir (char *path)

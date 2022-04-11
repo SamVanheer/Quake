@@ -33,7 +33,7 @@ void Sys_FileClose (int handle);
 void Sys_FileSeek (int handle, int position);
 int Sys_FileRead (int handle, void *dest, int count);
 int Sys_FileWrite (int handle, const void *data, int count);
-int	Sys_FileTime (char *path);
+time_t Sys_FileTime (char *path);
 void Sys_mkdir (char *path);
 
 //
