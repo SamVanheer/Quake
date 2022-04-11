@@ -24,6 +24,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "resource.h"
 #include <commctrl.h>
 
+#include <thread>
+
 #include <SDL.h>
 #include <SDL_syswm.h>
 #include <SDL_version.h>
@@ -358,7 +360,7 @@ int VID_SetMode (int modenum, unsigned char *palette)
 
 	Sys_SendKeyEvents();
 
-	Sleep (100);
+	std::this_thread::sleep_for(std::chrono::milliseconds{100});
 
 	//SDL_SetWindowPosition(mainwindow, 0, 0);
 

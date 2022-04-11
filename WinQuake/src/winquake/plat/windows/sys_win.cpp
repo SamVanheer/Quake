@@ -26,6 +26,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "conproc.h"
 #include <VersionHelpers.h>
 
+#include <thread>
+
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
 #include <SDL_events.h>
@@ -598,7 +600,7 @@ char *Sys_ConsoleInput (void)
 
 void Sys_Sleep (void)
 {
-	Sleep (1);
+	std::this_thread::sleep_for(std::chrono::milliseconds{1});
 }
 
 
