@@ -45,6 +45,7 @@ target_sources(winquake
 		draw.h
 		host.cpp
 		host_cmd.cpp
+		input.cpp
 		input.h
 		keys.cpp
 		keys.h
