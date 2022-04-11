@@ -1169,7 +1169,7 @@ VID_InitFullDIB
 */
 void VID_InitFullDIB ()
 {
-// enumerate >8 bpp modes
+	// enumerate >=24 bpp modes
 	const int originalnummodes = nummodes;
 
 	//TODO: support multiple displays.
@@ -1186,7 +1186,7 @@ void VID_InitFullDIB ()
 
 		const int bpp = SDL_BITSPERPIXEL(devmode.format);
 
-		if ((bpp >= 15) &&
+		if ((bpp >= 24) &&
 			(devmode.w <= MAXWIDTH) &&
 			(devmode.h <= MAXHEIGHT) &&
 			(nummodes < MAX_MODE_LIST))
@@ -1222,7 +1222,7 @@ void VID_InitFullDIB ()
 			{
 				if ((modelist[nummodes].width == modelist[i].width) &&
 					(modelist[nummodes].height == modelist[i].height) &&
-					(modelist[nummodes].bpp == modelist[i].bpp))
+					(modelist[nummodes].bpp >= modelist[i].bpp))
 				{
 					existingmode = true;
 					break;
@@ -1282,10 +1282,6 @@ VID_Init
 */
 void	VID_Init (unsigned char *palette)
 {
-	int		i;
-	int		basenummodes, width, height, bpp, findbpp;
-	char	gldir[MAX_OSPATH];
-
 	if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
 	{
 		Sys_Error("Couldn't initialize video subsystem: %s", SDL_GetError());
@@ -1309,8 +1305,6 @@ void	VID_Init (unsigned char *palette)
 	Cmd_AddCommand ("vid_describemodes", VID_DescribeModes_f);
 
 	VID_InitDIB ();
-	basenummodes = nummodes = 1;
-
 	VID_InitFullDIB ();
 
 	if (COM_CheckParm("-window"))
@@ -1349,6 +1343,8 @@ void	VID_Init (unsigned char *palette)
 			}
 			else
 			{
+				int width;
+
 				if (COM_CheckParm("-width"))
 				{
 					width = Q_atoi(com_argv[COM_CheckParm("-width")+1]);
@@ -1358,16 +1354,19 @@ void	VID_Init (unsigned char *palette)
 					width = 640;
 				}
 
-				if (COM_CheckParm("-bpp"))
+				int bpp;
+				const bool findbpp = COM_CheckParm("-bpp") == 0;
+
+				if (findbpp)
 				{
-					bpp = Q_atoi(com_argv[COM_CheckParm("-bpp")+1]);
-					findbpp = 0;
+					bpp = 32;
 				}
 				else
 				{
-					bpp = 15;
-					findbpp = 1;
+					bpp = Q_atoi(com_argv[COM_CheckParm("-bpp") + 1]);
 				}
+
+				int height;
 
 				if (COM_CheckParm("-height"))
 				{
@@ -1394,7 +1393,7 @@ void	VID_Init (unsigned char *palette)
 
 					bool existingmode = false;
 
-					for (i=nummodes; i<nummodes ; i++)
+					for (int i=nummodes; i<nummodes ; i++)
 					{
 						if ((modelist[nummodes].width == modelist[i].width)   &&
 							(modelist[nummodes].height == modelist[i].height) &&
@@ -1419,7 +1418,7 @@ void	VID_Init (unsigned char *palette)
 					{
 						height = Q_atoi(com_argv[COM_CheckParm("-height")+1]);
 
-						for (i=1, vid_default=0 ; i<nummodes ; i++)
+						for (int i=1, vid_default=0 ; i<nummodes ; i++)
 						{
 							if ((modelist[i].width == width) &&
 								(modelist[i].height == height) &&
@@ -1433,7 +1432,7 @@ void	VID_Init (unsigned char *palette)
 					}
 					else
 					{
-						for (i=1, vid_default=0 ; i<nummodes ; i++)
+						for (int i=1, vid_default=0 ; i<nummodes ; i++)
 						{
 							if ((modelist[i].width == width) && (modelist[i].bpp == bpp))
 							{
@@ -1450,12 +1449,6 @@ void	VID_Init (unsigned char *palette)
 						{
 							switch (bpp)
 							{
-							case 15:
-								bpp = 16;
-								break;
-							case 16:
-								bpp = 32;
-								break;
 							case 32:
 								bpp = 24;
 								break;
@@ -1473,7 +1466,39 @@ void	VID_Init (unsigned char *palette)
 
 				if (!vid_default)
 				{
-					Sys_Error ("Specified video mode not available");
+					//Try to fall back to the native resolution.
+					SDL_Rect rect;
+
+					if (SDL_GetDisplayBounds(0, &rect) < 0)
+					{
+						Sys_Error("Couldn't get display bounds: %s", SDL_GetError());
+					}
+
+					width = rect.w - rect.x;
+					height = rect.h - rect.y;
+
+					for (int i = 1; i < nummodes; ++i)
+					{
+						if ((modelist[i].width == width) &&
+							(modelist[i].height == height))
+						{
+							if (vid_default != 0)
+							{
+								//Pick the mode with the highest bpp.
+								if (modelist[i].bpp < modelist[vid_default].bpp)
+								{
+									continue;
+								}
+							}
+
+							vid_default = i;
+						}
+					}
+				}
+
+				if (!vid_default)
+				{
+					Sys_Error("Specified video mode not available");
 				}
 			}
 		}
@@ -1481,7 +1506,7 @@ void	VID_Init (unsigned char *palette)
 
 	vid_initialized = true;
 
-	if ((i = COM_CheckParm("-conwidth")) != 0)
+	if (int i = COM_CheckParm("-conwidth"); i != 0)
 		vid.conwidth = Q_atoi(com_argv[i+1]);
 	else
 		vid.conwidth = 640;
@@ -1494,7 +1519,7 @@ void	VID_Init (unsigned char *palette)
 	// pick a conheight that matches with correct aspect
 	vid.conheight = vid.conwidth*3 / 4;
 
-	if ((i = COM_CheckParm("-conheight")) != 0)
+	if (int i = COM_CheckParm("-conheight"); i != 0)
 		vid.conheight = Q_atoi(com_argv[i+1]);
 	if (vid.conheight < 200)
 		vid.conheight = 200;
@@ -1521,6 +1546,7 @@ void	VID_Init (unsigned char *palette)
 
 	GL_Init ();
 
+	char	gldir[MAX_OSPATH];
 	sprintf (gldir, "%s/glquake", com_gamedir);
 	Sys_mkdir (gldir);
 
