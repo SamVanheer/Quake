@@ -43,7 +43,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 int			starttime;
 qboolean	ActiveApp, Minimized;
-qboolean	WinNT;
 
 static double		pfreq;
 static double		curtime = 0.0;
@@ -269,8 +268,6 @@ void Sys_Init (void)
 	{
 		Sys_Error("WinQuake requires at least Windows 7");
 	}
-
-	WinNT = true;
 }
 
 

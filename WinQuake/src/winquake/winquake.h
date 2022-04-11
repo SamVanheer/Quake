@@ -43,8 +43,6 @@ void	VID_UnlockBuffer (void);
 
 #endif
 
-extern qboolean	WinNT;
-
 HWND VID_GetWindowHandle();
 
 extern qboolean	winsock_lib_initialized;
