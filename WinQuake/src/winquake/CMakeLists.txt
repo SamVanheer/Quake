@@ -63,6 +63,7 @@ target_sources(winquake
 		server.h
 		spritegn.h
 		sys.h
+		vid.cpp
 		vid.h
 		view.cpp
 		view.h
