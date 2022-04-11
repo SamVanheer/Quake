@@ -97,8 +97,8 @@ cvar_t	joy_yawsensitivity = {"joyyawsensitivity", "-1.0"};
 cvar_t	joy_wwhack1 = {"joywwhack1", "0.0"};
 cvar_t	joy_wwhack2 = {"joywwhack2", "0.0"};
 
-qboolean	joy_avail, joy_advancedinit, joy_haspov;
-std::uint32_t		joy_oldbuttonstate, joy_oldpovstate;
+qboolean	joy_avail, joy_advancedinit;
+std::uint32_t		joy_oldbuttonstate;
 
 SDL_GameController* joystick = nullptr;
 std::uint32_t		joy_numbuttons;
@@ -532,11 +532,11 @@ void IN_StartupJoystick (void)
 
 	// get the capabilities of the selected joystick
 	// abort startup if command fails
-	// save the joystick's number of buttons and POV status
+	// save the joystick's number of buttons status
 	joy_numbuttons = SDL_CONTROLLER_BUTTON_MAX;
 
-	// old button and POV states default to no buttons pressed
-	joy_oldbuttonstate = joy_oldpovstate = 0;
+	// old button state default to no buttons pressed
+	joy_oldbuttonstate = 0;
 
 	// mark the joystick as available and advanced initialization not completed
 	// this is needed as cvars are not available during initialization
@@ -636,7 +636,6 @@ IN_Commands
 void IN_Commands (void)
 {
 	int		key_index;
-	std::uint32_t	povstate;
 
 	if (!joy_avail)
 	{
@@ -669,28 +668,6 @@ void IN_Commands (void)
 		}
 	}
 	joy_oldbuttonstate = buttonstate;
-
-	if (joy_haspov)
-	{
-		// convert POV information into 4 bits of state information
-		// this avoids any potential problems related to moving from one
-		// direction to another without going through the center position
-		povstate = 0;
-		// determine which bits have changed and key an auxillary event for each change
-		for (int i=0 ; i < 4 ; i++)
-		{
-			if ( (povstate & (1<<i)) && !(joy_oldpovstate & (1<<i)) )
-			{
-				Key_Event (K_AUX29 + i, true);
-			}
-
-			if ( !(povstate & (1<<i)) && (joy_oldpovstate & (1<<i)) )
-			{
-				Key_Event (K_AUX29 + i, false);
-			}
-		}
-		joy_oldpovstate = povstate;
-	}
 }
 
 
