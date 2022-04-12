@@ -1,3 +1,6 @@
 [submodule "WinQuake/external/SDL2"]
 	path = WinQuake/external/SDL2
 	url = https://github.com/libsdl-org/SDL.git
+[submodule "WinQuake/external/OpenAL"]
+	path = WinQuake/external/OpenAL
+	url = https://github.com/kcat/openal-soft.git
