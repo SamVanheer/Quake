@@ -871,7 +871,8 @@ char *net_helpMessage [] =
   " by a null-modem cable. ",
   "                        ",
 
-  " Novell network LANs.   ",
+  " Novell network LANs    ",
+  " or Windows 95 DOS-box. ",
   "                        ",
   "(LAN=Local Area Network)",
 
