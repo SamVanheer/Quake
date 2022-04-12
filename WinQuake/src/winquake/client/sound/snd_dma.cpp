@@ -205,6 +205,12 @@ void S_Init (void)
 
 	S_Startup ();
 
+	if (!shm)
+	{
+		//If sound failed to initialize just use fake dma.
+		fakedma = true;
+	}
+
 	SND_InitScaletable ();
 
 	known_sfx = reinterpret_cast<sfx_t*>( Hunk_AllocName (MAX_SFX*sizeof(sfx_t), "sfx_t") );
