@@ -9,6 +9,7 @@ target_sources(winquake
 		sound/snd_dma.cpp
 		sound/snd_mem.cpp
 		sound/snd_mix.cpp
+		sound/sound.cpp
 		sound/sound.h
 		ui/menu.cpp
 		ui/menu.h

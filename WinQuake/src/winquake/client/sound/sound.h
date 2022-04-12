@@ -86,6 +86,23 @@ typedef struct
 	int		dataofs;		// chunk starts this many bytes from file start
 } wavinfo_t;
 
+struct ISoundSystem
+{
+	virtual bool IsBlocked() const = 0;
+
+	virtual void Block() = 0;
+	virtual void Unblock() = 0;
+
+	virtual int GetDMAPosition() const = 0;
+
+	/**
+	* @brief Send sound to device if buffer isn't really the dma buffer
+	*/
+	virtual void Submit() = 0;
+};
+
+extern ISoundSystem* g_SoundSystem;
+
 void S_Init (void);
 void S_Startup (void);
 void S_Shutdown (void);
@@ -105,14 +122,6 @@ void S_EndPrecaching (void);
 void S_PaintChannels(int endtime);
 void S_InitPaintChannels (void);
 
-#ifdef WIN32
-void S_BlockSound(void);
-void S_UnblockSound(void);
-#else
-#define S_BlockSound()
-#define S_UnblockSound()
-#endif
-
 // picks a channel based on priorities, empty slots, number of channels
 channel_t *SND_PickChannel(int entnum, int entchannel);
 
@@ -120,13 +129,10 @@ channel_t *SND_PickChannel(int entnum, int entchannel);
 void SND_Spatialize(channel_t *ch);
 
 // initializes cycling through a DMA buffer and returns information on it
-qboolean SNDDMA_Init(void);
-
-// gets the current DMA position
-int SNDDMA_GetDMAPos(void);
+qboolean SNDDMA_Init();
 
 // shutdown the DMA xfer.
-void SNDDMA_Shutdown(void);
+void SNDDMA_Shutdown();
 
 // ====================================================================
 // User-setable variables
@@ -166,15 +172,12 @@ extern	cvar_t volume;
 
 extern qboolean	snd_initialized;
 
-extern int		snd_blocked;
-
 void S_LocalSound (char *s);
 sfxcache_t *S_LoadSound (sfx_t *s);
 
 wavinfo_t GetWavinfo (char *name, byte *wav, int wavlength);
 
 void SND_InitScaletable (void);
-void SNDDMA_Submit(void);
 
 void S_AmbientOff (void);
 void S_AmbientOn (void);

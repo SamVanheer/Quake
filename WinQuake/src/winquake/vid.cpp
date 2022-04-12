@@ -1022,21 +1022,17 @@ void AppActivate(bool fActive, bool minimize)
 *
 ****************************************************************************/
 {
-	static bool	sound_active;
-
 	ActiveApp = fActive;
 	Minimized = minimize;
 
 // enable/disable sound on focus gain/loss
-	if (!ActiveApp && sound_active)
+	if (!ActiveApp && !g_SoundSystem->IsBlocked())
 	{
-		S_BlockSound ();
-		sound_active = false;
+		g_SoundSystem->Block();
 	}
-	else if (ActiveApp && !sound_active)
+	else if (ActiveApp && g_SoundSystem->IsBlocked())
 	{
-		S_UnblockSound ();
-		sound_active = true;
+		g_SoundSystem->Unblock();
 	}
 
 	if (fActive)

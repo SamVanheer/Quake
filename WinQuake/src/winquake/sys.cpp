@@ -566,7 +566,7 @@ int EngineMain (int argc, char* argv[])
 	Sys_Init ();
 
 // because sound is off until we become active
-	S_BlockSound ();
+	g_SoundSystem->Block();
 
 	Sys_Printf ("Host_Init\n");
 	Host_Init (&parms);

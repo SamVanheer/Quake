@@ -39,7 +39,6 @@ void S_StopAllSoundsC(void);
 channel_t   channels[MAX_CHANNELS];
 int			total_channels;
 
-int				snd_blocked = 0;
 static qboolean	snd_ambient = 1;
 qboolean		snd_initialized = false;
 
@@ -691,7 +690,7 @@ void S_Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
 	channel_t	*ch;
 	channel_t	*combine;
 
-	if (!sound_started || (snd_blocked > 0))
+	if (!sound_started)
 		return;
 
 	VectorCopy(origin, listener_origin);
@@ -784,7 +783,7 @@ void GetSoundtime(void)
 
 // it is possible to miscount buffers if it has wrapped twice between
 // calls to S_Update.  Oh well.
-	samplepos = SNDDMA_GetDMAPos();
+	samplepos = g_SoundSystem->GetDMAPosition();
 
 
 	if (samplepos < oldsamplepos)
@@ -820,7 +819,7 @@ void S_Update_(void)
 	unsigned        endtime;
 	int				samps;
 	
-	if (!sound_started || (snd_blocked > 0))
+	if (!sound_started)
 		return;
 
 // Updates DMA time
@@ -841,7 +840,7 @@ void S_Update_(void)
 
 	S_PaintChannels (endtime);
 
-	SNDDMA_Submit ();
+	g_SoundSystem->Submit();
 }
 
 /*
