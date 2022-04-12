@@ -57,6 +57,10 @@ This is needed on Linux because its audio code relies on the obsolete `/dev/dsp`
 
 It is not possible to play games as-is because the precompiled QuakeC code uses 32 bit structure layouts and offsets, but it is possible to launch the game and interact with the main menu.
 
+## Improved networking driver code on Windows.
+
+The Winsock2 API is now used directly and the IPX driver has been removed (no longer supported by Windows).
+
 ## More work to be done.
 
 # Original readme.txt contents
