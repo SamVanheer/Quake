@@ -63,7 +63,11 @@ WSADATA		winsockdata;
 
 static double	blocktime;
 
+#ifdef _WIN64
+INT_PTR FAR WINAPI BlockingHook(void)
+#else
 BOOL PASCAL FAR BlockingHook(void)  
+#endif
 { 
     MSG		msg;
     BOOL	ret;
