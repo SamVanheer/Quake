@@ -1,4 +1,3 @@
 target_sources(winquake
 	PRIVATE
-		cd_linux.cpp
-		snd_linux.cpp)
+		cd_linux.cpp)
