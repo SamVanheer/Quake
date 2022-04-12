@@ -21,13 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 
-#ifdef _WIN32
-#include "winquake.h"
-#else
-#define DWORD	unsigned long
-#define LPVOID void*
-#endif
-
 #define	PAINTBUFFER_SIZE	512
 portable_samplepair_t paintbuffer[ PAINTBUFFER_SIZE ];
 int		snd_scaletable[ 32 ][ 256 ];
@@ -66,14 +59,13 @@ void S_TransferStereo16 (int endtime)
 {
 	int		lpos;
 	int		lpaintedtime;
-	LPVOID	pbuf;
 	
 	snd_vol = volume.value*256;
 
 	snd_p = (int *) paintbuffer;
 	lpaintedtime = paintedtime;
 
-	pbuf = (LPVOID)shm->buffer;
+	void* pbuf = shm->buffer;
 
 	while (lpaintedtime < endtime)
 	{
@@ -105,7 +97,6 @@ void S_TransferPaintBuffer(int endtime)
 	int 	step;
 	int		val;
 	int		snd_vol;
-	LPVOID	pbuf;
 
 	if (shm->samplebits == 16 && shm->channels == 2)
 	{
@@ -120,7 +111,7 @@ void S_TransferPaintBuffer(int endtime)
 	step = 3 - shm->channels;
 	snd_vol = volume.value*256;
 
-	pbuf = (LPVOID)shm->buffer;
+	void* pbuf = shm->buffer;
 
 	if (shm->samplebits == 16)
 	{
