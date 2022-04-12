@@ -26,16 +26,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <SDL_video.h>
 
 #ifndef SERVERONLY
-#include <dsound.h>
-#endif
-
-#ifndef SERVERONLY
-
-extern LPDIRECTSOUND pDS;
-extern LPDIRECTSOUNDBUFFER pDSBuf;
-
-extern DWORD gSndBufSize;
-//#define SNDBUFSIZE 65536
 
 void	VID_LockBuffer (void);
 void	VID_UnlockBuffer (void);

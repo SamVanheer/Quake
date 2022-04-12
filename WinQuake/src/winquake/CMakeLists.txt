@@ -120,13 +120,11 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${TARGET_SOURCES})
 
 target_include_directories(winquake PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}
-	$<$<CXX_COMPILER_ID:MSVC>:${CMAKE_SOURCE_DIR}/external/dxsdk/sdk/inc>
 )
 
 target_compile_definitions(winquake PRIVATE
 	$<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>
 	$<$<CXX_COMPILER_ID:MSVC>:$<$<CONFIG:Debug>:_DEBUG>>
-	$<$<CXX_COMPILER_ID:MSVC>:CINTERFACE> #DirectX interfaces need this (for now)
 )
 
 if(RENDERER_IS_OPENGL)
@@ -137,7 +135,6 @@ endif()
 target_link_libraries(winquake PRIVATE
 	$<$<CXX_COMPILER_ID:MSVC>:winmm>
 	$<$<CXX_COMPILER_ID:MSVC>:Ws2_32>
-	$<$<CXX_COMPILER_ID:MSVC>:${CMAKE_SOURCE_DIR}/external/dxsdk/sdk/lib/dxguid.lib>
 	SDL2::SDL2
 	OpenGL::GLU
 	OpenGL::GL
