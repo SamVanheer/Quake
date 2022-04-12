@@ -684,25 +684,23 @@ int		texture_mode = GL_LINEAR;
 
 int		texture_extension_number = 1;
 
-lpMTexFUNC qglMTexCoord2fSGIS = NULL;
-lpSelTexFUNC qglSelectTextureSGIS = NULL;
+lpMTexFUNC qglMTexCoord2fSGIS = nullptr;
+lpSelTexFUNC qglSelectTextureSGIS = nullptr;
 
-#ifdef _WIN32
-void CheckMultiTextureExtensions(void) 
+void CheckMultiTextureExtensions() 
 {
-	if (strstr(gl_extensions, "GL_SGIS_multitexture ") && !COM_CheckParm("-nomtex")) {
-		Con_Printf("Multitexture extensions found.\n");
-		qglMTexCoord2fSGIS = reinterpret_cast<decltype( qglMTexCoord2fSGIS )>(SDL_GL_GetProcAddress("glMTexCoord2fSGIS") );
-		qglSelectTextureSGIS = reinterpret_cast<decltype( qglSelectTextureSGIS )>(SDL_GL_GetProcAddress("glSelectTextureSGIS") );
-		gl_mtexable = true;
+	if (strstr(gl_extensions, "GL_SGIS_multitexture ") && !COM_CheckParm("-nomtex"))
+	{
+		qglMTexCoord2fSGIS = reinterpret_cast<decltype(qglMTexCoord2fSGIS)>(SDL_GL_GetProcAddress("glMTexCoord2fSGIS"));
+		qglSelectTextureSGIS = reinterpret_cast<decltype(qglSelectTextureSGIS)>(SDL_GL_GetProcAddress("glSelectTextureSGIS"));
+
+		if (qglMTexCoord2fSGIS && qglSelectTextureSGIS)
+		{
+			Con_Printf("Multitexture extensions found.\n");
+			gl_mtexable = true;
+		}
 	}
 }
-#else
-void CheckMultiTextureExtensions(void) 
-{
-		gl_mtexable = true;
-}
-#endif
 
 /*
 ===============
