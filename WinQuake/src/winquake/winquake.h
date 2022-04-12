@@ -19,11 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // winquake.h: Win32-specific Quake header file
 
-#pragma warning( disable : 4229 )  // mgraph gets this
-
 #include <windows.h>
-
-#include <SDL_video.h>
 
 #ifndef SERVERONLY
 
@@ -34,10 +30,5 @@ void	VID_UnlockBuffer (void);
 
 HWND VID_GetWindowHandle();
 
-extern qboolean	winsock_lib_initialized;
-
 extern cvar_t		_windowed_mouse;
 
-extern Rect		window_rect;
-
-extern qboolean	mouseinitialized;

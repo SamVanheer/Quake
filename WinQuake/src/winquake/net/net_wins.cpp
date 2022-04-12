@@ -33,8 +33,6 @@ static struct qsockaddr broadcastaddr;
 
 static unsigned long myAddr;
 
-qboolean	winsock_lib_initialized;
-
 #include "net_wins.h"
 
 int winsock_initialized = 0;
@@ -106,8 +104,6 @@ int WINS_Init (void)
 	char	*p;
 	int		r;
 	WORD	wVersionRequested;
-
-	winsock_lib_initialized = true;
 
 	if (COM_CheckParm ("-noudp"))
 		return -1;
