@@ -51,22 +51,3 @@ extern cvar_t		_windowed_mouse;
 extern Rect		window_rect;
 
 extern qboolean	mouseinitialized;
-
-extern int (PASCAL FAR *pWSAStartup)(WORD wVersionRequired, LPWSADATA lpWSAData);
-extern int (PASCAL FAR *pWSACleanup)(void);
-extern int (PASCAL FAR *pWSAGetLastError)(void);
-extern SOCKET (PASCAL FAR *psocket)(int af, int type, int protocol);
-extern int (PASCAL FAR *pioctlsocket)(SOCKET s, long cmd, u_long FAR *argp);
-extern int (PASCAL FAR *psetsockopt)(SOCKET s, int level, int optname,
-							  const char FAR * optval, int optlen);
-extern int (PASCAL FAR *precvfrom)(SOCKET s, char FAR * buf, int len, int flags,
-							struct sockaddr FAR *from, int FAR * fromlen);
-extern int (PASCAL FAR *psendto)(SOCKET s, const char FAR * buf, int len, int flags,
-						  const struct sockaddr FAR *to, int tolen);
-extern int (PASCAL FAR *pclosesocket)(SOCKET s);
-extern int (PASCAL FAR *pgethostname)(char FAR * name, int namelen);
-extern struct hostent FAR * (PASCAL FAR *pgethostbyname)(const char FAR * name);
-extern struct hostent FAR * (PASCAL FAR *pgethostbyaddr)(const char FAR * addr,
-												  int len, int type);
-extern int (PASCAL FAR *pgetsockname)(SOCKET s, struct sockaddr FAR *name,
-							   int FAR * namelen);
