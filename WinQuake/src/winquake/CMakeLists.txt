@@ -122,7 +122,6 @@ endif()
 target_link_libraries(winquake PRIVATE
 	$<$<CXX_COMPILER_ID:MSVC>:winmm>
 	$<$<CXX_COMPILER_ID:MSVC>:wsock32>
-	$<$<CXX_COMPILER_ID:MSVC>:comctl32>
 	$<$<CXX_COMPILER_ID:MSVC>:${CMAKE_SOURCE_DIR}/external/dxsdk/sdk/lib/dxguid.lib>
 	SDL2::SDL2
 	OpenGL::GLU
