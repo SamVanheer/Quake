@@ -4,9 +4,24 @@
 
 find_package(OpenGL REQUIRED)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 add_subdirectory(../../external/SDL2
 	SDL2-binary-dir
 	EXCLUDE_FROM_ALL)
+
+option(ALSOFT_UTILS  "" OFF)
+add_subdirectory(../../external/OpenAL
+	OpenAL-binary-dir
+	EXCLUDE_FROM_ALL)
+
+set_target_properties(
+	SDL2
+	build_version
+	common
+	OpenAL
+	PROPERTIES
+		FOLDER "Dependencies")
 
 set(WINQUAKE_RENDERER "OpenGL" CACHE STRING "Renderer to use")
 set_property(CACHE WINQUAKE_RENDERER PROPERTY STRINGS Software OpenGL)
@@ -125,7 +140,8 @@ target_link_libraries(winquake PRIVATE
 	$<$<CXX_COMPILER_ID:MSVC>:${CMAKE_SOURCE_DIR}/external/dxsdk/sdk/lib/dxguid.lib>
 	SDL2::SDL2
 	OpenGL::GLU
-	OpenGL::GL)
+	OpenGL::GL
+	OpenAL)
 
 if(MSVC)	
 	target_compile_options(winquake
@@ -149,6 +165,10 @@ install(TARGETS SDL2
 	RUNTIME DESTINATION .
 	LIBRARY DESTINATION .)
 
+install(TARGETS OpenAL
+	RUNTIME DESTINATION .
+	LIBRARY DESTINATION .)
+	
 install(TARGETS winquake
 	RUNTIME DESTINATION .)
 
