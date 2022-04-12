@@ -61,6 +61,10 @@ It is not possible to play games as-is because the precompiled QuakeC code uses 
 
 The Winsock2 API is now used directly and the IPX driver has been removed (no longer supported by Windows).
 
+## Replaced DirectSound, Wave and /dev/dsp sound APIs with OpenAL.
+
+OpenAL provides a cross-platform sound API. This implementation is based on the Wave sound system implementation so there is a small amount of latency.
+
 ## More work to be done.
 
 # Original readme.txt contents
