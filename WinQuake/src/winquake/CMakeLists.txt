@@ -117,6 +117,9 @@ elseif(RENDERER_IS_OPENGL)
 	add_subdirectory(renderer/opengl)
 endif()
 
+
+target_precompile_headers(winquake PRIVATE quakedef.h)
+
 #Create filters
 get_target_property(TARGET_SOURCES winquake SOURCES)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${TARGET_SOURCES})
