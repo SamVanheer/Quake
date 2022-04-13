@@ -100,7 +100,7 @@ void R_EmitEdge (mvertex_t *pv0, mvertex_t *pv1)
 		TransformVector (local, transformed);
 	
 		if (transformed[2] < NEAR_CLIP)
-			transformed[2] = NEAR_CLIP;
+			transformed[2] = static_cast<vec_t>(NEAR_CLIP);
 	
 		lzi0 = 1.0 / transformed[2];
 	
@@ -129,7 +129,7 @@ void R_EmitEdge (mvertex_t *pv0, mvertex_t *pv1)
 	TransformVector (local, transformed);
 
 	if (transformed[2] < NEAR_CLIP)
-		transformed[2] = NEAR_CLIP;
+		transformed[2] = static_cast<vec_t>(NEAR_CLIP);
 
 	r_lzi1 = 1.0 / transformed[2];
 
