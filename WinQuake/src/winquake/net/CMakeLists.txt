@@ -7,14 +7,20 @@ target_sources(winquake
 		net_loop.h
 		net_main.cpp
 		net_vcr.cpp
-		net_vcr.h
-		$<$<CXX_COMPILER_ID:MSVC>:
-			net_win.cpp
-			net_wins.cpp
-			net_wins.h
-		>
-		$<$<PLATFORM_ID:Linux>:
-			net_bsd.cpp
-			net_udp.cpp
-			net_udp.h
-		>)
+		net_vcr.h)
+
+if (MSVC)
+target_sources(winquake
+	PRIVATE
+		net_win.cpp
+		net_wins.cpp
+		net_wins.h)
+endif()
+
+if (UNIX)
+target_sources(winquake
+	PRIVATE
+		net_bsd.cpp
+		net_udp.cpp
+		net_udp.h)
+endif()
