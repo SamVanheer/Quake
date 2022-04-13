@@ -2460,7 +2460,7 @@ void M_Draw (void)
 
 	if (!m_recursiveDraw)
 	{
-		scr_copyeverything = 1;
+		scr_copyeverything = true;
 
 		if (scr_con_current)
 		{

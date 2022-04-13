@@ -73,8 +73,8 @@ console is:
 int			glx, gly, glwidth, glheight;
 
 // only the refresh window will be updated unless these variables are flagged 
-int			scr_copytop;
-int			scr_copyeverything;
+bool		scr_copytop;
+bool		scr_copyeverything;
 
 float		scr_con_current;
 float		scr_conlines;		// lines of console to display
@@ -204,7 +204,7 @@ void SCR_DrawCenterString (void)
 
 void SCR_CheckDrawCenterString (void)
 {
-	scr_copytop = 1;
+	scr_copytop = true;
 	if (scr_center_lines > scr_erase_lines)
 		scr_erase_lines = scr_center_lines;
 
@@ -552,7 +552,7 @@ void SCR_DrawConsole (void)
 {
 	if (scr_con_current)
 	{
-		scr_copyeverything = 1;
+		scr_copyeverything = true;
 		Con_DrawConsole (scr_con_current, true);
 		clearconsole = 0;
 	}
@@ -824,8 +824,8 @@ void SCR_UpdateScreen (void)
 
 	vid.numpages = 2 + gl_triplebuffer.value;
 
-	scr_copytop = 0;
-	scr_copyeverything = 0;
+	scr_copytop = false;
+	scr_copyeverything = false;
 
 	if (scr_disabled_for_loading)
 	{

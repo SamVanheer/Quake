@@ -23,8 +23,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "r_local.h"
 
 // only the refresh window will be updated unless these variables are flagged 
-int			scr_copytop;
-int			scr_copyeverything;
+bool scr_copytop;
+bool scr_copyeverything;
 
 float		scr_con_current;
 float		scr_conlines;		// lines of console to display
@@ -117,7 +117,7 @@ void SCR_EraseCenterString (void)
 	else
 		y = 48;
 
-	scr_copytop = 1;
+	scr_copytop = true;
 	Draw_TileClear (0, y,vid.width, 8*scr_erase_lines);
 }
 
@@ -170,7 +170,7 @@ void SCR_DrawCenterString (void)
 
 void SCR_CheckDrawCenterString (void)
 {
-	scr_copytop = 1;
+	scr_copytop = true;
 	if (scr_center_lines > scr_erase_lines)
 		scr_erase_lines = scr_center_lines;
 
@@ -478,13 +478,13 @@ void SCR_SetUpToDrawConsole (void)
 
 	if (clearconsole++ < vid.numpages)
 	{
-		scr_copytop = 1;
+		scr_copytop = true;
 		Draw_TileClear (0,(int)scr_con_current,vid.width, vid.height - (int)scr_con_current);
 		Sbar_Changed ();
 	}
 	else if (clearnotify++ < vid.numpages)
 	{
-		scr_copytop = 1;
+		scr_copytop = true;
 		Draw_TileClear (0,0,vid.width, con_notifylines);
 	}
 	else
@@ -500,7 +500,7 @@ void SCR_DrawConsole (void)
 {
 	if (scr_con_current)
 	{
-		scr_copyeverything = 1;
+		scr_copyeverything = true;
 		Con_DrawConsole (scr_con_current, true);
 		clearconsole = 0;
 	}
@@ -813,8 +813,8 @@ void SCR_UpdateScreen (void)
 	if (scr_skipupdate || block_drawing)
 		return;
 
-	scr_copytop = 0;
-	scr_copyeverything = 0;
+	scr_copytop = false;
+	scr_copyeverything = false;
 
 	if (scr_disabled_for_loading)
 	{
@@ -873,7 +873,7 @@ void SCR_UpdateScreen (void)
 
 	if (scr_fullupdate++ < vid.numpages)
 	{	// clear the entire screen
-		scr_copyeverything = 1;
+		scr_copyeverything = true;
 		Draw_TileClear (0,0,vid.width,vid.height);
 		Sbar_Changed ();
 	}

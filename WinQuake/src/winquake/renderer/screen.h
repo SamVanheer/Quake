@@ -49,8 +49,8 @@ extern	cvar_t		scr_viewsize;
 extern cvar_t scr_viewsize;
 
 // only the refresh window will be updated unless these variables are flagged 
-extern	int			scr_copytop;
-extern	int			scr_copyeverything;
+extern	bool		scr_copytop;
+extern	bool		scr_copyeverything;
 
 extern bool			block_drawing;
 
