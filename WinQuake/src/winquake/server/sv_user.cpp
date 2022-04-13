@@ -37,7 +37,7 @@ float	*angles;
 float	*origin;
 float	*velocity;
 
-qboolean	onground;
+bool	onground;
 
 usercmd_t	cmd;
 
@@ -384,7 +384,7 @@ void SV_ClientThink (void)
 	if (sv_player->v.movetype == MOVETYPE_NONE)
 		return;
 	
-	onground = (int)sv_player->v.flags & FL_ONGROUND;
+	onground = ((int)sv_player->v.flags & FL_ONGROUND) != 0;
 
 	origin = sv_player->v.origin;
 	velocity = sv_player->v.velocity;
@@ -479,7 +479,7 @@ SV_ReadClientMessage
 Returns false if the client should be killed
 ===================
 */
-qboolean SV_ReadClientMessage (void)
+bool SV_ReadClientMessage (void)
 {
 	int		ret;
 	int		cmd;

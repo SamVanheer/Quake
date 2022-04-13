@@ -89,7 +89,7 @@ void R_AliasProjectFinalVert (finalvert_t *fv, auxvert_t *av);
 R_AliasCheckBBox
 ================
 */
-qboolean R_AliasCheckBBox (void)
+bool R_AliasCheckBBox (void)
 {
 	int					i, flags, frame, numv;
 	aliashdr_t			*pahdr;
@@ -97,7 +97,7 @@ qboolean R_AliasCheckBBox (void)
 	finalvert_t			*pv0, *pv1, viewpts[16];
 	auxvert_t			*pa0, *pa1, viewaux[16];
 	maliasframedesc_t	*pframedesc;
-	qboolean			zclipped, zfullyclipped;
+	bool				zclipped, zfullyclipped;
 	unsigned			anyclip, allclip;
 	int					minz;
 	

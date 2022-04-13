@@ -408,7 +408,7 @@ Try to find a sound device to mix for.
 Returns false if nothing is found.
 ==================
 */
-int SNDDMA_Init()
+bool SNDDMA_Init()
 {
 	if (snd_firsttime)
 	{
@@ -434,10 +434,10 @@ int SNDDMA_Init()
 		if (wasFirstTime)
 			Con_SafePrintf("No sound device initialized\n");
 
-		return 0;
+		return false;
 	}
 
-	return 1;
+	return true;
 }
 
 /*

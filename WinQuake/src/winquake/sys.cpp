@@ -50,13 +50,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define PAUSE_SLEEP		50				// sleep time on pause or minimization
 #define NOT_FOCUS_SLEEP	20				// sleep time when not focus
 
-qboolean	ActiveApp, Minimized;
+bool ActiveApp, Minimized;
 
 static double starttime = 0.0;
 static double curtime = 0.0;
 static double lastcurtime = 0.0;
 
-qboolean			isDedicated;
+bool isDedicated;
 
 static const char			*tracking_tag = "Clams & Mooses";
 
@@ -448,7 +448,7 @@ void Sys_SendKeyEvents (void)
 	while (SDL_PollEvent(&event))
 	{
 		// we always update if there are any event, even if we're paused
-		scr_skipupdate = 0;
+		scr_skipupdate = false;
 
 		VID_ProcessEvent(event);
 	}
@@ -584,7 +584,7 @@ int EngineMain (int argc, char* argv[])
 			time = newtime - oldtime;
 
 			extern int vcrFile;
-			extern int recording;
+			extern bool recording;
 
 			while (time < sys_ticrate.value && (vcrFile == -1 || recording))
 			{
@@ -599,7 +599,7 @@ int EngineMain (int argc, char* argv[])
 			if ((cl.paused && !ActiveApp) || Minimized || block_drawing)
 			{
 				SleepUntilInput (PAUSE_SLEEP);
-				scr_skipupdate = 1;		// no point in bothering to draw
+				scr_skipupdate = true;		// no point in bothering to draw
 			}
 			else if (!ActiveApp)
 			{

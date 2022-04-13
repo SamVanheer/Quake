@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 entity_t	r_worldentity;
 
-qboolean	r_cache_thrash;		// compatability
+bool		r_cache_thrash;		// compatability
 
 vec3_t		modelorg, r_entorigin;
 entity_t	*currententity;
@@ -35,7 +35,7 @@ mplane_t	frustum[4];
 
 int			c_brush_polys, c_alias_polys;
 
-qboolean	envmap;				// true during envmap command capture 
+bool		envmap;				// true during envmap command capture 
 
 int			currenttexture = -1;		// to avoid unnecessary texture sets
 
@@ -45,7 +45,7 @@ int			particletexture;	// little dot for particles
 int			playertextures;		// up to 16 color translated skins
 
 int			mirrortexturenum;	// quake texturenum, not gltexturenum
-qboolean	mirror;
+bool		mirror;
 mplane_t	*mirror_plane;
 
 //
@@ -108,7 +108,7 @@ R_CullBox
 Returns true if the box is completely outside the frustom
 =================
 */
-qboolean R_CullBox (vec3_t mins, vec3_t maxs)
+bool R_CullBox (vec3_t mins, vec3_t maxs)
 {
 	int		i;
 

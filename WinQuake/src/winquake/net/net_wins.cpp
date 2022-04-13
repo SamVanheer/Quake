@@ -201,7 +201,7 @@ void WINS_Shutdown (void)
 
 //=============================================================================
 
-void WINS_Listen (qboolean state)
+void WINS_Listen (bool state)
 {
 	// enable listening
 	if (state)

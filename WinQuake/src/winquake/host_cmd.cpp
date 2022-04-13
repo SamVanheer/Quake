@@ -144,7 +144,7 @@ void Host_Notarget_f (void)
 		SV_ClientPrintf ("notarget ON\n");
 }
 
-qboolean noclip_anglehack;
+bool noclip_anglehack;
 
 void Host_Noclip_f (void)
 {
@@ -1009,13 +1009,13 @@ void Host_Please_f (void)
 #endif
 
 
-void Host_Say(qboolean teamonly)
+void Host_Say(bool teamonly)
 {
 	client_t *client;
 	client_t *save;
 	int		j;
 	char	text[64];
-	qboolean	fromServer = false;
+	bool	fromServer = false;
 
 	if (cmd_source == src_command)
 	{
@@ -1241,7 +1241,7 @@ void Host_Pause_f (void)
 		SV_ClientPrintf ("Pause not allowed.\n");
 	else
 	{
-		sv.paused ^= 1;
+		sv.paused = !sv.paused;
 
 		if (sv.paused)
 		{
@@ -1254,7 +1254,7 @@ void Host_Pause_f (void)
 
 	// send notification to all clients
 		MSG_WriteByte (&sv.reliable_datagram, svc_setpause);
-		MSG_WriteByte (&sv.reliable_datagram, sv.paused);
+		MSG_WriteByte (&sv.reliable_datagram, static_cast<int>(sv.paused));
 	}
 }
 
@@ -1442,7 +1442,7 @@ void Host_Kick_f (void)
 	char		*message = NULL;
 	client_t	*save;
 	int			i;
-	qboolean	byNumber = false;
+	bool		byNumber = false;
 
 	if (cmd_source == src_command)
 	{

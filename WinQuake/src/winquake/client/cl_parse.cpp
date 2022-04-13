@@ -332,7 +332,6 @@ void CL_ParseUpdate (int bits)
 	int			i;
 	model_t		*model;
 	int			modnum;
-	qboolean	forcelink;
 	entity_t	*ent;
 	int			num;
 
@@ -359,10 +358,8 @@ for (i=0 ; i<16 ; i++)
 if (bits&(1<<i))
 	bitcounts[i]++;
 
-	if (ent->msgtime != cl.mtime[1])
-		forcelink = true;	// no previous frame to lerp from
-	else
-		forcelink = false;
+	// no previous frame to lerp from if true
+	bool forcelink = ent->msgtime != cl.mtime[1];
 
 	ent->msgtime = cl.mtime[0];
 	
@@ -880,7 +877,7 @@ void CL_ParseServerMessage (void)
 
 		case svc_setpause:
 			{
-				cl.paused = MSG_ReadByte ();
+				cl.paused = MSG_ReadByte () != 0;
 
 				if (cl.paused)
 				{

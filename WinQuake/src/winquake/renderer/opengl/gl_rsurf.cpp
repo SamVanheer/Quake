@@ -43,7 +43,7 @@ typedef struct glRect_s {
 } glRect_t;
 
 glpoly_t	*lightmap_polys[MAX_LIGHTMAPS];
-qboolean	lightmap_modified[MAX_LIGHTMAPS];
+bool		lightmap_modified[MAX_LIGHTMAPS];
 glRect_t	lightmap_rectchange[MAX_LIGHTMAPS];
 
 int			allocated[MAX_LIGHTMAPS][BLOCK_WIDTH];
@@ -273,7 +273,7 @@ extern	float	speedscale;		// for top sky and bottom sky
 void DrawGLWaterPoly (glpoly_t *p);
 void DrawGLWaterPolyLightmap (glpoly_t *p);
 
-qboolean mtexenabled = false;
+bool mtexenabled = false;
 
 void GL_SelectTexture (GLenum target);
 
@@ -1070,7 +1070,7 @@ void R_DrawBrushModel (entity_t *e)
 	float		dot;
 	mplane_t	*pplane;
 	model_t		*clmodel;
-	qboolean	rotated;
+	bool		rotated;
 
 	currententity = e;
 	currenttexture = -1;
@@ -1578,7 +1578,7 @@ void GL_BuildLightmaps (void)
 {
 	int		i, j;
 	model_t	*m;
-	extern qboolean isPermedia;
+	extern bool isPermedia;
 
 	memset (allocated, 0, sizeof(allocated));
 

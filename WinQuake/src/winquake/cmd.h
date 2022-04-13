@@ -84,7 +84,7 @@ void	Cmd_AddCommand (const char *cmd_name, xcommand_t function);
 // register commands and functions to call for them.
 // The cmd_name is referenced later, so it should not be in temp memory
 
-qboolean Cmd_Exists (const char *cmd_name);
+bool Cmd_Exists (const char *cmd_name);
 // used by the cvar code to check for cvar / command name overlap
 
 const char 	*Cmd_CompleteCommand (const char *partial);

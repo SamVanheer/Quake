@@ -99,7 +99,7 @@ void UDP_Shutdown (void)
 
 //=============================================================================
 
-void UDP_Listen (qboolean state)
+void UDP_Listen (bool state)
 {
 	// enable listening
 	if (state)
@@ -124,12 +124,12 @@ int UDP_OpenSocket (int port)
 {
 	int newsocket;
 	struct sockaddr_in address;
-	qboolean _true = true;
+	int _true = 1;
 
 	if ((newsocket = socket (PF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
 		return -1;
 
-	if (ioctl (newsocket, FIONBIO, (char *)&_true) == -1)
+	if (ioctl (newsocket, FIONBIO, &_true) == -1)
 		goto ErrorReturn;
 
 	address.sin_family = AF_INET;

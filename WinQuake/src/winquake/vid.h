@@ -66,7 +66,7 @@ extern void (*vid_menukeyfn)(int key);
 extern modestate_t	modestate;
 
 extern SDL_Window* mainwindow;
-extern qboolean		ActiveApp, Minimized;
+extern bool ActiveApp, Minimized;
 
 extern int		window_center_x, window_center_y;
 

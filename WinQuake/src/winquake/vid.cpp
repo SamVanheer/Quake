@@ -83,19 +83,19 @@ const char *gl_renderer;
 const char *gl_version;
 const char *gl_extensions;
 
-qboolean		scr_skipupdate;
+bool			scr_skipupdate;
 
 static vmode_t	modelist[MAX_MODE_LIST];
 static int		nummodes;
 static vmode_t	*pcurrentmode;
 static vmode_t	badmode;
 
-static qboolean	vid_initialized = false;
-static qboolean	windowed, leavecurrentmode;
-static qboolean vid_canalttab = false;
-static qboolean vid_wassuspended = false;
-static int		windowed_mouse;
-extern qboolean	mouseactive;  // from in_win.c
+static bool vid_initialized = false;
+static bool windowed, leavecurrentmode;
+static bool vid_canalttab = false;
+static bool vid_wassuspended = false;
+static bool windowed_mouse;
+extern bool	mouseactive;  // from in_win.c
 
 int			DIBWidth, DIBHeight;
 Rect		WindowRect;
@@ -107,7 +107,7 @@ int			vid_realmode;
 int			vid_default = MODE_WINDOWED;
 static int	windowed_default;
 unsigned char	vid_curpal[256*3];
-static qboolean fullsbardraw = false;
+static bool fullsbardraw = false;
 
 static float vid_gamma = 1.0;
 
@@ -132,9 +132,9 @@ void ClearAllStates (void);
 void VID_UpdateWindowStatus (void);
 void GL_Init (void);
 
-qboolean is8bit = false;
-qboolean isPermedia = false;
-qboolean gl_mtexable = false;
+bool is8bit = false;
+bool isPermedia = false;
+bool gl_mtexable = false;
 
 //====================================
 
@@ -189,7 +189,7 @@ static int lockcount;
 VID_AllocBuffers
 ================
 */
-qboolean VID_AllocBuffers(int width, int height)
+bool VID_AllocBuffers(int width, int height)
 {
 	int		tsize, tbuffersize;
 
@@ -425,7 +425,7 @@ void D_EndDirectRect(int x, int y, int width, int height)
 	drawdirecttexture = false;
 }
 #else
-qboolean VID_AllocBuffers(int width, int height)
+bool VID_AllocBuffers(int width, int height)
 {
 	return true;
 }
@@ -475,7 +475,7 @@ static void ClearWindowToBlack(SDL_Window* window)
 	SDL_DestroyRenderer(renderer);
 }
 
-qboolean VID_CreateWindow(int modenum, bool windowed)
+bool VID_CreateWindow(int modenum, bool windowed)
 {
 	//Configure OpenGL parameters.
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);
@@ -573,12 +573,12 @@ int VID_SetMode (int modenum, unsigned char *palette)
 	}
 
 // so Con_Printfs don't mess us up by forcing vid and snd updates
-	const int temp = scr_disabled_for_loading;
+	const bool temp = scr_disabled_for_loading;
 	scr_disabled_for_loading = true;
 
 	CDAudio_Pause ();
 
-	qboolean stat;
+	bool stat;
 
 	// Set either the fullscreen or windowed mode
 	if (modelist[modenum].type == MS_WINDOWED)
@@ -1323,8 +1323,8 @@ void VID_DescribeMode_f (void)
 {
 	const int modenum = Q_atoi (Cmd_Argv(1));
 
-	const qboolean t = leavecurrentmode;
-	leavecurrentmode = 0;
+	const bool t = leavecurrentmode;
+	leavecurrentmode = false;
 
 	Con_Printf ("%s\n", VID_GetExtModeDescription (modenum));
 
@@ -1341,8 +1341,8 @@ void VID_DescribeModes_f (void)
 {
 	const int lnummodes = VID_NumModes ();
 
-	const qboolean t = leavecurrentmode;
-	leavecurrentmode = 0;
+	const bool t = leavecurrentmode;
+	leavecurrentmode = false;
 
 	for (int i=1 ; i<lnummodes ; i++)
 	{
@@ -1458,7 +1458,7 @@ void VID_InitDIB ()
 		Con_SafePrintf("No fullscreen DIB modes found\n");
 }
 
-qboolean VID_Is8bit() {
+bool VID_Is8bit() {
 	return is8bit;
 }
 
@@ -1553,7 +1553,7 @@ void	VID_Init (unsigned char *palette)
 				modelist[MODE_FULLSCREEN_DEFAULT].height = rect.h - rect.y;
 				vid_default = MODE_FULLSCREEN_DEFAULT;
 
-				leavecurrentmode = 1;
+				leavecurrentmode = true;
 			}
 			else
 			{

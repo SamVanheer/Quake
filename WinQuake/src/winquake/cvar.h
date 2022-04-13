@@ -57,12 +57,12 @@ typedef struct cvar_s
 {
 	const char	*name;
 	char	*string;
-	qboolean archive;		// set to true to cause it to be saved to vars.rc
-	qboolean server;		// notifies players when changed
+	bool archive;		// set to true to cause it to be saved to vars.rc
+	bool server;		// notifies players when changed
 	float	value;
 	struct cvar_s *next;
 	
-	cvar_s(const char* name, const char* string, qboolean archive = false, qboolean server = false, float value = 0)
+	cvar_s(const char* name, const char* string, bool archive = false, bool server = false, float value = 0)
 		: name(name)
 		, string(const_cast<char*>(string))
 		, archive(archive)
@@ -93,7 +93,7 @@ const char 	*Cvar_CompleteVariable (const char *partial);
 // attempts to match a partial variable name for command line completion
 // returns NULL if nothing fits
 
-qboolean Cvar_Command (void);
+bool Cvar_Command (void);
 // called by Cmd_ExecuteString when Cmd_Argv(0) doesn't match a known
 // command.  Returns true if the command was a variable reference that
 // was handled. (print or change)

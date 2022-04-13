@@ -32,13 +32,13 @@ static const char     *safeargvs[NUM_SAFE_ARGVS] =
 cvar_t  registered = {"registered","0"};
 cvar_t  cmdline = {"cmdline","0", false, true};
 
-qboolean        com_modified;   // set true if using non-id files
+bool	        com_modified;   // set true if using non-id files
 
-qboolean		proghack;
+bool			proghack;
 
-int             static_registered = 1;  // only for startup check, then set
+bool             static_registered = true;  // only for startup check, then set
 
-qboolean		msg_suppress_1 = 0;
+bool			msg_suppress_1 = false;
 
 void COM_InitFilesystem (void);
 
@@ -53,7 +53,7 @@ const char	**com_argv;
 #define CMDLINE_LENGTH	256
 char	com_cmdline[CMDLINE_LENGTH];
 
-qboolean		standard_quake = true, rogue, hipnotic;
+bool		standard_quake = true, rogue, hipnotic;
 
 // this graphic needs to be in the pak file to use registered features
 unsigned short pop[] =
@@ -436,7 +436,7 @@ float Q_atof (const char *str)
 ============================================================================
 */
 
-qboolean        bigendien;
+bool        bigendien;
 
 short   (*BigShort) (short l);
 short   (*LittleShort) (short l);
@@ -599,8 +599,8 @@ void MSG_WriteAngle (sizebuf_t *sb, float f)
 //
 // reading functions
 //
-int                     msg_readcount;
-qboolean        msg_badread;
+int msg_readcount;
+bool msg_badread;
 
 void MSG_BeginReading (void)
 {
@@ -1024,7 +1024,7 @@ void COM_CheckRegistered (void)
 	int                     i;
 
 	COM_OpenFile("gfx/pop.lmp", &h);
-	static_registered = 0;
+	static_registered = false;
 
 	if (h == -1)
 	{
@@ -1046,7 +1046,7 @@ void COM_CheckRegistered (void)
 	
 	Cvar_Set ("cmdline", com_cmdline);
 	Cvar_Set ("registered", "1");
-	static_registered = 1;
+	static_registered = true;
 	Con_Printf ("Playing registered version.\n");
 }
 
@@ -1061,7 +1061,7 @@ COM_InitArgv
 */
 void COM_InitArgv (int argc, char **argv)
 {
-	qboolean        safe;
+	bool        safe;
 	int             i, j, n;
 
 // reconstitute the command line for the cmdline externally visible cvar

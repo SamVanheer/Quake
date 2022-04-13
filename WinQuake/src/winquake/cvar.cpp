@@ -104,7 +104,7 @@ Cvar_Set
 void Cvar_Set (const char *var_name, const char *value)
 {
 	cvar_t	*var;
-	qboolean changed;
+	bool changed;
 	
 	var = Cvar_FindVar (var_name);
 	if (!var)
@@ -113,7 +113,7 @@ void Cvar_Set (const char *var_name, const char *value)
 		return;
 	}
 
-	changed = Q_strcmp(var->string, value);
+	changed = Q_strcmp(var->string, value) != 0;
 	
 	Z_Free (var->string);	// free the old value string
 	
@@ -184,7 +184,7 @@ Cvar_Command
 Handles variable inspection and changing from the console
 ============
 */
-qboolean	Cvar_Command (void)
+bool	Cvar_Command (void)
 {
 	cvar_t			*v;
 

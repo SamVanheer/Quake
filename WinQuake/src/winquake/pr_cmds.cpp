@@ -129,7 +129,7 @@ void PF_setorigin (void)
 }
 
 
-void SetMinMaxSize (edict_t *e, float *min, float *max, qboolean rotate)
+void SetMinMaxSize (edict_t *e, float *min, float *max, bool rotate)
 {
 	float	*angles;
 	vec3_t	rmin, rmax;
@@ -620,11 +620,11 @@ void PF_traceline (void)
 
 	trace = SV_Move (v1, vec3_origin, vec3_origin, v2, nomonsters, ent);
 
-	pr_global_struct->trace_allsolid = trace.allsolid;
-	pr_global_struct->trace_startsolid = trace.startsolid;
+	pr_global_struct->trace_allsolid = static_cast<int>(trace.allsolid);
+	pr_global_struct->trace_startsolid = static_cast<int>(trace.startsolid);
 	pr_global_struct->trace_fraction = trace.fraction;
-	pr_global_struct->trace_inwater = trace.inwater;
-	pr_global_struct->trace_inopen = trace.inopen;
+	pr_global_struct->trace_inwater = static_cast<int>(trace.inwater);
+	pr_global_struct->trace_inopen = static_cast<int>(trace.inopen);
 	VectorCopy (trace.endpos, pr_global_struct->trace_endpos);
 	VectorCopy (trace.plane.normal, pr_global_struct->trace_plane_normal);
 	pr_global_struct->trace_plane_dist =  trace.plane.dist;	
@@ -1171,7 +1171,7 @@ void PF_walkmove (void)
 	oldf = pr_xfunction;
 	oldself = pr_global_struct->self;
 	
-	G_FLOAT(OFS_RETURN) = SV_movestep(ent, move, true);
+	G_FLOAT(OFS_RETURN) = static_cast<int>(SV_movestep(ent, move, true));
 	
 	
 // restore program state
@@ -1274,7 +1274,7 @@ void PF_checkbottom (void)
 	
 	ent = G_EDICT(OFS_PARM0);
 
-	G_FLOAT(OFS_RETURN) = SV_CheckBottom (ent);
+	G_FLOAT(OFS_RETURN) = static_cast<int>(SV_CheckBottom (ent));
 }
 
 /*

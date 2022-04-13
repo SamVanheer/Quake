@@ -40,13 +40,13 @@ int			mouse_oldbuttonstate;
 Point		current_pos;
 int			mouse_x, mouse_y, old_mouse_x, old_mouse_y, mx_accum, my_accum;
 
-static qboolean	restore_spi;
+static bool restore_spi;
 static int		originalmouseparms[3], newmouseparms[3] = {0, 0, 1};
 
-qboolean	mouseactive;
-qboolean		mouseinitialized;
-static qboolean	mouseparmsvalid, mouseactivatetoggle;
-static qboolean	mouseshowtoggle = 1;
+bool			mouseactive;
+bool			mouseinitialized;
+static bool mouseparmsvalid, mouseactivatetoggle;
+static bool mouseshowtoggle = true;
 
 static unsigned int		mstate_di;
 
@@ -100,7 +100,7 @@ cvar_t	joy_yawsensitivity = {"joyyawsensitivity", "-1.0"};
 cvar_t	joy_wwhack1 = {"joywwhack1", "0.0"};
 cvar_t	joy_wwhack2 = {"joywwhack2", "0.0"};
 
-qboolean	joy_avail, joy_advancedinit;
+bool	joy_avail, joy_advancedinit;
 std::uint32_t		joy_oldbuttonstate;
 
 SDL_GameController* joystick = nullptr;
@@ -135,7 +135,7 @@ void IN_ShowMouse (void)
 	if (!mouseshowtoggle)
 	{
 		SDL_ShowCursor(SDL_ENABLE);
-		mouseshowtoggle = 1;
+		mouseshowtoggle = true;
 	}
 }
 
@@ -151,7 +151,7 @@ void IN_HideMouse (void)
 	if (mouseshowtoggle)
 	{
 		SDL_ShowCursor(SDL_DISABLE);
-		mouseshowtoggle = 0;
+		mouseshowtoggle = false;
 	}
 }
 
@@ -170,7 +170,7 @@ void IN_ActivateMouse (void)
 	{
 #ifdef WIN32
 		if (mouseparmsvalid)
-			restore_spi = SystemParametersInfo (SPI_SETMOUSE, 0, newmouseparms, 0);
+			restore_spi = SystemParametersInfo (SPI_SETMOUSE, 0, newmouseparms, 0) != FALSE;
 #endif
 
 		SDL_WarpMouseInWindow(mainwindow, window_center_x, window_center_y);
@@ -249,7 +249,7 @@ void IN_StartupMouse (void)
 	mouseinitialized = true;
 
 #ifdef WIN32
-	mouseparmsvalid = SystemParametersInfo (SPI_GETMOUSE, 0, originalmouseparms, 0);
+	mouseparmsvalid = SystemParametersInfo (SPI_GETMOUSE, 0, originalmouseparms, 0) != FALSE;
 #endif
 
 	if (mouseparmsvalid)
@@ -679,7 +679,7 @@ void IN_Commands (void)
 IN_ReadJoystick
 =============== 
 */  
-qboolean IN_ReadJoystick (void)
+bool IN_ReadJoystick (void)
 {
 	SDL_JoystickUpdate();
 
@@ -713,7 +713,7 @@ void IN_JoyMove (usercmd_t *cmd)
 	}
  
 	// collect the joystick data, if possible
-	if (IN_ReadJoystick () != true)
+	if (!IN_ReadJoystick ())
 	{
 		return;
 	}
