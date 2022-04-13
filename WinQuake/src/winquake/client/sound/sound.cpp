@@ -82,7 +82,10 @@ struct OpenALBuffer final
 
 	~OpenALBuffer()
 	{
-		alDeleteBuffers(1, &Id);
+		if (Id != 0)
+		{
+			alDeleteBuffers(1, &Id);
+		}
 	}
 
 	static OpenALBuffer Create()
@@ -121,7 +124,10 @@ struct OpenALSource final
 
 	~OpenALSource()
 	{
-		alGenSources(1, &Id);
+		if (Id != 0)
+		{
+			alDeleteSources(1, &Id);
+		}
 	}
 
 	static OpenALSource Create()
