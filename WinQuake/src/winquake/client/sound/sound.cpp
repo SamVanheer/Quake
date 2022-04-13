@@ -216,7 +216,7 @@ static std::optional<OpenALAudio> openal_audio;
 
 static DummySoundSystem g_DummySoundSystem;
 
-extern ISoundSystem* g_SoundSystem = &g_DummySoundSystem;
+ISoundSystem* g_SoundSystem = &g_DummySoundSystem;
 
 std::optional<OpenALAudio> OpenALAudio::Create()
 {

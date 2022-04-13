@@ -264,7 +264,7 @@ void R_DrawSpriteModel (entity_t *e)
 #define NUMVERTEXNORMALS	162
 #pragma warning( push )
 #pragma warning( disable: 4838 4305 )
-extern float	r_avertexnormals[ NUMVERTEXNORMALS ][ 3 ] = {
+float	r_avertexnormals[ NUMVERTEXNORMALS ][ 3 ] = {
 #include "anorms.h"
 };
 #pragma warning( pop )
