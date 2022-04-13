@@ -1599,8 +1599,7 @@ void	VID_Init (unsigned char *palette)
 					modelist[nummodes].dib = 1;
 					modelist[nummodes].fullscreen = 1;
 					modelist[nummodes].bpp = bpp;
-					//TODO: the devmode variable was always zero initialized so the parameters are also all 0.
-					sprintf (modelist[nummodes].modedesc, "%dx%dx%d", 0, 0, 0);
+					sprintf (modelist[nummodes].modedesc, "%dx%dx%d", width, height, bpp);
 
 					bool existingmode = false;
 
