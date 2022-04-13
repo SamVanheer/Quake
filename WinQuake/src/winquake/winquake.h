@@ -29,6 +29,3 @@ void	VID_UnlockBuffer (void);
 #endif
 
 HWND VID_GetWindowHandle();
-
-extern cvar_t		_windowed_mouse;
-

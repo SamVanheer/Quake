@@ -202,6 +202,7 @@ void	VID_UnlockBuffer (void);
 // #define IDGODS
 
 #include "common.h"
+#include "cvar.h"
 #include "bspfile.h"
 #include "vid.h"
 #include "sys.h"
@@ -222,7 +223,6 @@ typedef struct
 
 #include "wad.h"
 #include "draw.h"
-#include "cvar.h"
 #include "renderer/screen.h"
 #include "net/net.h"
 #include "protocol.h"
