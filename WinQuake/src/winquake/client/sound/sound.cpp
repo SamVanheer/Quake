@@ -26,12 +26,25 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <cassert>
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include <AL/al.h>
 #include <AL/alc.h>
 
 #include "quakedef.h"
+
+struct DummySoundSystem final : public ISoundSystem
+{
+	bool IsBlocked() const override { return false; }
+
+	void Block() override {}
+	void Unblock() override {}
+
+	int GetDMAPosition() const override { return 0; }
+
+	void Submit() override {}
+};
 
 template<auto Function>
 struct DeleterWrapper final
@@ -158,9 +171,8 @@ private:
 	static constexpr int MAX_BUFFERS_AHEAD = 2;
 
 public:
-	static OpenALAudio Create();
 
-	bool IsInitialized() const { return m_Initialized; }
+	static std::optional<OpenALAudio> Create();
 
 	bool IsBlocked() const override { return m_Blocked; }
 
@@ -175,8 +187,6 @@ private:
 	bool CreateCore();
 
 private:
-	bool m_Initialized = false;
-
 	std::unique_ptr<ALCdevice, DeleterWrapper<alcCloseDevice>> m_Device;
 	std::unique_ptr<ALCcontext, DeleterWrapper<alcDestroyContext>> m_Context;
 
@@ -196,11 +206,13 @@ private:
 
 static bool snd_firsttime = true;
 
-static OpenALAudio openal_audio;
+static std::optional<OpenALAudio> openal_audio;
 
-ISoundSystem* g_SoundSystem = &openal_audio;
+static DummySoundSystem g_DummySoundSystem;
 
-OpenALAudio OpenALAudio::Create()
+extern ISoundSystem* g_SoundSystem = &g_DummySoundSystem;
+
+std::optional<OpenALAudio> OpenALAudio::Create()
 {
 	if (OpenALAudio audio; audio.CreateCore())
 	{
@@ -310,9 +322,7 @@ bool OpenALAudio::CreateCore()
 		return false;
 	}
 
-	m_Initialized = true;
-
-	return m_Initialized;
+	return true;
 }
 
 void OpenALAudio::Block()
@@ -329,7 +339,7 @@ void OpenALAudio::Unblock()
 
 int OpenALAudio::GetDMAPosition() const
 {
-	int s = m_Initialized ? m_Sent * BUFFER_SIZE : 0;
+	int s = m_Sent * BUFFER_SIZE;
 
 	s >>= m_Sample16;
 
@@ -340,9 +350,6 @@ int OpenALAudio::GetDMAPosition() const
 
 void OpenALAudio::Submit()
 {
-	if (!m_Initialized)
-		return;
-
 	ALint state;
 	alGetSourcei(m_Source.Id, AL_SOURCE_STATE, &state);
 	CheckALErrors();
@@ -414,8 +421,10 @@ bool SNDDMA_Init()
 	{
 		openal_audio = OpenALAudio::Create();
 
-		if (openal_audio.IsInitialized())
+		if (openal_audio.has_value())
 		{
+			g_SoundSystem = &openal_audio.value();
+
 			if (snd_firsttime)
 				Con_SafePrintf("OpenAL sound initialized\n");
 		}
@@ -429,7 +438,7 @@ bool SNDDMA_Init()
 
 	snd_firsttime = false;
 
-	if (!openal_audio.IsInitialized())
+	if (!openal_audio.has_value())
 	{
 		if (wasFirstTime)
 			Con_SafePrintf("No sound device initialized\n");
@@ -442,20 +451,6 @@ bool SNDDMA_Init()
 
 /*
 ==============
-SNDDMA_GetDMAPos
-
-return the current sample position (in mono samples read)
-inside the recirculating dma buffer, so the mixing code will know
-how many sample are required to fill it up.
-===============
-*/
-int SNDDMA_GetDMAPos()
-{
-	return openal_audio.GetDMAPosition();
-}
-
-/*
-==============
 SNDDMA_Shutdown
 
 Reset the sound device for exiting
@@ -463,5 +458,6 @@ Reset the sound device for exiting
 */
 void SNDDMA_Shutdown()
 {
-	openal_audio = OpenALAudio{};
+	g_SoundSystem = &g_DummySoundSystem;
+	openal_audio.reset();
 }
