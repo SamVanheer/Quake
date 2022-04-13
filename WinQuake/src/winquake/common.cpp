@@ -38,8 +38,6 @@ bool			proghack;
 
 bool             static_registered = true;  // only for startup check, then set
 
-bool			msg_suppress_1 = false;
-
 void COM_InitFilesystem (void);
 
 // if a packfile directory differs from this, it is assumed to be hacked

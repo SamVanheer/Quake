@@ -343,8 +343,6 @@ void Host_Quit_f (void);
 void Host_ClientCommands (const char *fmt, ...);
 void Host_ShutdownServer (bool crash);
 
-extern bool			msg_suppress_1;		// suppresses resolution and cache size console output
-										//  an fullscreen DIB focus gain/loss
 extern int			current_skill;		// skill level for currently loaded level (in case
 										//  the user changes the cvar while the level is
 										//  running, this reflects the level actually in use)
