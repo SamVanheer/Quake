@@ -110,9 +110,6 @@ void IN_StartupJoystick (void);
 void Joy_AdvancedUpdate_f (void);
 void IN_JoyMove (usercmd_t *cmd);
 
-//TODO: clip mouse in window somehow
-
-
 /*
 ===========
 Force_CenterView_f
