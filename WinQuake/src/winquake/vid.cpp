@@ -133,7 +133,6 @@ void VID_UpdateWindowStatus (void);
 void GL_Init (void);
 
 bool is8bit = false;
-bool isPermedia = false;
 bool gl_mtexable = false;
 
 //====================================
@@ -722,9 +721,6 @@ void GL_Init (void)
 
     if (strnicmp(gl_renderer,"PowerVR",7)==0)
          fullsbardraw = true;
-
-    if (strnicmp(gl_renderer,"Permedia",8)==0)
-         isPermedia = true;
 
 	CheckMultiTextureExtensions ();
 
