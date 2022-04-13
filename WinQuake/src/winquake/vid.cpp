@@ -1094,10 +1094,7 @@ void VID_ProcessEvent(SDL_Event& event)
 		case SDL_WINDOWEVENT_FOCUS_LOST:
 		{
 			const bool fActive = event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED;
-			const bool fMinimized = false;// (BOOL)HIWORD(wParam); //TODO: figure out if this is even needed.
-
-			if (!fActive)
-				SDL_MinimizeWindow(mainwindow);
+			const bool fMinimized = (SDL_GetWindowFlags(mainwindow) & SDL_WINDOW_MINIMIZED) != 0;
 
 			AppActivate(fActive, fMinimized);
 
