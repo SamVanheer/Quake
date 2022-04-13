@@ -60,7 +60,7 @@ void Host_Status_f (void)
 	int			minutes;
 	int			hours = 0;
 	int			j;
-	void		(*print) (char *fmt, ...);
+	void		(*print) (const char *fmt, ...);
 	
 	if (cmd_source == src_command)
 	{
@@ -907,7 +907,7 @@ Host_Name_f
 */
 void Host_Name_f (void)
 {
-	char	*newName;
+	const char	*newName;
 
 	if (Cmd_Argc () == 1)
 	{
@@ -918,7 +918,13 @@ void Host_Name_f (void)
 		newName = Cmd_Argv(1);	
 	else
 		newName = Cmd_Args();
-	newName[15] = 0;
+		
+	char truncatedName[16];
+	
+	Q_strncpy(truncatedName, newName, sizeof(truncatedName) - 1);
+	truncatedName[15] = 0;
+	
+	newName = truncatedName;
 
 	if (cmd_source == src_command)
 	{
@@ -1008,7 +1014,6 @@ void Host_Say(qboolean teamonly)
 	client_t *client;
 	client_t *save;
 	int		j;
-	char	*p;
 	char	text[64];
 	qboolean	fromServer = false;
 
@@ -1031,7 +1036,14 @@ void Host_Say(qboolean teamonly)
 
 	save = host_client;
 
-	p = Cmd_Args();
+	//TODO: need to make sure the buffer is large enough.
+	char input[64];
+	
+	strncpy(input, Cmd_Args(), sizeof(input) - 1);
+	input[sizeof(input) - 1] = '\0';
+	
+	char* p = input;
+
 // remove quotes if present
 	if (*p == '"')
 	{
@@ -1084,7 +1096,6 @@ void Host_Tell_f(void)
 	client_t *client;
 	client_t *save;
 	int		j;
-	char	*p;
 	char	text[64];
 
 	if (cmd_source == src_command)
@@ -1099,7 +1110,13 @@ void Host_Tell_f(void)
 	Q_strcpy(text, host_client->name);
 	Q_strcat(text, ": ");
 
-	p = Cmd_Args();
+	//TODO: need to make sure the buffer is large enough.
+	char input[64];
+	
+	strncpy(input, Cmd_Args(), sizeof(input) - 1);
+	input[sizeof(input) - 1] = '\0';
+	
+	char* p = input;
 
 // remove quotes if present
 	if (*p == '"')
@@ -1421,7 +1438,7 @@ Kicks a user off of the server
 */
 void Host_Kick_f (void)
 {
-	char		*who;
+	const char		*who;
 	char		*message = NULL;
 	client_t	*save;
 	int			i;
@@ -1477,7 +1494,7 @@ void Host_Kick_f (void)
 
 		if (Cmd_Argc() > 2)
 		{
-			message = COM_Parse(Cmd_Args());
+			message = COM_Parse(const_cast<char*>(Cmd_Args()));
 			if (byNumber)
 			{
 				message++;							// skip the #
@@ -1513,7 +1530,7 @@ Host_Give_f
 */
 void Host_Give_f (void)
 {
-	char	*t;
+	const char	*t;
 	int		v;
 	eval_t	*val;
 

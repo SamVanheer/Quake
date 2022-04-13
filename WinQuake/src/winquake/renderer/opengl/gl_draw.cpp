@@ -177,7 +177,7 @@ byte		menuplyr_pixels[4096];
 int		pic_texels;
 int		pic_count;
 
-qpic_t *Draw_PicFromWad (char *name)
+qpic_t *Draw_PicFromWad (const char *name)
 {
 	qpic_t	*p;
 	glpic_t	*gl;
@@ -225,7 +225,7 @@ qpic_t *Draw_PicFromWad (char *name)
 Draw_CachePic
 ================
 */
-qpic_t	*Draw_CachePic (char *path)
+qpic_t	*Draw_CachePic (const char *path)
 {
 	cachepic_t	*pic;
 	int			i;
@@ -295,7 +295,7 @@ void Draw_CharToConback (int num, byte *dest)
 
 typedef struct
 {
-	char *name;
+	const char *name;
 	int	minimize, maximize;
 } glmode_t;
 
@@ -378,8 +378,8 @@ void Draw_Init (void)
 	Cvar_RegisterVariable (&gl_picmip);
 
 	// 3dfx can only handle 256 wide textures
-	if (!Q_strncasecmp ((char *)gl_renderer, "3dfx",4) ||
-		strstr((char *)gl_renderer, "Glide"))
+	if (!Q_strncasecmp (gl_renderer, "3dfx",4) ||
+		strstr(gl_renderer, "Glide"))
 		Cvar_Set ("gl_max_size", "256");
 
 	Cmd_AddCommand ("gl_texturemode", &Draw_TextureMode_f);
@@ -528,7 +528,7 @@ void Draw_Character (int x, int y, int num)
 Draw_String
 ================
 */
-void Draw_String (int x, int y, char *str)
+void Draw_String (int x, int y, const char *str)
 {
 	while (*str)
 	{
@@ -841,7 +841,7 @@ void GL_Set2D (void)
 GL_FindTexture
 ================
 */
-int GL_FindTexture (char *identifier)
+int GL_FindTexture (const char *identifier)
 {
 	int		i;
 	gltexture_t	*glt;
@@ -1211,7 +1211,7 @@ static	unsigned	trans[640*480];		// FIXME, temporary
 GL_LoadTexture
 ================
 */
-int GL_LoadTexture (char *identifier, int width, int height, byte *data, qboolean mipmap, qboolean alpha)
+int GL_LoadTexture (const char *identifier, int width, int height, byte *data, qboolean mipmap, qboolean alpha)
 {
 	int			i;
 	gltexture_t	*glt;

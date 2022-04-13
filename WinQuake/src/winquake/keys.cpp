@@ -48,7 +48,7 @@ qboolean	keydown[256];
 
 typedef struct
 {
-	char	*name;
+	const char	*name;
 	int		keynum;
 } keyname_t;
 
@@ -158,7 +158,7 @@ Interactive line editing and console scrollback
 */
 void Key_Console (int key)
 {
-	char	*cmd;
+	const char	*cmd;
 	
 	if (key == K_ENTER)
 	{
@@ -338,7 +338,7 @@ the given string.  Single ascii characters return themselves, while
 the K_* names are matched up.
 ===================
 */
-int Key_StringToKeynum (char *str)
+int Key_StringToKeynum (const char *str)
 {
 	keyname_t	*kn;
 	
@@ -364,7 +364,7 @@ given keynum.
 FIXME: handle quote special (general escape sequence?)
 ===================
 */
-char *Key_KeynumToString (int keynum)
+const char *Key_KeynumToString (int keynum)
 {
 	keyname_t	*kn;	
 	static	char	tinystr[2];
@@ -391,7 +391,7 @@ char *Key_KeynumToString (int keynum)
 Key_SetBinding
 ===================
 */
-void Key_SetBinding (int keynum, char *binding)
+void Key_SetBinding (int keynum, const char *binding)
 {
 	char	*newBinding;
 	int		l;

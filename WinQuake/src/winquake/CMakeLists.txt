@@ -159,12 +159,6 @@ if(MSVC)
 			/W4 /wd4805 /wd4244 /wd4100 /wd4459 /wd4611)
 endif()
 
-if (UNIX)
-	target_compile_options(winquake
-		PRIVATE
-			-Wno-write-strings)
-endif()
-
 install(TARGETS SDL2
 	RUNTIME DESTINATION .
 	LIBRARY DESTINATION .)

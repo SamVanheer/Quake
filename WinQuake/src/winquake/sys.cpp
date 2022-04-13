@@ -58,7 +58,7 @@ static double lastcurtime = 0.0;
 
 qboolean			isDedicated;
 
-static char			*tracking_tag = "Clams & Mooses";
+static const char			*tracking_tag = "Clams & Mooses";
 
 #ifdef WIN32
 static HANDLE hFile;
@@ -106,7 +106,7 @@ long filelength (FILE *f)
 	return end;
 }
 
-long Sys_FileOpenRead (char *path, int *hndl)
+long Sys_FileOpenRead (const char *path, int *hndl)
 {
 	const int i = findhandle ();
 
@@ -121,7 +121,7 @@ long Sys_FileOpenRead (char *path, int *hndl)
 	return -1;
 }
 
-int Sys_FileOpenWrite (char *path)
+int Sys_FileOpenWrite (const char *path)
 {
 	const int i = findhandle ();
 
@@ -154,7 +154,7 @@ int Sys_FileWrite (int handle, const void *data, int count)
 	return fwrite (data, 1, count, sys_handles[handle]);
 }
 
-time_t Sys_FileTime (char *path)
+time_t Sys_FileTime (const char *path)
 {
 	struct stat buf;
 
@@ -166,7 +166,7 @@ time_t Sys_FileTime (char *path)
 	return buf.st_mtime;
 }
 
-void Sys_mkdir (char *path)
+void Sys_mkdir (const char *path)
 {
 #ifdef WIN32
 	_mkdir(path);
@@ -206,7 +206,7 @@ void Sys_Init (void)
 }
 
 
-void Sys_Error (char *error, ...)
+void Sys_Error (const char *error, ...)
 {
 	static bool in_sys_error0 = false;
 	static bool in_sys_error1 = false;
@@ -283,7 +283,7 @@ void Sys_Error (char *error, ...)
 	exit(1);
 }
 
-void Sys_Printf (char *fmt, ...)
+void Sys_Printf (const char *fmt, ...)
 {
 	if (isDedicated)
 	{

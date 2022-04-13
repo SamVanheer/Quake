@@ -218,7 +218,7 @@ extern	edict_t		*sv_player;
 void SV_Init (void);
 
 void SV_StartParticle (vec3_t org, vec3_t dir, int color, int count);
-void SV_StartSound (edict_t *entity, int channel, char *sample, int volume,
+void SV_StartSound (edict_t *entity, int channel, const char *sample, int volume,
     float attenuation);
 
 void SV_DropClient (qboolean crash);
@@ -226,7 +226,7 @@ void SV_DropClient (qboolean crash);
 void SV_SendClientMessages (void);
 void SV_ClearDatagram (void);
 
-int SV_ModelIndex (char *name);
+int SV_ModelIndex (const char *name);
 
 void SV_SetIdealPitch (void);
 
@@ -235,8 +235,8 @@ void SV_AddUpdates (void);
 void SV_ClientThink (void);
 void SV_AddClientToServer (struct qsocket_s	*ret);
 
-void SV_ClientPrintf (char *fmt, ...);
-void SV_BroadcastPrintf (char *fmt, ...);
+void SV_ClientPrintf (const char *fmt, ...);
+void SV_BroadcastPrintf (const char *fmt, ...);
 
 void SV_Physics (void);
 
@@ -251,7 +251,7 @@ void SV_CheckForNewClients (void);
 void SV_RunClients (void);
 void SV_SaveSpawnparms ();
 #ifdef QUAKE2
-void SV_SpawnServer (char *server, char *startspot);
+void SV_SpawnServer (const char *server, const char *startspot);
 #else
-void SV_SpawnServer (char *server);
+void SV_SpawnServer (const char *server);
 #endif

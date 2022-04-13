@@ -51,7 +51,7 @@ cachepic_t	menu_cachepics[MAX_CACHED_PICS];
 int			menu_numcachepics;
 
 
-qpic_t	*Draw_PicFromWad (char *name)
+qpic_t	*Draw_PicFromWad (const char *name)
 {
 	return reinterpret_cast<qpic_t*>( W_GetLumpName (name) );
 }
@@ -61,7 +61,7 @@ qpic_t	*Draw_PicFromWad (char *name)
 Draw_CachePic
 ================
 */
-qpic_t	*Draw_CachePic (char *path)
+qpic_t	*Draw_CachePic (const char *path)
 {
 	cachepic_t	*pic;
 	int			i;
@@ -226,7 +226,7 @@ void Draw_Character (int x, int y, int num)
 Draw_String
 ================
 */
-void Draw_String (int x, int y, char *str)
+void Draw_String (int x, int y, const char *str)
 {
 	while (*str)
 	{

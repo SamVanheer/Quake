@@ -1053,7 +1053,7 @@ void PF_Find (void)
 }
 #endif
 
-void PR_CheckEmptyString (char *s)
+void PR_CheckEmptyString (const char *s)
 {
 	if (s[0] <= ' ')
 		PR_RunError ("Bad string");
@@ -1579,7 +1579,7 @@ void PF_WriteEntity (void)
 
 //=============================================================================
 
-int SV_ModelIndex (char *name);
+int SV_ModelIndex (const char *name);
 
 void PF_makestatic (void)
 {

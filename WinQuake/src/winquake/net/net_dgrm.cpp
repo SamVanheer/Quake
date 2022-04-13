@@ -84,7 +84,7 @@ void NET_Ban_f (void)
 {
 	char	addrStr [32];
 	char	maskStr [32];
-	void	(*print) (char *fmt, ...);
+	void	(*print) (const char *fmt, ...);
 
 	if (cmd_source == src_command)
 	{
@@ -556,7 +556,7 @@ static void Test_Poll(void)
 
 static void Test_f (void)
 {
-	char	*host;
+	const char	*host;
 	int		n;
 	int		max = MAX_SCOREBOARD;
 	struct qsockaddr sendaddr;
@@ -685,7 +685,7 @@ Done:
 
 static void Test2_f (void)
 {
-	char	*host;
+	const char	*host;
 	int		n;
 	struct qsockaddr sendaddr;
 
@@ -1189,7 +1189,7 @@ void Datagram_SearchForHosts (qboolean xmit)
 }
 
 
-static qsocket_t *_Datagram_Connect (char *host)
+static qsocket_t *_Datagram_Connect (const char *host)
 {
 	struct qsockaddr sendaddr;
 	struct qsockaddr readaddr;
@@ -1199,7 +1199,7 @@ static qsocket_t *_Datagram_Connect (char *host)
 	int			reps;
 	double		start_time;
 	int			control;
-	char		*reason;
+	const char		*reason;
 
 	// see if we can resolve the host name
 	if (dfunc.GetAddrFromName(host, &sendaddr) == -1)
@@ -1356,7 +1356,7 @@ ErrorReturn2:
 	return NULL;
 }
 
-qsocket_t *Datagram_Connect (char *host)
+qsocket_t *Datagram_Connect (const char *host)
 {
 	qsocket_t *ret = NULL;
 

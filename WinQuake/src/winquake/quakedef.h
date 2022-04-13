@@ -299,7 +299,7 @@ typedef struct
 	const char	*basedir;
 	char	*cachedir;		// for development over ISDN lines
 	int		argc;
-	char	**argv;
+	const char	**argv;
 	void	*membase;
 	int		memsize;
 } quakeparms_t;
@@ -334,11 +334,11 @@ void Host_ServerFrame (void);
 void Host_InitCommands (void);
 void Host_Init (quakeparms_t *parms);
 void Host_Shutdown(void);
-void Host_Error (char *error, ...);
-void Host_EndGame (char *message, ...);
+void Host_Error (const char *error, ...);
+void Host_EndGame (const char *message, ...);
 void Host_Frame (float time);
 void Host_Quit_f (void);
-void Host_ClientCommands (char *fmt, ...);
+void Host_ClientCommands (const char *fmt, ...);
 void Host_ShutdownServer (qboolean crash);
 
 extern qboolean		msg_suppress_1;		// suppresses resolution and cache size console output
