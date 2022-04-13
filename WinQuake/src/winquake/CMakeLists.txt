@@ -23,6 +23,9 @@ set_target_properties(
 	PROPERTIES
 		FOLDER "Dependencies")
 
+target_compile_options(common PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/MP>)
+target_compile_options(OpenAL PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/MP>)
+
 set(WINQUAKE_RENDERER "OpenGL" CACHE STRING "Renderer to use")
 set_property(CACHE WINQUAKE_RENDERER PROPERTY STRINGS Software OpenGL)
 
@@ -139,6 +142,10 @@ target_link_libraries(winquake PRIVATE
 	OpenGL::GLU
 	OpenGL::GL
 	OpenAL)
+
+target_compile_options(winquake
+	PRIVATE
+		$<$<CXX_COMPILER_ID:MSVC>:/MP>)
 
 if(MSVC)	
 	target_compile_options(winquake
