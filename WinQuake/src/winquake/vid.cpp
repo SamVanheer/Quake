@@ -1154,13 +1154,15 @@ void VID_ProcessEvent(SDL_Event& event)
 	{
 		int temp = 0;
 
-		if (event.button.button == SDL_BUTTON_LEFT)
+		const auto buttonsDown = SDL_GetMouseState(nullptr, nullptr);
+
+		if ((buttonsDown & SDL_BUTTON_LMASK) != 0)
 			temp |= 1;
 
-		if (event.button.button == SDL_BUTTON_RIGHT)
+		if ((buttonsDown & SDL_BUTTON_RMASK) != 0)
 			temp |= 2;
 
-		if (event.button.button == SDL_BUTTON_MIDDLE)
+		if ((buttonsDown & SDL_BUTTON_MMASK) != 0)
 			temp |= 4;
 
 		IN_MouseEvent(temp);
