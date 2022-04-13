@@ -50,10 +50,6 @@ target_sources(winquake
 		cmd.h
 		common.cpp
 		common.h
-		$<$<CXX_COMPILER_ID:MSVC>:
-			conproc.cpp
-			conproc.h
-		>
 		console.cpp
 		console.h
 		crc.cpp
@@ -96,27 +92,64 @@ target_sources(winquake
 		zone.h
 		progdefs.q1
 		progdefs.q2
+		
+		client/cl_demo.cpp
+		client/cl_input.cpp
+		client/cl_main.cpp
+		client/cl_parse.cpp
+		client/cl_tent.cpp
+		
+		client/sound/cdaudio.h
+		client/sound/snd_dma.cpp
+		client/sound/snd_mem.cpp
+		client/sound/snd_mix.cpp
+		client/sound/sound.cpp
+		client/sound/sound.h
+		
+		client/ui/menu.cpp
+		client/ui/menu.h
+		client/ui/sbar.cpp
+		client/ui/sbar.h
+		
+		net/net.h
+		net/net_dgrm.cpp
+		net/net_dgrm.h
+		net/net_loop.cpp
+		net/net_loop.h
+		net/net_main.cpp
+		net/net_vcr.cpp
+		net/net_vcr.h
+		
 		renderer/r_part.cpp
 		renderer/render.h
 		renderer/screen.h
-		$<$<CXX_COMPILER_ID:MSVC>:winquake.rc>)
-
-add_subdirectory(client)
-add_subdirectory(net)
-add_subdirectory(server)
-
-if (MSVC)
-	add_subdirectory(plat/windows)
-else()
-	add_subdirectory(plat/linux)
-endif()
+		
+		server/sv_main.cpp
+		server/sv_move.cpp
+		server/sv_phys.cpp
+		server/sv_user.cpp
+		
+		$<$<CXX_COMPILER_ID:MSVC>:
+			plat/windows/cd_win.cpp
+			conproc.cpp
+			conproc.h
+			net/net_win.cpp
+			net/net_wins.cpp
+			net/net_wins.h
+			winquake.rc
+		>
+		$<$<PLATFORM_ID:UNIX>:
+			plat/linux/cd_linux.cpp
+			net/net_bsd.cpp
+			net/net_udp.cpp
+			net/net_udp.h
+		>)
 
 if(RENDERER_IS_SOFTWARE)
 	add_subdirectory(renderer/software)
 elseif(RENDERER_IS_OPENGL)
 	add_subdirectory(renderer/opengl)
 endif()
-
 
 target_precompile_headers(winquake PRIVATE quakedef.h)
 
