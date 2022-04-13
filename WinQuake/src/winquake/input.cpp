@@ -37,8 +37,7 @@ cvar_t	m_filter = {"m_filter","0"};
 
 int			mouse_buttons;
 int			mouse_oldbuttonstate;
-Point		current_pos;
-int			mouse_x, mouse_y, old_mouse_x, old_mouse_y, mx_accum, my_accum;
+int			mouse_x, mouse_y, old_mouse_x, old_mouse_y;
 
 static bool restore_spi;
 static int		originalmouseparms[3], newmouseparms[3] = {0, 0, 1};
@@ -173,8 +172,7 @@ void IN_ActivateMouse (void)
 			restore_spi = SystemParametersInfo (SPI_SETMOUSE, 0, newmouseparms, 0) != FALSE;
 #endif
 
-		SDL_WarpMouseInWindow(mainwindow, window_center_x, window_center_y);
-		SDL_CaptureMouse(SDL_TRUE);
+		SDL_SetRelativeMouseMode(SDL_TRUE);
 
 		mouseactive = true;
 	}
@@ -210,7 +208,7 @@ void IN_DeactivateMouse (void)
 			SystemParametersInfo (SPI_SETMOUSE, 0, originalmouseparms, 0);
 #endif
 
-		SDL_CaptureMouse(SDL_FALSE);
+		SDL_SetRelativeMouseMode(SDL_FALSE);
 
 		mouseactive = false;
 	}
@@ -370,16 +368,11 @@ IN_MouseMove
 */
 void IN_MouseMove (usercmd_t *cmd)
 {
-	int					mx, my;
-
 	if (!mouseactive)
 		return;
 
-	SDL_GetMouseState(&current_pos.x, &current_pos.y);
-	mx = current_pos.x - window_center_x + mx_accum;
-	my = current_pos.y - window_center_y + my_accum;
-	mx_accum = 0;
-	my_accum = 0;
+	int mx, my;
+	SDL_GetRelativeMouseState(&mx, &my);
 
 //if (mx ||  my)
 //	Con_DPrintf("mx=%d, my=%d\n", mx, my);
@@ -425,12 +418,6 @@ void IN_MouseMove (usercmd_t *cmd)
 		else
 			cmd->forwardmove -= m_forward.value * mouse_y;
 	}
-
-// if the mouse has moved, force it to the center, so there's room to move
-	if (mx || my)
-	{
-		SDL_WarpMouseInWindow(mainwindow, window_center_x, window_center_y);
-	}
 }
 
 
@@ -449,27 +436,6 @@ void IN_Move (usercmd_t *cmd)
 	}
 }
 
-
-/*
-===========
-IN_Accumulate
-===========
-*/
-void IN_Accumulate (void)
-{
-	if (mouseactive)
-	{
-		SDL_GetMouseState(&current_pos.x, &current_pos.y);
-
-		mx_accum += current_pos.x - window_center_x;
-		my_accum += current_pos.y - window_center_y;
-
-	// force the mouse to the center, so there's room to move
-		SDL_WarpMouseInWindow(mainwindow, window_center_x, window_center_y);
-	}
-}
-
-
 /*
 ===================
 IN_ClearStates
@@ -480,8 +446,8 @@ void IN_ClearStates (void)
 
 	if (mouseactive)
 	{
-		mx_accum = 0;
-		my_accum = 0;
+		int x, y;
+		SDL_GetRelativeMouseState(&x, &y);
 		mouse_oldbuttonstate = 0;
 	}
 }
