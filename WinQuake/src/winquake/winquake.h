@@ -21,11 +21,4 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <windows.h>
 
-#ifndef SERVERONLY
-
-void	VID_LockBuffer (void);
-void	VID_UnlockBuffer (void);
-
-#endif
-
 HWND VID_GetWindowHandle();
