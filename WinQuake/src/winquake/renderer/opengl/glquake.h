@@ -204,8 +204,6 @@ extern	const char *gl_extensions;
 void R_TranslatePlayerSkin (int playernum);
 void GL_Bind (int texnum);
 
-bool VID_Is8bit();
-
 void GL_SubdivideSurface( msurface_t *fa );
 
 void GL_MakeAliasModelDisplayLists( model_t *m, aliashdr_t *hdr );
@@ -229,8 +227,6 @@ void R_DrawWaterSurfaces( void );
 void R_RenderBrushPoly( msurface_t *fa );
 
 void R_InitParticles( void );
-
-void GL_Upload8_EXT( byte *data, int width, int height, bool mipmap, bool alpha );
 
 void R_ClearParticles( void );
 
