@@ -320,13 +320,8 @@ typedef struct _PollProcedure
 
 void SchedulePollProcedure(PollProcedure *pp, double timeOffset);
 
-extern	bool		serialAvailable;
 extern	bool		tcpipAvailable;
 extern	char		my_tcpip_address[NET_NAMELEN];
-extern void (*GetComPortConfig) (int portNumber, int *port, int *irq, int *baud, bool *useModem);
-extern void (*SetComPortConfig) (int portNumber, int port, int irq, int baud, bool useModem);
-extern void (*GetModemConfig) (int portNumber, char *dialType, char *clear, char *init, char *hangup);
-extern void (*SetModemConfig) (int portNumber, char *dialType, char *clear, char *init, char *hangup);
 
 extern	bool		slistInProgress;
 extern	bool		slistSilent;
