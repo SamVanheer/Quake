@@ -130,19 +130,19 @@ target_sources(winquake
 		server/sv_user.cpp
 		
 		$<$<CXX_COMPILER_ID:MSVC>:
-			plat/windows/cd_win.cpp
 			conproc.cpp
 			conproc.h
 			net/net_win.cpp
 			net/net_wins.cpp
 			net/net_wins.h
+			plat/windows/cd_win.cpp
 			winquake.rc
 		>
-		$<$<PLATFORM_ID:UNIX>:
-			plat/linux/cd_linux.cpp
+		$<$<PLATFORM_ID:Linux>:
 			net/net_bsd.cpp
 			net/net_udp.cpp
 			net/net_udp.h
+			plat/linux/cd_linux.cpp
 		>)
 
 if(RENDERER_IS_SOFTWARE)
