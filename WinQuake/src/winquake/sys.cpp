@@ -30,7 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifdef WIN32
 #include "winquake.h"
-#include "conproc.h"
+#include "server/conproc.h"
 #include <VersionHelpers.h>
 #else
 #include <signal.h>

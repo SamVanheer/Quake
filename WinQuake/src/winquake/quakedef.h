@@ -206,7 +206,7 @@ void	VID_UnlockBuffer (void);
 #include "common.h"
 #include "cvar.h"
 #include "bspfile.h"
-#include "vid.h"
+#include "client/vid.h"
 #include "sys.h"
 #include "zone.h"
 #include "mathlib.h"
@@ -224,30 +224,30 @@ typedef struct
 
 
 #include "wad.h"
-#include "draw.h"
-#include "renderer/screen.h"
+#include "client/renderer/draw.h"
+#include "client/renderer/screen.h"
 #include "net/net.h"
 #include "protocol.h"
 #include "cmd.h"
 #include "client/ui/sbar.h"
 #include "client/sound/sound.h"
-#include "renderer/render.h"
-#include "client.h"
-#include "progs.h"
-#include "server.h"
+#include "client/renderer/render.h"
+#include "client/client.h"
+#include "server/progs/progs.h"
+#include "server/server.h"
 
 #ifdef GLQUAKE
-#include "renderer/opengl/gl_model.h"
+#include "client/renderer/opengl/gl_model.h"
 #else
-#include "renderer/software/model.h"
-#include "renderer/software/d_iface.h"
+#include "client/renderer/software/model.h"
+#include "client/renderer/software/d_iface.h"
 #endif
 
-#include "input.h"
-#include "world.h"
-#include "keys.h"
+#include "client/input.h"
+#include "server/world.h"
+#include "client/keys.h"
 #include "console.h"
-#include "view.h"
+#include "client/view.h"
 #include "client/ui/menu.h"
 #include "crc.h"
 #include "client/sound/cdaudio.h"
@@ -287,7 +287,7 @@ void GL_EnableMultitexture(void);
 //GL stuff end
 
 #ifdef GLQUAKE
-#include "renderer/opengl/glquake.h"
+#include "client/renderer/opengl/glquake.h"
 #endif
 
 //=============================================================================

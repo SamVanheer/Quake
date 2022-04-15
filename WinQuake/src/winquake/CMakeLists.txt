@@ -44,8 +44,6 @@ target_sources(winquake
 		anorm_dots.h
 		anorms.h
 		bspfile.h
-		chase.cpp
-		client.h
 		cmd.cpp
 		cmd.h
 		common.cpp
@@ -56,48 +54,43 @@ target_sources(winquake
 		crc.h
 		cvar.cpp
 		cvar.h
-		draw.h
 		host.cpp
 		host_cmd.cpp
-		input.cpp
-		input.h
-		keys.cpp
-		keys.h
 		mathlib.cpp
 		mathlib.h
 		modelgen.h
 		quakedef.h
-		pr_cmds.cpp
-		pr_comp.h
-		pr_edict.cpp
-		pr_exec.cpp
-		progdefs.h
-		progs.h
 		protocol.h
 		quakedef.h
-		server.h
 		spritegn.h
 		sys.cpp
 		sys.h
-		vid.cpp
-		vid.h
-		view.cpp
-		view.h
 		wad.cpp
 		wad.h
 		winquake.h
-		world.cpp
-		world.h
 		zone.cpp
 		zone.h
-		progdefs.q1
-		progdefs.q2
 		
+		client/chase.cpp
 		client/cl_demo.cpp
 		client/cl_input.cpp
 		client/cl_main.cpp
 		client/cl_parse.cpp
 		client/cl_tent.cpp
+		client/client.h
+		client/input.cpp
+		client/input.h
+		client/keys.cpp
+		client/keys.h
+		client/vid.cpp
+		client/vid.h
+		client/view.cpp
+		client/view.h
+		
+		client/renderer/draw.h
+		client/renderer/r_part.cpp
+		client/renderer/render.h
+		client/renderer/screen.h
 		
 		client/sound/cdaudio.h
 		client/sound/snd_dma.cpp
@@ -120,22 +113,30 @@ target_sources(winquake
 		net/net_vcr.cpp
 		net/net_vcr.h
 		
-		renderer/r_part.cpp
-		renderer/render.h
-		renderer/screen.h
-		
+		server/server.h
 		server/sv_main.cpp
 		server/sv_move.cpp
 		server/sv_phys.cpp
 		server/sv_user.cpp
+		server/world.cpp
+		server/world.h
+		
+		server/progs/pr_cmds.cpp
+		server/progs/pr_comp.h
+		server/progs/pr_edict.cpp
+		server/progs/pr_exec.cpp
+		server/progs/progdefs.h
+		server/progs/progs.h
+		server/progs/progdefs.q1
+		server/progs/progdefs.q2
 		
 		$<$<CXX_COMPILER_ID:MSVC>:
-			conproc.cpp
-			conproc.h
 			net/net_win.cpp
 			net/net_wins.cpp
 			net/net_wins.h
 			plat/windows/cd_win.cpp
+			server/conproc.cpp
+			server/conproc.h
 			winquake.rc
 		>
 		$<$<PLATFORM_ID:Linux>:
@@ -146,9 +147,9 @@ target_sources(winquake
 		>)
 
 if(RENDERER_IS_SOFTWARE)
-	add_subdirectory(renderer/software)
+	add_subdirectory(client/renderer/software)
 elseif(RENDERER_IS_OPENGL)
-	add_subdirectory(renderer/opengl)
+	add_subdirectory(client/renderer/opengl)
 endif()
 
 target_precompile_headers(winquake PRIVATE quakedef.h)
