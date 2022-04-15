@@ -245,7 +245,7 @@ bool SV_movestep (edict_t *ent, vec3_t move, bool relink);
 
 void SV_WriteClientdataToMessage (edict_t *ent, sizebuf_t *msg);
 
-void SV_MoveToGoal (void);
+void SV_MoveToGoal (edict_t* ent, float dist);
 
 void SV_CheckForNewClients (void);
 void SV_RunClients (void);

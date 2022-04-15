@@ -126,10 +126,10 @@ bool SV_movestep (edict_t *ent, vec3_t move, bool relink)
 		for (i=0 ; i<2 ; i++)
 		{
 			VectorAdd (ent->v.origin, move, neworg);
-			enemy = PROG_TO_EDICT(ent->v.enemy);
+			enemy = ent->v.enemy;
 			if (i == 0 && enemy != sv.edicts)
 			{
-				dz = ent->v.origin[2] - PROG_TO_EDICT(ent->v.enemy)->v.origin[2];
+				dz = ent->v.origin[2] - ent->v.enemy->v.origin[2];
 				if (dz > 40)
 					neworg[2] -= 8;
 				if (dz < 30)
@@ -209,7 +209,7 @@ bool SV_movestep (edict_t *ent, vec3_t move, bool relink)
 //		Con_Printf ("back on ground\n"); 
 		ent->v.flags = (int)ent->v.flags & ~FL_PARTIALGROUND;
 	}
-	ent->v.groundentity = EDICT_TO_PROG(trace.ent);
+	ent->v.groundentity = trace.ent;
 
 // the move is ok
 	if (relink)
@@ -229,14 +229,14 @@ facing it.
 
 ======================
 */
-void PF_changeyaw (void);
+void PF_changeyaw (edict_t* ent);
 bool SV_StepDirection (edict_t *ent, float yaw, float dist)
 {
 	vec3_t		move, oldorigin;
 	float		delta;
 	
 	ent->v.ideal_yaw = yaw;
-	PF_changeyaw();
+	PF_changeyaw(ent);
 	
 	yaw = yaw*M_PI*2 / 360;
 	move[0] = cos(yaw)*dist;
@@ -390,31 +390,17 @@ SV_MoveToGoal
 
 ======================
 */
-void SV_MoveToGoal (void)
+void SV_MoveToGoal (edict_t* ent, float dist)
 {
-	edict_t		*ent, *goal;
-	float		dist;
-#ifdef QUAKE2
-	edict_t		*enemy;
-#endif
-
-	ent = PROG_TO_EDICT(pr_global_struct->self);
-	goal = PROG_TO_EDICT(ent->v.goalentity);
-	dist = G_FLOAT(OFS_PARM0);
+	auto goal = ent->v.goalentity;
 
 	if ( !( (int)ent->v.flags & (FL_ONGROUND|FL_FLY|FL_SWIM) ) )
 	{
-		G_FLOAT(OFS_RETURN) = 0;
 		return;
 	}
 
 // if the next step hits the enemy, return immediately
-#ifdef QUAKE2
-	enemy = PROG_TO_EDICT(ent->v.enemy);
-	if (enemy != sv.edicts &&  SV_CloseEnough (ent, enemy, dist) )
-#else
-	if ( PROG_TO_EDICT(ent->v.enemy) != sv.edicts &&  SV_CloseEnough (ent, goal, dist) )
-#endif
+	if ( ent->v.enemy != sv.edicts &&  SV_CloseEnough (ent, goal, dist) )
 		return;
 
 // bump around...

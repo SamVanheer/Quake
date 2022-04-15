@@ -193,7 +193,7 @@ void SV_SendServerinfo (client_t *client)
 	char			message[2048];
 
 	MSG_WriteByte (&client->message, svc_print);
-	sprintf (message, "%c\nVERSION %4.2f SERVER (%i CRC)", 2, VERSION, pr_crc);
+	sprintf (message, "%c\nVERSION %4.2f SERVER", 2, VERSION);
 	MSG_WriteString (&client->message,message);
 
 	MSG_WriteByte (&client->message, svc_serverinfo);
@@ -437,8 +437,8 @@ void SV_WriteEntitiesToClient (edict_t	*clent, sizebuf_t *msg)
 	pvs = SV_FatPVS (org);
 
 // send over all entities (excpet the client) that touch the pvs
-	ent = NEXT_EDICT(sv.edicts);
-	for (e=1 ; e<sv.num_edicts ; e++, ent = NEXT_EDICT(ent))
+	ent = sv.edicts + 1;
+	for (e=1 ; e<sv.num_edicts ; e++, ++ent)
 	{
 #ifdef QUAKE2
 		// don't send if flagged for NODRAW and there are no lighting effects
@@ -558,8 +558,8 @@ void SV_CleanupEnts (void)
 	int		e;
 	edict_t	*ent;
 	
-	ent = NEXT_EDICT(sv.edicts);
-	for (e=1 ; e<sv.num_edicts ; e++, ent = NEXT_EDICT(ent))
+	ent = sv.edicts + 1;
+	for (e=1 ; e<sv.num_edicts ; e++, ++ent)
 	{
 		ent->v.effects = (int)ent->v.effects & ~EF_MUZZLEFLASH;
 	}
@@ -587,7 +587,7 @@ void SV_WriteClientdataToMessage (edict_t *ent, sizebuf_t *msg)
 //
 	if (ent->v.dmg_take || ent->v.dmg_save)
 	{
-		other = PROG_TO_EDICT(ent->v.dmg_inflictor);
+		other = ent->v.dmg_inflictor;
 		MSG_WriteByte (msg, svc_damage);
 		MSG_WriteByte (msg, ent->v.dmg_save);
 		MSG_WriteByte (msg, ent->v.dmg_take);
@@ -1088,6 +1088,9 @@ void SV_SpawnServer (const char *server)
 		strcpy(sv.startspot, startspot);
 #endif
 
+	// load progs to get entity field count
+	PR_LoadProgs();
+
 // allocate server memory
 	sv.max_edicts = MAX_EDICTS;
 	
@@ -1148,7 +1151,7 @@ void SV_SpawnServer (const char *server)
 // load the rest of the entities
 //	
 	ent = EDICT_NUM(0);
-	memset (&ent->v, 0, progs->entityfields * 4);
+	memset (&ent->v, 0, sizeof(entvars_t));
 	ent->free = false;
 	ent->v.model = sv.worldmodel->name - pr_strings;
 	ent->v.modelindex = 1;		// world model

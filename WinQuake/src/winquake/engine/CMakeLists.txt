@@ -83,11 +83,8 @@ target_sources(winquake
 		server/progs/pr_cmds.cpp
 		server/progs/pr_comp.h
 		server/progs/pr_edict.cpp
-		server/progs/pr_exec.cpp
 		server/progs/progdefs.h
-		server/progs/progs.h
-		server/progs/progdefs.q1
-		server/progs/progdefs.q2)
+		server/progs/progs.h)
 
 if (MSVC)
 	target_sources(winquake
