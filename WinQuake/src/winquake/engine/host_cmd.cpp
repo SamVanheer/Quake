@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "quakedef.h"
+#include "game/IGame.h"
 
 extern cvar_t	pausable;
 
@@ -1219,8 +1220,7 @@ void Host_Kill_f (void)
 	}
 	
 	pr_global_struct->time = sv.time;
-	pr_global_struct->self = EDICT_TO_PROG(sv_player);
-	PR_ExecuteProgram (pr_global_struct->ClientKill);
+	g_Game->ClientKill(sv_player);
 }
 
 
@@ -1333,13 +1333,12 @@ void Host_Spawn_f (void)
 		// call the spawn function
 
 		pr_global_struct->time = sv.time;
-		pr_global_struct->self = EDICT_TO_PROG(sv_player);
-		PR_ExecuteProgram (pr_global_struct->ClientConnect);
+		g_Game->ClientConnect(sv_player);
 
 		if ((Sys_FloatTime() - host_client->netconnection->connecttime) <= sv.time)
 			Sys_Printf ("%s entered the game\n", host_client->name);
 
-		PR_ExecuteProgram (pr_global_struct->PutClientInServer);	
+		g_Game->PutClientInServer(sv_player);
 	}
 
 

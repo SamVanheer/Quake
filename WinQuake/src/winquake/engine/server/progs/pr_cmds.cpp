@@ -141,7 +141,7 @@ void SetMinMaxSize (edict_t *e, float *min, float *max, bool rotate)
 	
 	for (i=0 ; i<3 ; i++)
 		if (min[i] > max[i])
-			PR_RunError ("backwards mins/maxs");
+			Host_Error("backwards mins/maxs");
 
 	rotate = false;		// FIXME: implement rotation properly again
 
@@ -247,7 +247,7 @@ void PF_setmodel (void)
 			break;
 			
 	if (!*check)
-		PR_RunError ("no precache: %s\n", m);
+		Host_Error("no precache: %s\n", m);
 		
 
 	e->v.model = m - pr_strings;
@@ -592,7 +592,7 @@ void PF_break (void)
 {
 Con_Printf ("break statement\n");
 *(int *)-4 = 0;	// dump to debugger
-//	PR_RunError ("break statement");
+//	Host_Error ("break statement");
 }
 
 /*
@@ -809,7 +809,7 @@ void PF_stuffcmd (void)
 	
 	entnum = G_EDICTNUM(OFS_PARM0);
 	if (entnum < 1 || entnum > svs.maxclients)
-		PR_RunError ("Parm 0 not a client");
+		Host_Error("Parm 0 not a client");
 	str = G_STRING(OFS_PARM1);	
 	
 	old = host_client;
@@ -988,7 +988,7 @@ void PF_Find (void)
 	f = G_INT(OFS_PARM1);
 	s = G_STRING(OFS_PARM2);
 	if (!s)
-		PR_RunError ("PF_Find: bad search string");
+		Host_Error("PF_Find: bad search string");
 		
 	for (e++ ; e < sv.num_edicts ; e++)
 	{
@@ -1032,7 +1032,7 @@ void PF_Find (void)
 	f = G_INT(OFS_PARM1);
 	s = G_STRING(OFS_PARM2);
 	if (!s)
-		PR_RunError ("PF_Find: bad search string");
+		Host_Error("PF_Find: bad search string");
 		
 	for (e++ ; e < sv.num_edicts ; e++)
 	{
@@ -1056,7 +1056,7 @@ void PF_Find (void)
 void PR_CheckEmptyString (const char *s)
 {
 	if (s[0] <= ' ')
-		PR_RunError ("Bad string");
+		Host_Error("Bad string");
 }
 
 void PF_precache_file (void)
@@ -1070,7 +1070,7 @@ void PF_precache_sound (void)
 	int		i;
 	
 	if (sv.state != ss_loading)
-		PR_RunError ("PF_Precache_*: Precache can only be done in spawn functions");
+		Host_Error("PF_Precache_*: Precache can only be done in spawn functions");
 		
 	s = G_STRING(OFS_PARM0);
 	G_INT(OFS_RETURN) = G_INT(OFS_PARM0);
@@ -1086,7 +1086,7 @@ void PF_precache_sound (void)
 		if (!strcmp(sv.sound_precache[i], s))
 			return;
 	}
-	PR_RunError ("PF_precache_sound: overflow");
+	Host_Error("PF_precache_sound: overflow");
 }
 
 void PF_precache_model (void)
@@ -1095,7 +1095,7 @@ void PF_precache_model (void)
 	int		i;
 	
 	if (sv.state != ss_loading)
-		PR_RunError ("PF_Precache_*: Precache can only be done in spawn functions");
+		Host_Error("PF_Precache_*: Precache can only be done in spawn functions");
 		
 	s = G_STRING(OFS_PARM0);
 	G_INT(OFS_RETURN) = G_INT(OFS_PARM0);
@@ -1112,7 +1112,7 @@ void PF_precache_model (void)
 		if (!strcmp(sv.model_precache[i], s))
 			return;
 	}
-	PR_RunError ("PF_precache_model: overflow");
+	Host_Error("PF_precache_model: overflow");
 }
 
 
@@ -1123,12 +1123,10 @@ void PF_coredump (void)
 
 void PF_traceon (void)
 {
-	pr_trace = true;
 }
 
 void PF_traceoff (void)
 {
-	pr_trace = false;
 }
 
 void PF_eprint (void)
@@ -1519,7 +1517,7 @@ sizebuf_t *WriteDest (void)
 		ent = PROG_TO_EDICT(pr_global_struct->msg_entity);
 		entnum = NUM_FOR_EDICT(ent);
 		if (entnum < 1 || entnum > svs.maxclients)
-			PR_RunError ("WriteDest: not a client");
+			Host_Error("WriteDest: not a client");
 		return &svs.clients[entnum-1].message;
 		
 	case MSG_ALL:
@@ -1529,7 +1527,7 @@ sizebuf_t *WriteDest (void)
 		return &sv.signon;
 
 	default:
-		PR_RunError ("WriteDest: bad destination");
+		Host_Error("WriteDest: bad destination");
 		break;
 	}
 	
@@ -1621,7 +1619,7 @@ void PF_setspawnparms (void)
 	ent = G_EDICT(OFS_PARM0);
 	i = NUM_FOR_EDICT(ent);
 	if (i < 1 || i > svs.maxclients)
-		PR_RunError ("Entity is not a client");
+		Host_Error("Entity is not a client");
 
 	// copy spawn parms out of the client_t
 	client = svs.clients + (i-1);
@@ -1823,7 +1821,7 @@ void PF_sqrt (void)
 
 void PF_Fixme (void)
 {
-	PR_RunError ("unimplemented bulitin");
+	Host_Error("unimplemented bulitin");
 }
 
 
@@ -1928,7 +1926,3 @@ PF_precache_file,
 
 PF_setspawnparms
 };
-
-builtin_t *pr_builtins = pr_builtin;
-int pr_numbuiltins = sizeof(pr_builtin)/sizeof(pr_builtin[0]);
-

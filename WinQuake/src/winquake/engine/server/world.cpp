@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // world.c -- world query functions
 
 #include "quakedef.h"
+#include "game/IGame.h"
 
 /*
 
@@ -299,10 +300,8 @@ void SV_TouchLinks ( edict_t *ent, areanode_t *node )
 		old_self = pr_global_struct->self;
 		old_other = pr_global_struct->other;
 
-		pr_global_struct->self = EDICT_TO_PROG(touch);
-		pr_global_struct->other = EDICT_TO_PROG(ent);
 		pr_global_struct->time = sv.time;
-		PR_ExecuteProgram (touch->v.touch);
+		g_Game->EntityTouch(touch, ent);
 
 		pr_global_struct->self = old_self;
 		pr_global_struct->other = old_other;

@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // sv_phys.c
 
 #include "quakedef.h"
+#include "game/IGame.h"
 
 /*
 
@@ -137,9 +138,7 @@ bool SV_RunThink (edict_t *ent)
 								// by a trigger with a local time.
 	ent->v.nextthink = 0;
 	pr_global_struct->time = thinktime;
-	pr_global_struct->self = EDICT_TO_PROG(ent);
-	pr_global_struct->other = EDICT_TO_PROG(sv.edicts);
-	PR_ExecuteProgram (ent->v.think);
+	g_Game->EntityThink(ent, sv.edicts);
 	return !ent->free;
 }
 
@@ -160,16 +159,12 @@ void SV_Impact (edict_t *e1, edict_t *e2)
 	pr_global_struct->time = sv.time;
 	if (e1->v.touch && e1->v.solid != SOLID_NOT)
 	{
-		pr_global_struct->self = EDICT_TO_PROG(e1);
-		pr_global_struct->other = EDICT_TO_PROG(e2);
-		PR_ExecuteProgram (e1->v.touch);
+		g_Game->EntityTouch(e1, e2);
 	}
 	
 	if (e2->v.touch && e2->v.solid != SOLID_NOT)
 	{
-		pr_global_struct->self = EDICT_TO_PROG(e2);
-		pr_global_struct->other = EDICT_TO_PROG(e1);
-		PR_ExecuteProgram (e2->v.touch);
+		g_Game->EntityTouch(e2, e1);
 	}
 
 	pr_global_struct->self = old_self;
@@ -538,9 +533,7 @@ void SV_PushMove (edict_t *pusher, float movetime)
 			// otherwise, just stay in place until the obstacle is gone
 			if (pusher->v.blocked)
 			{
-				pr_global_struct->self = EDICT_TO_PROG(pusher);
-				pr_global_struct->other = EDICT_TO_PROG(check);
-				PR_ExecuteProgram (pusher->v.blocked);
+				g_Game->EntityBlocked(pusher, check);
 			}
 			
 		// move back any entities we already moved
@@ -671,9 +664,7 @@ void SV_PushRotate (edict_t *pusher, float movetime)
 			// otherwise, just stay in place until the obstacle is gone
 			if (pusher->v.blocked)
 			{
-				pr_global_struct->self = EDICT_TO_PROG(pusher);
-				pr_global_struct->other = EDICT_TO_PROG(check);
-				PR_ExecuteProgram (pusher->v.blocked);
+				g_Game->EntityBlocked(pusher, check);
 			}
 			
 		// move back any entities we already moved
@@ -733,9 +724,7 @@ void SV_Physics_Pusher (edict_t *ent)
 	{
 		ent->v.nextthink = 0;
 		pr_global_struct->time = sv.time;
-		pr_global_struct->self = EDICT_TO_PROG(ent);
-		pr_global_struct->other = EDICT_TO_PROG(sv.edicts);
-		PR_ExecuteProgram (ent->v.think);
+		g_Game->EntityThink(ent, sv.edicts);
 		if (ent->free)
 			return;
 	}
@@ -1065,8 +1054,7 @@ void SV_Physics_Client (edict_t	*ent, int num)
 // call standard client pre-think
 //	
 	pr_global_struct->time = sv.time;
-	pr_global_struct->self = EDICT_TO_PROG(ent);
-	PR_ExecuteProgram (pr_global_struct->PlayerPreThink);
+	g_Game->PlayerPreThink(ent);
 	
 //
 // do a move
@@ -1126,8 +1114,7 @@ void SV_Physics_Client (edict_t	*ent, int num)
 	SV_LinkEdict (ent, true);
 
 	pr_global_struct->time = sv.time;
-	pr_global_struct->self = EDICT_TO_PROG(ent);
-	PR_ExecuteProgram (pr_global_struct->PlayerPostThink);
+	g_Game->PlayerPostThink(ent);
 }
 
 //============================================================================
@@ -1510,10 +1497,8 @@ void SV_Physics (void)
 	edict_t	*ent;
 
 // let the progs know that a new frame has started
-	pr_global_struct->self = EDICT_TO_PROG(sv.edicts);
-	pr_global_struct->other = EDICT_TO_PROG(sv.edicts);
 	pr_global_struct->time = sv.time;
-	PR_ExecuteProgram (pr_global_struct->StartFrame);
+	g_Game->StartFrame(sv.edicts);
 
 //SV_CheckAllEnts ();
 

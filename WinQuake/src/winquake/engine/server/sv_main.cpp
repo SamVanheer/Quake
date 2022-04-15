@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // sv_main.c -- server main program
 
 #include "quakedef.h"
+#include "game/IGame.h"
 
 server_t		sv;
 server_static_t	svs;
@@ -247,7 +248,6 @@ void SV_ConnectClient (int clientnum)
 	client_t		*client;
 	int				edictnum;
 	struct qsocket_s *netconnection;
-	int				i;
 	float			spawn_parms[NUM_SPAWN_PARMS];
 
 	client = svs.clients + clientnum;
@@ -285,9 +285,7 @@ void SV_ConnectClient (int clientnum)
 	else
 	{
 	// call the progs to get default spawn parms for the new client
-		PR_ExecuteProgram (pr_global_struct->SetNewParms);
-		for (i=0 ; i<NUM_SPAWN_PARMS ; i++)
-			client->spawn_parms[i] = (&pr_global_struct->parm1)[i];
+		g_Game->SetNewParms(client->spawn_parms);
 	}
 
 	SV_SendServerinfo (client);
@@ -1015,7 +1013,7 @@ transition to another level
 */
 void SV_SaveSpawnparms (void)
 {
-	int		i, j;
+	int		i;
 
 	svs.serverflags = pr_global_struct->serverflags;
 
@@ -1025,10 +1023,7 @@ void SV_SaveSpawnparms (void)
 			continue;
 
 	// call the progs to get default spawn parms for the new client
-		pr_global_struct->self = EDICT_TO_PROG(host_client->edict);
-		PR_ExecuteProgram (pr_global_struct->SetChangeParms);
-		for (j=0 ; j<NUM_SPAWN_PARMS ; j++)
-			host_client->spawn_parms[j] = (&pr_global_struct->parm1)[j];
+		g_Game->SetChangeParms(host_client->edict, host_client->spawn_parms);
 	}
 }
 
@@ -1093,13 +1088,10 @@ void SV_SpawnServer (const char *server)
 		strcpy(sv.startspot, startspot);
 #endif
 
-// load progs to get entity field count
-	PR_LoadProgs ();
-
 // allocate server memory
 	sv.max_edicts = MAX_EDICTS;
 	
-	sv.edicts = reinterpret_cast<edict_t*>( Hunk_AllocName (sv.max_edicts*pr_edict_size, "edicts") );
+	sv.edicts = reinterpret_cast<edict_t*>( Hunk_AllocName (sv.max_edicts*sizeof(edict_t), "edicts"));
 
 	sv.datagram.maxsize = sizeof(sv.datagram_buf);
 	sv.datagram.cursize = 0;

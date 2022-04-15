@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 //#include "r_local.h"
+#include "game/IGame.h"
 
 /*
 
@@ -342,7 +343,6 @@ if (crash = true), don't bother sending signofs
 */
 void SV_DropClient (bool crash)
 {
-	int		saveSelf;
 	int		i;
 	client_t *client;
 
@@ -359,10 +359,7 @@ void SV_DropClient (bool crash)
 		{
 		// call the prog function for removing a client
 		// this will set the body to a dead frame, among other things
-			saveSelf = pr_global_struct->self;
-			pr_global_struct->self = EDICT_TO_PROG(host_client->edict);
-			PR_ExecuteProgram (pr_global_struct->ClientDisconnect);
-			pr_global_struct->self = saveSelf;
+			g_Game->ClientDisconnect(host_client->edict);
 		}
 
 		Sys_Printf ("Client %s removed\n",host_client->name);
@@ -867,6 +864,7 @@ void Host_Init (quakeparms_t *parms)
 	Mod_Init ();
 	NET_Init ();
 	SV_Init ();
+	g_Game->Initialize();
 
 	Con_Printf ("Exe: " __TIME__ " " __DATE__ "\n");
 	Con_Printf ("%4.1f megabyte heap\n",parms->memsize/ (1024*1024.0));
@@ -937,6 +935,7 @@ void Host_Shutdown(void)
 
 	Host_WriteConfiguration (); 
 
+	g_Game->Shutdown();
 	CDAudio_Shutdown ();
 	NET_Shutdown ();
 	S_Shutdown();

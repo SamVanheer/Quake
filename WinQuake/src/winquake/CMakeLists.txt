@@ -40,6 +40,7 @@ endif()
 add_executable(winquake WIN32)
 
 add_subdirectory(engine)
+add_subdirectory(game)
 
 if (MSVC)
 	target_sources(winquake
@@ -56,6 +57,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${TARGET_SOURCES})
 
 target_include_directories(winquake PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}/engine
+	${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 target_compile_definitions(winquake PRIVATE

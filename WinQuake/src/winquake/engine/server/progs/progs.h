@@ -59,16 +59,9 @@ extern	dstatement_t	*pr_statements;
 extern	globalvars_t	*pr_global_struct;
 extern	float			*pr_globals;			// same as pr_global_struct
 
-extern	int				pr_edict_size;	// in bytes
-
 //============================================================================
 
 void PR_Init (void);
-
-void PR_ExecuteProgram (func_t fnum);
-void PR_LoadProgs (void);
-
-void PR_Profile_f (void);
 
 edict_t *ED_Alloc (void);
 void ED_Free (edict_t *ed);
@@ -85,13 +78,13 @@ void ED_ParseGlobals (char *data);
 
 void ED_LoadFromFile (char *data);
 
-//define EDICT_NUM(n) ((edict_t *)(sv.edicts+ (n)*pr_edict_size))
-//define NUM_FOR_EDICT(e) (((byte *)(e) - sv.edicts)/pr_edict_size)
+//define EDICT_NUM(n) ((edict_t *)(sv.edicts+ (n)*sizeof(edict_t)))
+//define NUM_FOR_EDICT(e) (((byte *)(e) - sv.edicts)/sizeof(edict_t))
 
 edict_t *EDICT_NUM(int n);
 int NUM_FOR_EDICT(edict_t *e);
 
-#define	NEXT_EDICT(e) ((edict_t *)( (byte *)e + pr_edict_size))
+#define	NEXT_EDICT(e) ((edict_t *)( (byte *)e + sizeof(edict_t)))
 
 #define	EDICT_TO_PROG(e) ((byte *)e - (byte *)sv.edicts)
 #define PROG_TO_EDICT(e) ((edict_t *)((byte *)sv.edicts + e))
@@ -114,18 +107,12 @@ int NUM_FOR_EDICT(edict_t *e);
 extern	int		type_size[8];
 
 typedef void (*builtin_t) (void);
-extern	builtin_t *pr_builtins;
-extern int pr_numbuiltins;
 
 extern int		pr_argc;
 
-extern	bool	pr_trace;
 extern	dfunction_t	*pr_xfunction;
-extern	int			pr_xstatement;
 
 extern	unsigned short		pr_crc;
-
-void PR_RunError (const char *error, ...);
 
 void ED_PrintEdicts (void);
 void ED_PrintNum (int ent);
