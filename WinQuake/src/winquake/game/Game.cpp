@@ -47,17 +47,27 @@ bool Game::SpawnEntity(edict_t* entity, const char* classname)
 
 void Game::EntityThink(edict_t* entity, edict_t* other)
 {
-	//TODO
+	//Should always be true if we get here since nextthink has to be non-zero.
+	if (entity->v.think)
+	{
+		entity->v.think(entity);
+	}
 }
 
 void Game::EntityTouch(edict_t* entity, edict_t* other)
 {
-	//TODO
+	if (entity->v.touch)
+	{
+		entity->v.touch(entity, other);
+	}
 }
 
 void Game::EntityBlocked(edict_t* entity, edict_t* other)
 {
-	//TODO
+	if (entity->v.blocked)
+	{
+		entity->v.blocked(entity, other);
+	}
 }
 
 void Game::StartFrame(edict_t* entities)
