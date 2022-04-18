@@ -35,14 +35,14 @@ public:
 
 	void StartFrame(edict_t* entities) override;
 
-	void SetChangeParms(edict_t* client, float* parms) override;
+	void SetChangeParms(edict_t* self, float* parms) override;
 	void SetNewParms(float* parms) override;
-	void ClientKill(edict_t* client) override;
-	void PutClientInServer(edict_t* client) override;
-	void PlayerPreThink(edict_t* client) override;
-	void PlayerPostThink(edict_t* client) override;
-	void ClientConnect(edict_t* client) override;
-	void ClientDisconnect(edict_t* client) override;
+	void ClientKill(edict_t* self) override;
+	void PutClientInServer(edict_t* self) override;
+	void PlayerPreThink(edict_t* self) override;
+	void PlayerPostThink(edict_t* self) override;
+	void ClientConnect(edict_t* self) override;
+	void ClientDisconnect(edict_t* self) override;
 };
 
 //

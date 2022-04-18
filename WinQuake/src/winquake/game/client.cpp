@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "Game.h"
 #include "client.h"
 
-void Game::SetChangeParms(edict_t* client, float* parms)
+void Game::SetChangeParms(edict_t* self, float* parms)
 {
 	// remove items
 	client->v.items = client->v.items - (((int)client->v.items) &
@@ -67,7 +67,7 @@ ClientKill
 Player entered the suicide command
 ============
 */
-void Game::ClientKill(edict_t* client)
+void Game::ClientKill(edict_t* self)
 {
 	//TODO
 	/*
@@ -91,7 +91,6 @@ called each time a player is spawned
 //void() PlayerDie;
 
 
-void Game::PutClientInServer(edict_t* client)
 {
 	//TODO
 	/*
@@ -123,6 +122,7 @@ void Game::PutClientInServer(edict_t* client)
 	self.th_die = PlayerDie;
 
 	self.deadflag = DEAD_NO;
+void Game::PutClientInServer(edict_t* self)
 	// paustime is set by teleporters to keep the player from moving a while
 		self.pausetime = 0;
 
@@ -162,7 +162,7 @@ PlayerPreThink
 Called every frame before physics are run
 ================
 */
-void Game::PlayerPreThink(edict_t* client)
+void Game::PlayerPreThink(edict_t* self)
 {
 	//TODO
 	/*
@@ -215,7 +215,7 @@ PlayerPostThink
 Called every frame after physics are run
 ================
 */
-void Game::PlayerPostThink(edict_t* client)
+void Game::PlayerPostThink(edict_t* self)
 {
 	//TODO
 	/*
@@ -262,7 +262,7 @@ ClientConnect
 called when a player connects to a server
 ============
 */
-void Game::ClientConnect(edict_t* client)
+void Game::ClientConnect(edict_t* self)
 {
 	//TODO
 	/*
@@ -282,7 +282,7 @@ ClientDisconnect
 called when a player disconnects from a server
 ============
 */
-void Game::ClientDisconnect(edict_t* client)
+void Game::ClientDisconnect(edict_t* self)
 {
 	//TODO
 	/*

@@ -35,14 +35,14 @@ struct IGame
 
 	virtual void StartFrame(edict_t* entities) = 0;
 
-	virtual void SetChangeParms(edict_t* client, float* parms) = 0;
+	virtual void SetChangeParms(edict_t* self, float* parms) = 0;
 	virtual void SetNewParms(float* parms) = 0;
-	virtual void ClientKill(edict_t* client) = 0;
-	virtual void PutClientInServer(edict_t* client) = 0;
-	virtual void PlayerPreThink(edict_t* client) = 0;
-	virtual void PlayerPostThink(edict_t* client) = 0;
-	virtual void ClientConnect(edict_t* client) = 0;
-	virtual void ClientDisconnect(edict_t* client) = 0;
+	virtual void ClientKill(edict_t* self) = 0;
+	virtual void PutClientInServer(edict_t* self) = 0;
+	virtual void PlayerPreThink(edict_t* self) = 0;
+	virtual void PlayerPostThink(edict_t* self) = 0;
+	virtual void ClientConnect(edict_t* self) = 0;
+	virtual void ClientDisconnect(edict_t* self) = 0;
 };
 
 extern IGame* g_Game;
