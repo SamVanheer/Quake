@@ -527,7 +527,11 @@ void ED_LoadFromFile (char *data)
 			Sys_Error ("ED_LoadFromFile: found %s when expecting {",com_token);
 
 		if (!ent)
+		{
 			ent = EDICT_NUM(0);
+			//HACKHACK: set the global world pointer. TODO: remove
+			pr_global_struct->world = ent;
+		}
 		else
 			ent = ED_Alloc ();
 		data = ED_ParseEdict (data, ent);
