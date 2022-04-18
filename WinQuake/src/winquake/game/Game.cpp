@@ -18,6 +18,7 @@
 */
 
 #include "quakedef.h"
+#include "entitymap.h"
 #include "game.h"
 #include "IGame.h"
 
@@ -41,8 +42,7 @@ void Game::NewMapStarted()
 
 bool Game::SpawnEntity(edict_t* entity, const char* classname)
 {
-	//TODO
-	return false;
+	return GetEntityMap().TrySpawn(classname, entity);
 }
 
 void Game::EntityThink(edict_t* entity, edict_t* other)
