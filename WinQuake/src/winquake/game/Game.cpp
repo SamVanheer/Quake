@@ -72,5 +72,7 @@ void Game::EntityBlocked(edict_t* entity, edict_t* other)
 
 void Game::StartFrame(edict_t* entities)
 {
-	//TODO
+	pr_global_struct->teamplay = PF_cvar("teamplay");
+	game_skill = PF_cvar("skill");
+	++framecount;
 }
