@@ -18,3 +18,5 @@
 */
 
 #pragma once
+
+void walkmonster_start(edict_t* self);

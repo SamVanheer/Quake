@@ -32,3 +32,6 @@ void player_nail1(edict_t* self);
 void player_light1(edict_t* self);
 void player_rocket1(edict_t* self);
 void player_pain(edict_t* self, edict_s* attacker, float damage);
+
+void ThrowGib(edict_t* self, char* gibname, float dm);
+void ThrowHead(edict_t* self, char* gibname, float dm);

@@ -22,6 +22,7 @@ target_sources(winquake
 		IGame.h
 		items.cpp
 		items.h
+		knight.cpp
 		misc.cpp
 		misc.h
 		monsters.cpp

@@ -52,8 +52,6 @@ void ai_face(edict_t* self);
 
 void knight_attack(edict_t* self)
 {
-	//TODO
-	/*
 	// decide if now is a good swing time
 	float len = PF_vlen(AsVector(self->v.enemy->v.origin) + AsVector(self->v.enemy->v.view_ofs) - (AsVector(self->v.origin) + AsVector(self->v.view_ofs)));
 
@@ -61,7 +59,6 @@ void knight_attack(edict_t* self)
 		knight_atk1(self);
 	else
 		knight_runatk1(self);
-		*/
 }
 
 //=============================================================================
