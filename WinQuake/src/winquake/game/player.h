@@ -19,6 +19,8 @@
 
 #pragma once
 
+const Animations* player_animations_get(edict_t* self);
+
 void player_stand1(edict_t* self);
 void player_run(edict_t* self);
 void player_axe1(edict_t* self);

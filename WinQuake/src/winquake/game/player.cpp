@@ -28,6 +28,95 @@
 #include "weapons.h"
 
 void DeathBubbles(edict_t* self, float num_bubbles);
+void PlayerDead(edict_t* self);
+
+void player_generic_frame(edict_t* self, const Animation* animation, int frame)
+{
+	if (animation->ReachedEnd(frame))
+	{
+		self->v.think = player_run;
+	}
+}
+
+void player_shot_frame(edict_t* self, const Animation* animation, int frame)
+{
+	self->v.weaponframe = frame + 1;
+
+	if (animation->ReachedEnd(frame))
+	{
+		self->v.think = player_run;
+	}
+}
+
+void player_axe_frame_core(edict_t* self, const Animation* animation, int frame, int offset)
+{
+	self->v.weaponframe = offset + frame + 1;
+
+	if (frame == 2)
+	{
+		W_FireAxe(self);
+	}
+
+	//Axe has more frames defined than actually need playing, so stop early.
+	if (frame == 3)
+	{
+		self->v.think = player_run;
+	}
+}
+
+void player_axe_frame(edict_t* self, const Animation* animation, int frame)
+{
+	player_axe_frame_core(self, animation, frame, 0);
+}
+
+void player_axe_frame_alt(edict_t* self, const Animation* animation, int frame)
+{
+	player_axe_frame_core(self, animation, frame, 4);
+}
+
+void player_nail_frame(edict_t* self, const Animation* animation, int frame)
+{
+	self->v.effects |= EF_MUZZLEFLASH;
+
+	if (!self->v.button0)
+	{
+		player_run(self);
+		return;
+	}
+
+	self->v.weaponframe = self->v.weaponframe + 1;
+	if (self->v.weaponframe == 9)
+		self->v.weaponframe = 1;
+	SuperDamageSound(self);
+	W_FireSpikes(self, frame == 0 ? 4 : -4);
+	self->v.attack_finished = pr_global_struct->time + 0.2;
+}
+
+void player_light_frame(edict_t* self, const Animation* animation, int frame)
+{
+	self->v.effects |= EF_MUZZLEFLASH;
+
+	if (!self->v.button0)
+	{
+		player_run(self); return;
+	}
+
+	self->v.weaponframe = self->v.weaponframe + 1;
+	if (self->v.weaponframe == 5)
+		self->v.weaponframe = 1;
+	SuperDamageSound(self);
+	W_FireLightning(self);
+	self->v.attack_finished = pr_global_struct->time + 0.2;
+}
+
+void player_death_frame(edict_t* self, const Animation* animation, int frame)
+{
+	if (animation->ReachedEnd(frame))
+	{
+		//Differs from QuakeC, but results in the same thing happening.
+		self->v.think = PlayerDead;
+	}
+}
 
 const Animations PlayerAnimations = MakeAnimations(
 	{
@@ -35,30 +124,28 @@ const Animations PlayerAnimations = MakeAnimations(
 
 		{"stand", 5}, {"axstnd", 12},
 
-		{"axpain", 6}, {"pain", 6},
+		{"axpain", 6, &player_generic_frame}, {"pain", 6, &player_generic_frame},
 
-		{"axdeth", 9},
-		{"deatha", 11},
-		{"deathb", 9},
-		{"deathc", 15},
-		{"deathd", 9},
-		{"deathe", 9},
+		{"axdeth", 9, &player_death_frame},
+		{"deatha", 11, &player_death_frame},
+		{"deathb", 9, &player_death_frame},
+		{"deathc", 15, &player_death_frame},
+		{"deathd", 9, &player_death_frame},
+		{"deathe", 9, &player_death_frame},
 
-		{"nailatt", 2},
-		{"light", 2},
-		{"rockatt", 6},
-		{"shotatt", 6},
-		{"axatt", 6},
-		{"axattb", 6},
-		{"axattc", 6},
-		{"axattd", 6}
+		{"nailatt", 2, &player_nail_frame, AnimationFlag::Looping},
+		{"light", 2, &player_light_frame, AnimationFlag::Looping},
+		{"rocketatt", 6, &player_shot_frame},
+		{"shotatt", 6, &player_shot_frame},
+		{"axatt", 6, &player_axe_frame},
+		{"axattb", 6, &player_axe_frame_alt},
+		{"axattc", 6, &player_axe_frame},
+		{"axattd", 6, &player_axe_frame_alt}
 	});
 
-void player_setanimation(edict_t* self, std::string_view name, int frame, decltype(entvars_t::think) thinkfunc)
+const Animations* player_animations_get(edict_t* self)
 {
-	self->v.frame = PlayerAnimations.FindAnimationStart(name) + frame;
-	self->v.nextthink = pr_global_struct->time + 0.1f;
-	self->v.think = thinkfunc;
+	return &PlayerAnimations;
 }
 
 /*
@@ -123,259 +210,49 @@ void player_run(edict_t* self)
 	++self->v.walkframe;
 }
 
-void player_shot6(edict_t* self)
-{
-	player_setanimation(self, "shotatt", 5, player_run);
-	self->v.weaponframe = 6;
-}
-
-void player_shot5(edict_t* self)
-{
-	player_setanimation(self, "shotatt", 4, player_shot6);
-	self->v.weaponframe = 5;
-}
-
-void player_shot4(edict_t* self)
-{
-	player_setanimation(self, "shotatt", 3, player_shot5);
-	self->v.weaponframe = 4;
-}
-
-void player_shot3(edict_t* self)
-{
-	player_setanimation(self, "shotatt", 2, player_shot4);
-	self->v.weaponframe = 3;
-}
-
-void player_shot2(edict_t* self)
-{
-	player_setanimation(self, "shotatt", 1, player_shot3);
-	self->v.weaponframe = 2;
-}
-
 void player_shot1(edict_t* self)
 {
-	player_setanimation(self, "shotatt", 0, player_shot2);
-	self->v.weaponframe = 1;
-	self->v.effects = self->v.effects | EF_MUZZLEFLASH;
-}
-
-void player_axe4(edict_t* self)
-{
-	player_setanimation(self, "shotatt", 3, player_run);
-	self->v.weaponframe = 4;
-}
-
-void player_axe3(edict_t* self)
-{
-	player_setanimation(self, "shotatt", 2, player_axe4);
-	self->v.weaponframe = 3;
-	W_FireAxe(self);
-}
-
-void player_axe2(edict_t* self)
-{
-	player_setanimation(self, "shotatt", 1, player_axe3);
-	self->v.weaponframe = 2;
+	animation_set(self, "shotatt");
+	self->v.effects |= EF_MUZZLEFLASH;
 }
 
 void player_axe1(edict_t* self)
 {
-	player_setanimation(self, "shotatt", 0, player_axe2);
-	self->v.weaponframe = 1;
-}
-
-void player_axeb4(edict_t* self)
-{
-	player_setanimation(self, "shotatt", 3, player_run);
-	self->v.weaponframe = 8;
-}
-
-void player_axeb3(edict_t* self)
-{
-	player_setanimation(self, "shotatt", 2, player_axeb4);
-	self->v.weaponframe = 7;
-	W_FireAxe(self);
-}
-
-void player_axeb2(edict_t* self)
-{
-	player_setanimation(self, "shotatt", 1, player_axeb3);
-	self->v.weaponframe = 6;
+	animation_set(self, "axatt");
 }
 
 void player_axeb1(edict_t* self)
 {
-	player_setanimation(self, "shotatt", 0, player_axeb2);
-	self->v.weaponframe = 5;
-}
-
-void player_axec4(edict_t* self)
-{
-	player_setanimation(self, "shotatt", 3, player_run);
-	self->v.weaponframe = 4;
-}
-
-void player_axec3(edict_t* self)
-{
-	player_setanimation(self, "shotatt", 2, player_axec4);
-	self->v.weaponframe = 3;
-	W_FireAxe(self);
-}
-
-void player_axec2(edict_t* self)
-{
-	player_setanimation(self, "shotatt", 1, player_axec3);
-	self->v.weaponframe = 2;
+	animation_set(self, "axattb");
 }
 
 void player_axec1(edict_t* self)
 {
-	player_setanimation(self, "shotatt", 0, player_axec2);
-	self->v.weaponframe = 1;
-}
-
-void player_axed4(edict_t* self)
-{
-	player_setanimation(self, "shotatt", 3, player_run);
-	self->v.weaponframe = 6;
-}
-
-void player_axed3(edict_t* self)
-{
-	player_setanimation(self, "shotatt", 2, player_axed4);
-	self->v.weaponframe = 7;
-	W_FireAxe(self);
-}
-
-void player_axed2(edict_t* self)
-{
-	player_setanimation(self, "shotatt", 1, player_axed3);
-	self->v.weaponframe = 6;
+	animation_set(self, "axattc");
 }
 
 void player_axed1(edict_t* self)
 {
-	player_setanimation(self, "shotatt", 0, player_axed2);
-	self->v.weaponframe = 5;
+	animation_set(self, "axattd");
 }
 
 //============================================================================
-void player_nail2(edict_t* self);
-
 void player_nail1(edict_t* self)
 {
-	player_setanimation(self, "nailatt", 0, player_nail2);
-
-	self->v.effects = self->v.effects | EF_MUZZLEFLASH;
-
-	if (!self->v.button0)
-	{
-		player_run(self);
-		return;
-	}
-	self->v.weaponframe = self->v.weaponframe + 1;
-	if (self->v.weaponframe == 9)
-		self->v.weaponframe = 1;
-	SuperDamageSound(self);
-	W_FireSpikes(self, 4);
-	self->v.attack_finished = pr_global_struct->time + 0.2;
-}
-
-void player_nail2(edict_t* self)
-{
-	player_setanimation(self, "nailatt", 1, player_nail1);
-
-	self->v.effects = self->v.effects | EF_MUZZLEFLASH;
-
-	if (!self->v.button0)
-	{
-		player_run(self); return;
-	}
-	self->v.weaponframe = self->v.weaponframe + 1;
-	if (self->v.weaponframe == 9)
-		self->v.weaponframe = 1;
-	SuperDamageSound(self);
-	W_FireSpikes(self, -4);
-	self->v.attack_finished = pr_global_struct->time + 0.2;
+	animation_set(self, "nailatt");
 }
 
 //============================================================================
-void player_light2(edict_t* self);
-
 void player_light1(edict_t* self)
 {
-	player_setanimation(self, "light", 0, player_light2);
-
-	self->v.effects = self->v.effects | EF_MUZZLEFLASH;
-
-	if (!self->v.button0)
-	{
-		player_run(self); return;
-	}
-	self->v.weaponframe = self->v.weaponframe + 1;
-	if (self->v.weaponframe == 5)
-		self->v.weaponframe = 1;
-	SuperDamageSound(self);
-	W_FireLightning(self);
-	self->v.attack_finished = pr_global_struct->time + 0.2;
-}
-
-void player_light2(edict_t* self)
-{
-	player_setanimation(self, "light", 1, player_light1);
-
-	self->v.effects = self->v.effects | EF_MUZZLEFLASH;
-
-	if (!self->v.button0)
-	{
-		player_run(self); return;
-	}
-	self->v.weaponframe = self->v.weaponframe + 1;
-	if (self->v.weaponframe == 5)
-		self->v.weaponframe = 1;
-	SuperDamageSound(self);
-	W_FireLightning(self);
-	self->v.attack_finished = pr_global_struct->time + 0.2;
+	animation_set(self, "light");
 }
 
 //============================================================================
-
-void player_rocket6(edict_t* self)
-{
-	player_setanimation(self, "rocketatt", 5, player_run);
-	self->v.weaponframe = 6;
-}
-
-void player_rocket5(edict_t* self)
-{
-	player_setanimation(self, "rocketatt", 4, player_rocket6);
-	self->v.weaponframe = 5;
-}
-
-void player_rocket4(edict_t* self)
-{
-	player_setanimation(self, "rocketatt", 3, player_rocket5);
-	self->v.weaponframe = 4;
-}
-
-void player_rocket3(edict_t* self)
-{
-	player_setanimation(self, "rocketatt", 2, player_rocket4);
-	self->v.weaponframe = 3;
-}
-
-void player_rocket2(edict_t* self)
-{
-	player_setanimation(self, "rocketatt", 1, player_rocket3);
-	self->v.weaponframe = 2;
-}
-
 void player_rocket1(edict_t* self)
 {
-	player_setanimation(self, "rocketatt", 0, player_rocket2);
-	self->v.weaponframe = 1;
-	self->v.effects = self->v.effects | EF_MUZZLEFLASH;
+	animation_set(self, "rocketatt");
+	self->v.effects |= EF_MUZZLEFLASH;
 }
 
 void PainSound(edict_t* self)
@@ -458,66 +335,16 @@ void PainSound(edict_t* self)
 	return;
 }
 
-void player_pain6(edict_t* self)
-{
-	player_setanimation(self, "pain", 5, &player_run);
-}
-
-void player_pain5(edict_t* self)
-{
-	player_setanimation(self, "pain", 4, &player_pain6);
-}
-
-void player_pain4(edict_t* self)
-{
-	player_setanimation(self, "pain", 3, &player_pain5);
-}
-
-void player_pain3(edict_t* self)
-{
-	player_setanimation(self, "pain", 2, &player_pain4);
-}
-
-void player_pain2(edict_t* self)
-{
-	player_setanimation(self, "pain", 1, &player_pain3);
-}
-
 void player_pain1(edict_t* self)
 {
-	player_setanimation(self, "pain", 0, &player_pain2);
+	animation_set(self, "pain");
 	PainSound(self);
 	self->v.weaponframe = 0;
 }
 
-void player_axpain6(edict_t* self)
-{
-	player_setanimation(self, "axpain", 5, &player_run);
-}
-
-void player_axpain5(edict_t* self)
-{
-	player_setanimation(self, "axpain", 4, &player_axpain6);
-}
-
-void player_axpain4(edict_t* self)
-{
-	player_setanimation(self, "axpain", 3, &player_axpain5);
-}
-
-void player_axpain3(edict_t* self)
-{
-	player_setanimation(self, "axpain", 2, &player_axpain4);
-}
-
-void player_axpain2(edict_t* self)
-{
-	player_setanimation(self, "axpain", 1, &player_axpain3);
-}
-
 void player_axpain1(edict_t* self)
 {
-	player_setanimation(self, "axpain", 0, &player_axpain2);
+	animation_set(self, "axpain");
 	PainSound(self);
 	self->v.weaponframe = 0;
 }
@@ -766,318 +593,32 @@ void set_suicide_frame(edict_t* self)
 	self->v.nextthink = -1;
 }
 
-void player_diea11(edict_t* self)
-{
-	player_setanimation(self, "deatha", 10, &player_diea11);
-	PlayerDead(self);
-}
-
-void player_diea10(edict_t* self)
-{
-	player_setanimation(self, "deatha", 9, &player_diea11);
-}
-
-void player_diea9(edict_t* self)
-{
-	player_setanimation(self, "deatha", 8, &player_diea10);
-}
-
-void player_diea8(edict_t* self)
-{
-	player_setanimation(self, "deatha", 7, &player_diea9);
-}
-
-void player_diea7(edict_t* self)
-{
-	player_setanimation(self, "deatha", 6, &player_diea8);
-}
-
-void player_diea6(edict_t* self)
-{
-	player_setanimation(self, "deatha", 5, &player_diea7);
-}
-
-void player_diea5(edict_t* self)
-{
-	player_setanimation(self, "deatha", 4, &player_diea6);
-}
-
-void player_diea4(edict_t* self)
-{
-	player_setanimation(self, "deatha", 3, &player_diea5);
-}
-
-void player_diea3(edict_t* self)
-{
-	player_setanimation(self, "deatha", 2, &player_diea4);
-}
-
-void player_diea2(edict_t* self)
-{
-	player_setanimation(self, "deatha", 1, &player_diea3);
-}
-
 void player_diea1(edict_t* self)
 {
-	player_setanimation(self, "deatha", 0, &player_diea2);
-}
-
-void player_dieb9(edict_t* self)
-{
-	player_setanimation(self, "deathb", 8, &player_dieb9);
-	PlayerDead(self);
-}
-
-void player_dieb8(edict_t* self)
-{
-	player_setanimation(self, "deathb", 7, &player_dieb9);
-}
-
-void player_dieb7(edict_t* self)
-{
-	player_setanimation(self, "deathb", 6, &player_dieb8);
-}
-
-void player_dieb6(edict_t* self)
-{
-	player_setanimation(self, "deathb", 5, &player_dieb7);
-}
-
-void player_dieb5(edict_t* self)
-{
-	player_setanimation(self, "deathb", 4, &player_dieb6);
-}
-
-void player_dieb4(edict_t* self)
-{
-	player_setanimation(self, "deathb", 3, &player_dieb5);
-}
-
-void player_dieb3(edict_t* self)
-{
-	player_setanimation(self, "deathb", 2, &player_dieb4);
-}
-
-void player_dieb2(edict_t* self)
-{
-	player_setanimation(self, "deathb", 1, &player_dieb3);
+	animation_set(self, "deatha");
 }
 
 void player_dieb1(edict_t* self)
 {
-	player_setanimation(self, "deathb", 0, &player_dieb2);
-}
-
-void player_diec15(edict_t* self)
-{
-	player_setanimation(self, "deathc", 14, &player_diec15);
-	PlayerDead(self);
-}
-
-void player_diec14(edict_t* self)
-{
-	player_setanimation(self, "deathc", 13, &player_diec15);
-}
-
-void player_diec13(edict_t* self)
-{
-	player_setanimation(self, "deathc", 12, &player_diec14);
-}
-
-void player_diec12(edict_t* self)
-{
-	player_setanimation(self, "deathc", 11, &player_diec13);
-}
-
-void player_diec11(edict_t* self)
-{
-	player_setanimation(self, "deathc", 10, &player_diec12);
-}
-
-void player_diec10(edict_t* self)
-{
-	player_setanimation(self, "deathc", 9, &player_diec11);
-}
-
-void player_diec9(edict_t* self)
-{
-	player_setanimation(self, "deathc", 8, &player_diec10);
-}
-
-void player_diec8(edict_t* self)
-{
-	player_setanimation(self, "deathc", 7, &player_diec9);
-}
-
-void player_diec7(edict_t* self)
-{
-	player_setanimation(self, "deathc", 6, &player_diec8);
-}
-
-void player_diec6(edict_t* self)
-{
-	player_setanimation(self, "deathc", 5, &player_diec7);
-}
-
-void player_diec5(edict_t* self)
-{
-	player_setanimation(self, "deathc", 4, &player_diec6);
-}
-
-void player_diec4(edict_t* self)
-{
-	player_setanimation(self, "deathc", 3, &player_diec5);
-}
-
-void player_diec3(edict_t* self)
-{
-	player_setanimation(self, "deathc", 2, &player_diec4);
-}
-
-void player_diec2(edict_t* self)
-{
-	player_setanimation(self, "deathc", 1, &player_diec3);
+	animation_set(self, "deathb");
 }
 
 void player_diec1(edict_t* self)
 {
-	player_setanimation(self, "deathc", 0, &player_diec2);
-}
-
-void player_died9(edict_t* self)
-{
-	player_setanimation(self, "deathd", 8, &player_died9);
-	PlayerDead(self);
-}
-
-void player_died8(edict_t* self)
-{
-	player_setanimation(self, "deathd", 7, &player_died9);
-}
-
-void player_died7(edict_t* self)
-{
-	player_setanimation(self, "deathd", 6, &player_died8);
-}
-
-void player_died6(edict_t* self)
-{
-	player_setanimation(self, "deathd", 5, &player_died7);
-}
-
-void player_died5(edict_t* self)
-{
-	player_setanimation(self, "deathd", 4, &player_died6);
-}
-
-void player_died4(edict_t* self)
-{
-	player_setanimation(self, "deathd", 3, &player_died5);
-}
-
-void player_died3(edict_t* self)
-{
-	player_setanimation(self, "deathd", 2, &player_died4);
-}
-
-void player_died2(edict_t* self)
-{
-	player_setanimation(self, "deathd", 1, &player_died3);
+	animation_set(self, "deathc");
 }
 
 void player_died1(edict_t* self)
 {
-	player_setanimation(self, "deathd", 0, &player_died2);
-}
-
-void player_diee9(edict_t* self)
-{
-	player_setanimation(self, "deathe", 8, &player_diee9);
-	PlayerDead(self);
-}
-
-void player_diee8(edict_t* self)
-{
-	player_setanimation(self, "deathe", 7, &player_diee9);
-}
-
-void player_diee7(edict_t* self)
-{
-	player_setanimation(self, "deathe", 6, &player_diee8);
-}
-
-void player_diee6(edict_t* self)
-{
-	player_setanimation(self, "deathe", 5, &player_diee7);
-}
-
-void player_diee5(edict_t* self)
-{
-	player_setanimation(self, "deathe", 4, &player_diee6);
-}
-
-void player_diee4(edict_t* self)
-{
-	player_setanimation(self, "deathe", 3, &player_diee5);
-}
-
-void player_diee3(edict_t* self)
-{
-	player_setanimation(self, "deathe", 2, &player_diee4);
-}
-
-void player_diee2(edict_t* self)
-{
-	player_setanimation(self, "deathe", 1, &player_diee3);
+	animation_set(self, "deathd");
 }
 
 void player_diee1(edict_t* self)
 {
-	player_setanimation(self, "deathe", 0, &player_diee2);
-}
-
-void player_die_ax9(edict_t* self)
-{
-	player_setanimation(self, "axdeth", 8, &player_die_ax9);
-	PlayerDead(self);
-}
-
-void player_die_ax8(edict_t* self)
-{
-	player_setanimation(self, "axdeth", 7, &player_die_ax9);
-}
-
-void player_die_ax7(edict_t* self)
-{
-	player_setanimation(self, "axdeth", 6, &player_die_ax8);
-}
-
-void player_die_ax6(edict_t* self)
-{
-	player_setanimation(self, "axdeth", 5, &player_die_ax7);
-}
-
-void player_die_ax5(edict_t* self)
-{
-	player_setanimation(self, "axdeth", 4, &player_die_ax6);
-}
-
-void player_die_ax4(edict_t* self)
-{
-	player_setanimation(self, "axdeth", 3, &player_die_ax5);
-}
-
-void player_die_ax3(edict_t* self)
-{
-	player_setanimation(self, "axdeth", 2, &player_die_ax4);
-}
-
-void player_die_ax2(edict_t* self)
-{
-	player_setanimation(self, "axdeth", 1, &player_die_ax3);
+	animation_set(self, "deathe");
 }
 
 void player_die_ax1(edict_t* self)
 {
-	player_setanimation(self, "axdeth", 0, &player_die_ax2);
+	animation_set(self, "axdeth");
 }

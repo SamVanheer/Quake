@@ -463,6 +463,7 @@ void Game::PutClientInServer(edict_t* self)
 	self->v.invincible_finished = 0;
 	self->v.effects = 0;
 	self->v.invincible_time = 0;
+	self->v.animations_get = &player_animations_get;
 
 	DecodeLevelParms(self);
 	

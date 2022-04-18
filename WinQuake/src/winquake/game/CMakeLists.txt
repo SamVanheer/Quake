@@ -2,6 +2,7 @@ target_sources(winquake
 	PRIVATE
 		ai.cpp
 		ai.h
+		animation.cpp
 		animation.h
 		buttons.cpp
 		buttons.h

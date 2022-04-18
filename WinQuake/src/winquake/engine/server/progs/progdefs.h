@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
+struct Animations;
 struct edict_s;
 
 typedef struct
@@ -287,4 +288,8 @@ struct entvars_t
 
 	//items.qc
 	float	healamount, healtype;
+
+	//New variables
+	const char* animation;
+	const Animations* (*animations_get)(edict_s*);
 };

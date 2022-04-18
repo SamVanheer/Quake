@@ -166,6 +166,12 @@ constexpr etype_t DeduceType<decltype(entvars_t::th_pain)>()
 	return ev_function;
 }
 
+template<>
+constexpr etype_t DeduceType<decltype(entvars_t::animations_get)>()
+{
+	return ev_function;
+}
+
 #define ENT_FIELD(name) {#name, DeduceType<decltype(entvars_t::name)>(), reinterpret_cast<decltype(fielddescription::Member)>(&entvars_t::name)}
 
 const fielddescription EntvarsFields[] =
@@ -350,7 +356,10 @@ const fielddescription EntvarsFields[] =
 	ENT_FIELD(dmgtime),
 
 	ENT_FIELD(healamount),
-	ENT_FIELD(healtype)
+	ENT_FIELD(healtype),
+
+	ENT_FIELD(animation),
+	ENT_FIELD(animations_get)
 };
 
 /*
