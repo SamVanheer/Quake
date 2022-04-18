@@ -87,7 +87,7 @@ void PF_setorigin (edict_t* e, float* org)
 }
 
 
-void SetMinMaxSize (edict_t *e, float *min, float *max, bool rotate)
+void SetMinMaxSize (edict_t *e, const float *min, const float *max, bool rotate)
 {
 	vec3_t	rmin, rmax;
 	
@@ -174,7 +174,7 @@ the size box is rotated by the current angle
 setsize (entity, minvector, maxvector)
 =================
 */
-void PF_setsize (edict_t* e, float* min, float* max)
+void PF_setsize (edict_t* e, const float* min, const float* max)
 {
 	SetMinMaxSize (e, min, max, false);
 }
@@ -687,7 +687,7 @@ edict_t* PF_findradius (const float* org, float rad)
 
 char	pr_string_temp[128];
 
-string_t PF_ftos (float v)
+const char* PF_ftos (float v)
 {
 	if (v == (int)v)
 		sprintf (pr_string_temp, "%d",(int)v);
@@ -701,7 +701,7 @@ float PF_fabs (float v)
 	return fabs(v);
 }
 
-string_t PF_vtos (const float* v)
+const char* PF_vtos (const float* v)
 {
 	sprintf (pr_string_temp, "'%5.1f %5.1f %5.1f'", v[0], v[1], v[2]);
 	return pr_string_temp;
@@ -749,6 +749,8 @@ edict_t* PF_Find (edict_t* ent, const char* f, const char* s)
 			break;
 		}
 	}
+
+	//TODO: QuakeC evaluates the world to false in conditional checks, so maybe just return nullptr here instead.
 
 	if (!member)
 	{
@@ -931,7 +933,7 @@ float PF_ceil (float value)
 PF_checkbottom
 =============
 */
-int PF_checkbottom (edict_t* ent)
+bool PF_checkbottom (edict_t* ent)
 {
 	return SV_CheckBottom (ent);
 }
@@ -1130,42 +1132,42 @@ sizebuf_t *WriteDest (int dest, edict_t* ent)
 	return NULL;
 }
 
-void PF_WriteByte (int dest, int value, edict_t* ent = nullptr)
+void PF_WriteByte (int dest, int value, edict_t* ent)
 {
 	MSG_WriteByte (WriteDest(dest, ent), value);
 }
 
-void PF_WriteChar (int dest, int value, edict_t* ent = nullptr)
+void PF_WriteChar (int dest, int value, edict_t* ent)
 {
 	MSG_WriteChar (WriteDest(dest, ent), value);
 }
 
-void PF_WriteShort (int dest, int value, edict_t* ent = nullptr)
+void PF_WriteShort (int dest, int value, edict_t* ent)
 {
 	MSG_WriteShort (WriteDest(dest, ent), value);
 }
 
-void PF_WriteLong (int dest, int value, edict_t* ent = nullptr)
+void PF_WriteLong (int dest, int value, edict_t* ent)
 {
 	MSG_WriteLong (WriteDest(dest, ent), value);
 }
 
-void PF_WriteAngle (int dest, float value, edict_t* ent = nullptr)
+void PF_WriteAngle (int dest, float value, edict_t* ent)
 {
 	MSG_WriteAngle (WriteDest(dest, ent), value);
 }
 
-void PF_WriteCoord (int dest, float value, edict_t* ent = nullptr)
+void PF_WriteCoord (int dest, float value, edict_t* ent)
 {
 	MSG_WriteCoord (WriteDest(dest, ent), value);
 }
 
-void PF_WriteString (int dest, const char* string, edict_t* ent = nullptr)
+void PF_WriteString (int dest, const char* string, edict_t* ent)
 {
 	MSG_WriteString (WriteDest(dest, ent), string);
 }
 
-void PF_WriteEntity (int dest, edict_t* ent, edict_t* destEnt = nullptr)
+void PF_WriteEntity (int dest, edict_t* ent, edict_t* destEnt)
 {
 	MSG_WriteShort (WriteDest(dest, destEnt), NUM_FOR_EDICT(ent));
 }
@@ -1226,4 +1228,9 @@ void PF_changelevel (const char* mapname)
 	svs.changelevel_issued = true;
 	
 	Cbuf_AddText (va("changelevel %s\n", mapname));
+}
+
+void dprint(const char* s)
+{
+	Con_DPrintf(s);
 }
