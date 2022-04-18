@@ -24,6 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 typedef intptr_t func_t;
 
-typedef enum : unsigned short {ev_void, ev_string, ev_float, ev_vector, ev_entity, ev_field, ev_function, ev_pointer} etype_t;
+typedef enum : unsigned short {ev_void, ev_string, ev_float, ev_vector, ev_entity, ev_field, ev_function, ev_pointer, ev_int} etype_t;
 
 #define	DEF_SAVEGLOBAL	(1<<15)

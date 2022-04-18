@@ -372,6 +372,10 @@ bool ED_ParseEpair (entvars_t *base, const fielddescription* key, const char *s)
 	case ev_float:
 		d->_float = atof (s);
 		break;
+
+	case ev_int:
+		d->_int = atoi(s);
+		break;
 		
 	case ev_vector:
 	{
