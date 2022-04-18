@@ -32,7 +32,7 @@ typedef struct
 	float	deathmatch;
 	float	coop;
 	float	teamplay;
-	float	serverflags;
+	int	serverflags;
 	float	total_secrets;
 	float	total_monsters;
 	float	found_secrets;
@@ -66,19 +66,9 @@ typedef struct
 	float	trace_inopen;
 	float	trace_inwater;
 	edict_s* msg_entity;
-	func_t	main;
-	func_t	StartFrame;
-	func_t	PlayerPreThink;
-	func_t	PlayerPostThink;
-	func_t	ClientKill;
-	func_t	ClientConnect;
-	func_t	PutClientInServer;
-	func_t	ClientDisconnect;
-	func_t	SetNewParms;
-	func_t	SetChangeParms;
 } globalvars_t;
 
-typedef struct
+struct entvars_t
 {
 	float	modelindex;
 	vec3_t	absmin;
@@ -96,19 +86,19 @@ typedef struct
 	const char*	model;
 	float	frame;
 	float	skin;
-	float	effects;
+	int	effects;
 	vec3_t	mins;
 	vec3_t	maxs;
 	vec3_t	size;
-	func_t	touch;
-	func_t	use;
-	func_t	think;
-	func_t	blocked;
+	void (*touch)(edict_s*, edict_s*);
+	void (*use)(edict_s*, edict_s*);
+	void (*think)(edict_s*);
+	void (*blocked)(edict_s*, edict_s*);
 	float	nextthink;
 	edict_s* groundentity;
 	float	health;
 	float	frags;
-	float	weapon;
+	int	weapon;
 	const char* weaponmodel;
 	float	weaponframe;
 	float	currentammo;
@@ -116,7 +106,7 @@ typedef struct
 	float	ammo_nails;
 	float	ammo_rockets;
 	float	ammo_cells;
-	float	items;
+	int	items;
 	float	takedamage;
 	edict_s* chain;
 	float	deadflag;
@@ -130,7 +120,7 @@ typedef struct
 	float	idealpitch;
 	const char* netname;
 	edict_s* enemy;
-	float	flags;
+	int	flags;
 	float	colormap;
 	float	team;
 	float	max_health;
@@ -143,7 +133,7 @@ typedef struct
 	float	yaw_speed;
 	edict_s* aiment;
 	edict_s* goalentity;
-	float	spawnflags;
+	int	spawnflags;
 	const char*	target;
 	const char*	targetname;
 	float	dmg_take;
@@ -157,4 +147,144 @@ typedef struct
 	const char*	noise1;
 	const char*	noise2;
 	const char*	noise3;
-} entvars_t;
+
+	//QuakeC only variables.
+	//
+	// world fields (FIXME: make globals)
+	//
+	const char*	wad;
+	const char* 	map;
+	float		worldtype;	// 0=medieval 1=metal 2=base
+
+	//================================================
+
+	const char* killtarget;
+
+	//
+	// quakeed fields
+	//
+	float		light_lev;		// not used by game, but parsed by light util
+	float		style;
+
+
+	//
+	// monster ai
+	//
+	void (*th_stand)(edict_s*);
+	void (*th_walk)(edict_s*);
+	void (*th_run)(edict_s*);
+	void (*th_missile)(edict_s*);
+	void (*th_melee)(edict_s*);
+	void (*th_pain)(edict_s*, edict_s* attacker, float damage);
+	void (*th_die)(edict_s*);
+
+	edict_s*	oldenemy;		// mad at this player before taking damage
+
+	float	speed;
+
+	float	lefty;
+
+	float	search_time;
+	float	attack_state;
+
+	//
+	// player only fields
+	//
+	float		walkframe;
+
+	float 		attack_finished;
+	float		pain_finished;
+
+	float		invincible_finished;
+	float		invisible_finished;
+	float		super_damage_finished;
+	float		radsuit_finished;
+
+	float		invincible_time, invincible_sound;
+	float		invisible_time, invisible_sound;
+	float		super_time, super_sound;
+	float		rad_time;
+	float		fly_sound;
+
+	float		axhitme;
+
+	float		show_hostile;	// set to time+0.2 whenever a client fires a
+							// weapon or takes damage.  Used to alert
+							// monsters that otherwise would let the player go
+	float		jump_flag;		// player jump flag
+	float		swim_flag;		// player swimming sound flag
+	float		air_finished;	// when time > air_finished, start drowning
+	float		bubble_count;	// keeps track of the number of bubbles
+	const char* deathtype;		// keeps track of how the player died
+
+	//
+	// object stuff
+	//
+	const char* mdl;
+	vec3_t		mangle;			// angle at start
+
+	//vec3_t		oldorigin;		// only used by secret door
+
+	float		t_length, t_width;
+
+
+	//
+	// doors, etc
+	//
+	vec3_t		dest, dest1, dest2;
+	float		wait;			// time from firing to restarting
+	float		delay;			// time from activation to firing
+	edict_s*	trigger_field;	// door's trigger entity
+	const char* noise4;
+
+	//
+	// monsters
+	//
+	float 		pausetime;
+	edict_s*	movetarget;
+
+
+	//
+	// doors
+	//
+	float		aflag;
+	float		dmg;			// damage done by door when hit
+
+	//
+	// misc
+	//
+	float		cnt; 			// misc flag
+
+	//
+	// subs
+	//
+	void (*think1)(edict_s*);
+	vec3_t		finaldest, finalangle;
+
+	//
+	// triggers
+	//
+	float		count;			// for counting triggers
+
+
+	//
+	// plats / doors / buttons
+	//
+	float	lip;
+	float	state;
+	vec3_t	pos1, pos2;		// top and bottom positions
+	float	height;
+
+	//
+	// sounds
+	//
+	float	waitmin, waitmax;
+	float	distance;
+	float	volume;
+
+	//client.qc
+	float dmgtime;
+
+	//items.qc
+	float	healamount, healtype;
+};
