@@ -33,6 +33,12 @@ void Game::Shutdown()
 {
 }
 
+void Game::NewMapStarted()
+{
+	//TODO: reset all globals here
+	intermission_running = false;
+}
+
 bool Game::SpawnEntity(edict_t* entity, const char* classname)
 {
 	//TODO

@@ -27,6 +27,8 @@ struct IGame
 	virtual void Initialize() = 0;
 	virtual void Shutdown() = 0;
 
+	virtual void NewMapStarted() = 0;
+
 	virtual bool SpawnEntity(edict_t* entity, const char* classname) = 0;
 	virtual void EntityThink(edict_t* entity, edict_t* other) = 0;
 	virtual void EntityTouch(edict_t* entity, edict_t* other) = 0;

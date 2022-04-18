@@ -577,6 +577,8 @@ void PR_LoadProgs()
 {
 	//Zero out globals
 	memset(pr_global_struct, 0, sizeof(*pr_global_struct));
+
+	g_Game->NewMapStarted();
 }
 
 /*

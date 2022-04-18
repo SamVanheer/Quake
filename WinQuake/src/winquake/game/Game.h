@@ -27,6 +27,8 @@ public:
 	void Initialize() override;
 	void Shutdown() override;
 
+	void NewMapStarted() override;
+
 	bool SpawnEntity(edict_t* entity, const char* classname) override;
 	void EntityThink(edict_t* entity, edict_t* other) override;
 	void EntityTouch(edict_t* entity, edict_t* other) override;
