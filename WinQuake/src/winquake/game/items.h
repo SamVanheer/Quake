@@ -19,4 +19,4 @@
 
 #pragma once
 
-inline int modelindex_eyes, modelindex_player;
+void DropBackpack(edict_t* self);

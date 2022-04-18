@@ -20,6 +20,8 @@
 #pragma once
 
 #include "IGame.h"
+#include "entitymap.h"
+#include "vector.h"
 
 class Game : public IGame
 {

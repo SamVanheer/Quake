@@ -19,4 +19,6 @@
 
 #pragma once
 
-inline int modelindex_eyes, modelindex_player;
+inline edict_t* lastspawn = nullptr;
+
+void CopyToBodyQue(edict_t* ent);

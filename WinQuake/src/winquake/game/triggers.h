@@ -19,4 +19,5 @@
 
 #pragma once
 
-inline int modelindex_eyes, modelindex_player;
+void spawn_tfog(edict_t* self, vec3_t org);
+void spawn_tdeath(edict_t* self, vec3_t org, edict_t* death_owner);

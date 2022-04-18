@@ -19,4 +19,14 @@
 
 #pragma once
 
-inline int modelindex_eyes, modelindex_player;
+void player_stand1(edict_t* self);
+void player_run(edict_t* self);
+void player_axe1(edict_t* self);
+void player_axeb1(edict_t* self);
+void player_axec1(edict_t* self);
+void player_axed1(edict_t* self);
+void player_shot1(edict_t* self);
+void player_nail1(edict_t* self);
+void player_light1(edict_t* self);
+void player_rocket1(edict_t* self);
+void player_pain(edict_t* self, edict_s* attacker, float damage);

@@ -1,8 +1,38 @@
 target_sources(winquake
 	PRIVATE
+		ai.cpp
+		ai.h
+		animation.h
+		buttons.cpp
+		buttons.h
 		client.cpp
 		client.h
+		combat.cpp
+		combat.h
+		doors.cpp
+		doors.h
 		entitymap.h
+		fight.cpp
+		fight.h
 		Game.cpp
 		Game.h
-		IGame.h)
+		game_world.cpp
+		game_world.h
+		IGame.h
+		items.cpp
+		items.h
+		misc.cpp
+		misc.h
+		monsters.cpp
+		monsters.h
+		plats.cpp
+		plats.h
+		player.cpp
+		player.h
+		subs.cpp
+		subs.h
+		triggers.cpp
+		triggers.h
+		vector.h
+		weapons.cpp
+		weapons.h)

@@ -19,4 +19,16 @@
 
 #pragma once
 
-inline int modelindex_eyes, modelindex_player;
+void SUB_NullThink(edict_t*);
+void SUB_NullTouch(edict_t*, edict_t*);
+void SUB_NullUse(edict_t*, edict_t*);
+void SUB_NullPain(edict_t*, edict_t*, float);
+void SUB_Remove(edict_t* self);
+void SetMovedir(edict_t* self);
+void InitTrigger(edict_t* self);
+void SUB_CalcMove(edict_t* self, vec3_t tdest, float tspeed, void (*func)(edict_t*));
+void SUB_CalcMoveDone(edict_t* self);
+void SUB_CalcAngleMove(edict_t* self, vec3_t destangle, float tspeed, void (*func)(edict_t*));
+void SUB_CalcAngleMoveDone(edict_t* self);
+void SUB_UseTargets(edict_t* self, edict_t* other = nullptr);
+void SUB_AttackFinished(edict_t* self, float normal);
