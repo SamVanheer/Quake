@@ -151,9 +151,6 @@ Two entities have touched, so run their touch functions
 */
 void SV_Impact (edict_t *e1, edict_t *e2)
 {
-	auto old_self = pr_global_struct->self;
-	auto old_other = pr_global_struct->other;
-	
 	pr_global_struct->time = sv.time;
 	if (e1->v.touch && e1->v.solid != SOLID_NOT)
 	{
@@ -164,9 +161,6 @@ void SV_Impact (edict_t *e1, edict_t *e2)
 	{
 		g_Game->EntityTouch(e2, e1);
 	}
-
-	pr_global_struct->self = old_self;
-	pr_global_struct->other = old_other;
 }
 
 

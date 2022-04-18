@@ -24,9 +24,6 @@ struct edict_s;
 
 typedef struct
 {
-	int	pad[28];
-	edict_s*	self;
-	edict_s* other;
 	edict_s* world;
 	float	time;
 	float	frametime;
