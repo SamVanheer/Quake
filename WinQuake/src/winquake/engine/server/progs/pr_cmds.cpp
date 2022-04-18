@@ -199,7 +199,7 @@ void PF_setmodel (edict_t* e, char* m)
 	if (!*check)
 		Host_Error("no precache: %s\n", m);
 
-	e->v.model = m - pr_strings;
+	e->v.model = m;
 	e->v.modelindex = i; //SV_ModelIndex (m);
 
 	auto mod = sv.models[ (int)e->v.modelindex];  // Mod_ForName (m, true);
@@ -693,7 +693,7 @@ string_t PF_ftos (float v)
 		sprintf (pr_string_temp, "%d",(int)v);
 	else
 		sprintf (pr_string_temp, "%5.1f",v);
-	return pr_string_temp - pr_strings;
+	return pr_string_temp;
 }
 
 float PF_fabs (float v)
@@ -704,7 +704,7 @@ float PF_fabs (float v)
 string_t PF_vtos (const float* v)
 {
 	sprintf (pr_string_temp, "'%5.1f %5.1f %5.1f'", v[0], v[1], v[2]);
-	return pr_string_temp - pr_strings;
+	return pr_string_temp;
 }
 
 edict_t* PF_Spawn ()
@@ -721,7 +721,7 @@ void PF_Remove (edict_t* ed)
 struct fieldtable_t
 {
 	const char* name;
-	const string_t entvars_t::* member;
+	const char* entvars_t::* member;
 };
 
 constexpr fieldtable_t entvarsFields[] =
@@ -762,11 +762,11 @@ edict_t* PF_Find (edict_t* ent, const char* f, const char* s)
 		if (ed->free)
 			continue;
 
-		auto t = pr_strings + ed->v.*member;
+		auto t = ed->v.*member;
 
 		if (!t)
 			continue;
-		if (!strcmp(t,s))
+		if (!strcmp(t, s))
 		{
 			return ed;
 		}
@@ -1178,7 +1178,7 @@ void PF_makestatic (edict_t* ent)
 {
 	MSG_WriteByte (&sv.signon,svc_spawnstatic);
 
-	MSG_WriteByte (&sv.signon, SV_ModelIndex(pr_strings + ent->v.model));
+	MSG_WriteByte (&sv.signon, SV_ModelIndex(ent->v.model));
 
 	MSG_WriteByte (&sv.signon, ent->v.frame);
 	MSG_WriteByte (&sv.signon, ent->v.colormap);

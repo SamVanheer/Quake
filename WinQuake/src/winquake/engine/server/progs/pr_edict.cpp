@@ -22,7 +22,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "game/IGame.h"
 
-char			*pr_strings;
 globalvars_t globalVars;
 globalvars_t	*pr_global_struct = &globalVars;
 
@@ -367,7 +366,7 @@ bool ED_ParseEpair (entvars_t *base, const fielddescription* key, const char *s)
 	switch (key->Type & ~DEF_SAVEGLOBAL)
 	{
 	case ev_string:
-		d->string = ED_NewString (s) - pr_strings;
+		d->string = ED_NewString (s);
 		break;
 		
 	case ev_float:
@@ -559,9 +558,9 @@ void ED_LoadFromFile (char *data)
 		}
 
 	// look for the spawn function
-		if (!g_Game->SpawnEntity(ent, pr_strings + ent->v.classname))
+		if (!g_Game->SpawnEntity(ent, ent->v.classname))
 		{
-			Con_Printf("No spawn function for: %s\n", pr_strings + ent->v.classname);
+			Con_Printf("No spawn function for: %s\n", ent->v.classname);
 			ED_Free(ent);
 			continue;
 		}

@@ -23,7 +23,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <cstdint>
 
 typedef intptr_t func_t;
-typedef intptr_t string_t;
 
 typedef enum : unsigned short {ev_void, ev_string, ev_float, ev_vector, ev_entity, ev_field, ev_function, ev_pointer} etype_t;
 
