@@ -438,7 +438,8 @@ void teleport_touch(edict_t* self, edict_t* other)
 			other->v.flags = other->v.flags - FL_ONGROUND;
 		AsVector(other->v.velocity) = AsVector(pr_global_struct->v_forward) * 300;
 	}
-	other->v.flags = other->v.flags - other->v.flags & FL_ONGROUND;
+	//TODO: need to fix all bitwise operations that are done using math instead of bitwise operators.
+	other->v.flags = other->v.flags - (other->v.flags & FL_ONGROUND);
 }
 
 /*QUAKED info_teleport_destination (.5 .5 .5) (-8 -8 -8) (8 8 32)
