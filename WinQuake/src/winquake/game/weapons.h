@@ -22,8 +22,10 @@
 void W_Precache(edict_t* self);
 float crandom();
 void W_FireAxe(edict_t* self);
+void SpawnMeatSpray(edict_t* self, vec3_t org, vec3_t vel);
 void SpawnBlood(vec3_t org, vec3_t vel, float damage);
 void FireBullets(edict_t* self, float shotcount, vec3_t dir, vec3_t spread);
+void s_explode1(edict_t* self);
 void BecomeExplosion(edict_t* self);
 void W_FireLightning(edict_t* self);
 void launch_spike(edict_t* self, vec3_t org, vec3_t dir);
