@@ -709,7 +709,13 @@ const char* PF_vtos (const float* v)
 
 edict_t* PF_Spawn ()
 {
-	return ED_Alloc();
+	auto ent = ED_Alloc();
+
+	//Mimic QuakeC behavior where a null string is an empty string.
+	//TODO: verify that !classname checks are updated everywhere.
+	ent->v.classname = "";
+
+	return ent;
 }
 
 void PF_Remove (edict_t* ed)

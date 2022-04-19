@@ -723,7 +723,7 @@ void ED_LoadFromFile (char *data)
 //
 // immediately call spawn function
 //
-		if (!ent->v.classname)
+		if (!ent->v.classname || !strcmp(ent->v.classname, ""))
 		{
 			Con_Printf ("No classname for entity\n");
 			ED_Free (ent);
