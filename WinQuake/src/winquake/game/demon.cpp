@@ -258,7 +258,7 @@ void demon1_jump1(edict_t* self)
 void demon1_jump11(edict_t* self)
 {
 	animation_set(self, "leap");
-	self->v.frame = 10;
+	self->v.frame = DemonAnimations.FindAnimationStart("leap") + 10;
 }
 
 void demon1_atta1(edict_t* self)
