@@ -32,6 +32,7 @@ target_sources(winquake
 		plats.h
 		player.cpp
 		player.h
+		soldier.cpp
 		subs.cpp
 		subs.h
 		triggers.cpp

@@ -203,6 +203,7 @@ void player_run(edict_t* self)
 	}
 	else
 	{
+		//TODO: set rockrun animation frames
 		if (self->v.walkframe == 6)
 			self->v.walkframe = 0;
 		self->v.frame += self->v.walkframe;
