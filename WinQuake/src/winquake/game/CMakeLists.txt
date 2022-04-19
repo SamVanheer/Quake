@@ -10,6 +10,7 @@ target_sources(winquake
 		client.h
 		combat.cpp
 		combat.h
+		demon.cpp
 		dog.cpp
 		doors.cpp
 		doors.h

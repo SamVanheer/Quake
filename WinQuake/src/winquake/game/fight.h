@@ -25,7 +25,7 @@ inline float enemy_yaw;
 float SoldierCheckAttack(edict_t* self);
 float OgreCheckAttack(edict_t* self);
 float ShamCheckAttack(edict_t* self);
-float DemonCheckAttack(edict_t* self);
+bool DemonCheckAttack(edict_t* self);
 bool CheckAttack(edict_t* self);
 
 void ai_face(edict_t* self);

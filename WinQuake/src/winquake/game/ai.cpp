@@ -587,9 +587,9 @@ bool CheckAnyAttack(edict_t* self)
 	/*
 	if (!strcmp(self->v.classname, "monster_shambler"))
 		return ShamCheckAttack(self);
+		*/
 	if (!strcmp(self->v.classname, "monster_demon1"))
 		return DemonCheckAttack(self);
-	*/
 	if (!strcmp(self->v.classname, "monster_dog"))
 		return DogCheckAttack(self);
 	/*

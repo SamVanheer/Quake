@@ -43,9 +43,6 @@ void sham_smash1(edict_t* self);
 void sham_swingr1(edict_t* self);
 void sham_swingl1(edict_t* self);
 
-float DemonCheckAttack(edict_t* self);
-void Demon_Melee(edict_t* self, float side);
-
 void ChooseTurn(edict_t* self, vec3_t dest);
 
 void ai_face(edict_t* self);
