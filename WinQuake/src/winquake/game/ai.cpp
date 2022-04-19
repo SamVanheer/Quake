@@ -580,9 +580,9 @@ bool CheckAnyAttack(edict_t* self)
 	if (!enemy_vis)
 		return false;
 	//TODO
-	/*
 	if (!strcmp(self->v.classname, "monster_army"))
 		return SoldierCheckAttack(self);
+	/*
 	if (!strcmp(self->v.classname, "monster_ogre"))
 		return OgreCheckAttack(self);
 	if (!strcmp(self->v.classname, "monster_shambler"))
