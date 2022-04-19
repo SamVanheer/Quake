@@ -40,4 +40,5 @@ target_sources(winquake
 		triggers.h
 		vector.h
 		weapons.cpp
-		weapons.h)
+		weapons.h
+		zombie.cpp)

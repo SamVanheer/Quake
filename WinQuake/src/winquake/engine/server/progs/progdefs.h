@@ -289,6 +289,9 @@ struct entvars_t
 	//items.qc
 	float	healamount, healtype;
 
+	//zombie.qc
+	float inpain;
+
 	//New variables
 	const char* animation;
 	const Animations* (*animations_get)(edict_s*);

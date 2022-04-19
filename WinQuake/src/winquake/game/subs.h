@@ -24,6 +24,7 @@ void SUB_NullTouch(edict_t*, edict_t*);
 void SUB_NullUse(edict_t*, edict_t*);
 void SUB_NullPain(edict_t*, edict_t*, float);
 void SUB_Remove(edict_t* self);
+void SUB_TouchRemove(edict_t* self, edict_t* other);
 void SetMovedir(edict_t* self);
 void InitTrigger(edict_t* self);
 void SUB_CalcMove(edict_t* self, vec3_t tdest, float tspeed, void (*func)(edict_t*));

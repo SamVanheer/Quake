@@ -43,6 +43,11 @@ void SUB_Remove(edict_t* self)
 	PF_Remove(self);
 }
 
+void SUB_TouchRemove(edict_t* self, edict_t* other)
+{
+	SUB_Remove(self);
+}
+
 vec3_t Up{0, -1, 0};
 vec3_t Down{0, -2, 0};
 
