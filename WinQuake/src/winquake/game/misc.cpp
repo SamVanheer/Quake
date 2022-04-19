@@ -333,11 +333,6 @@ constexpr int SPAWNFLAG_LASER = 2;
 
 void LaunchLaser(edict_t* self, vec3_t org, vec3_t vec);
 
-void LaunchLaser(edict_t* self, vec3_t org, vec3_t vec)
-{
-	//TODO move to enforcer.cpp
-}
-
 void spikeshooter_use(edict_t* self, edict_t* other)
 {
 	if (self->v.spawnflags & SPAWNFLAG_LASER)

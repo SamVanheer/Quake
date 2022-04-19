@@ -12,6 +12,7 @@ target_sources(winquake
 		combat.h
 		doors.cpp
 		doors.h
+		enforcer.cpp
 		entitymap.h
 		fight.cpp
 		fight.h

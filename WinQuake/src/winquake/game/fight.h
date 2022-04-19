@@ -28,6 +28,7 @@ float ShamCheckAttack(edict_t* self);
 float DemonCheckAttack(edict_t* self);
 bool CheckAttack(edict_t* self);
 
+void ai_face(edict_t* self);
 void ai_charge(edict_t* self, float d);
 void ai_charge_side(edict_t* self);
 void ai_melee(edict_t* self);

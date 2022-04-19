@@ -23,6 +23,10 @@ bool visible(edict_t* self, edict_t* targ);
 bool infront(edict_t* self, edict_t* targ);
 float range(edict_t* self, edict_t* targ);
 void FoundTarget(edict_t* self);
+
+void ai_forward(edict_t* self, float dist);
+void ai_back(edict_t* self, float dist);
+void ai_pain(edict_t* self, float dist);
 void ai_painforward(edict_t* self, float dist);
 void ai_walk(edict_t* self, float dist);
 void ai_stand(edict_t* self);

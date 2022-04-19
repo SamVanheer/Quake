@@ -32,3 +32,4 @@ void SUB_CalcAngleMove(edict_t* self, vec3_t destangle, float tspeed, void (*fun
 void SUB_CalcAngleMoveDone(edict_t* self);
 void SUB_UseTargets(edict_t* self, edict_t* other = nullptr);
 void SUB_AttackFinished(edict_t* self, float normal);
+void SUB_CheckRefire(edict_t* self, void (*thinkst)(edict_t*));
