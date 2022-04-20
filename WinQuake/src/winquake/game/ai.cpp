@@ -572,7 +572,7 @@ float FacingIdeal(edict_t* self)
 
 //=============================================================================
 
-float	WizardCheckAttack(edict_t* self);
+bool	WizardCheckAttack(edict_t* self);
 bool	DogCheckAttack(edict_t* self);
 
 bool CheckAnyAttack(edict_t* self)
@@ -592,10 +592,8 @@ bool CheckAnyAttack(edict_t* self)
 		return DemonCheckAttack(self);
 	if (!strcmp(self->v.classname, "monster_dog"))
 		return DogCheckAttack(self);
-	/*
 	if (!strcmp(self->v.classname, "monster_wizard"))
 		return WizardCheckAttack(self);
-		*/
 	return CheckAttack(self);
 }
 

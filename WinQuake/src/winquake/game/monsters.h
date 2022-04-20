@@ -20,4 +20,5 @@
 #pragma once
 
 void walkmonster_start(edict_t* self);
+void flymonster_start(edict_t* self);
 void swimmonster_start(edict_t* self);
