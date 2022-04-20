@@ -410,7 +410,7 @@ void teleport_touch(edict_t* self, edict_t* other)
 	spawn_tfog(self, other->v.origin);
 
 	auto t = PF_Find(pr_global_struct->world, "targetname", self->v.target);
-	if (!t)
+	if (t == pr_global_struct->world)
 		PF_objerror("couldn't find target");
 
 	// PF_Spawn a tfog flash in front of the destination

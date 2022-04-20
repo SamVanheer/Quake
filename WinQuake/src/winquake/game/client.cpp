@@ -113,13 +113,13 @@ edict_t* FindIntermission(edict_t* self)
 {
 	// look for info_intermission first
 	auto spot = PF_Find(pr_global_struct->world, "classname", "info_intermission");
-	if (spot)
+	if (spot != pr_global_struct->world)
 	{	// pick a random one
 		float cyc = PF_random() * 4;
 		while (cyc > 1)
 		{
 			spot = PF_Find(spot, "classname", "info_intermission");
-			if (!spot)
+			if (spot == pr_global_struct->world)
 				spot = PF_Find(spot, "classname", "info_intermission");
 			cyc = cyc - 1;
 		}
@@ -128,12 +128,12 @@ edict_t* FindIntermission(edict_t* self)
 
 	// then look for the start position
 	spot = PF_Find(pr_global_struct->world, "classname", "info_player_start");
-	if (spot)
+	if (spot != pr_global_struct->world)
 		return spot;
 
 	// testinfo_player_start is only found in regioned levels
 	spot = PF_Find(pr_global_struct->world, "classname", "testplayerstart");
-	if (spot)
+	if (spot != pr_global_struct->world)
 		return spot;
 
 	PF_objerror("FindIntermission: no spot");
@@ -597,9 +597,9 @@ void DumpScore(edict_t* self)
 	// build a sorted lis
 	auto e = PF_Find(pr_global_struct->world, "classname", "player");
 	auto sort = pr_global_struct->world;
-	while (e)
+	while (e != pr_global_struct->world)
 	{
-		if (!sort)
+		if (sort == pr_global_struct->world)
 		{
 			sort = e;
 			e->v.chain = pr_global_struct->world;
@@ -653,7 +653,7 @@ void NextLevel(edict_t* self)
 {
 	// find a trigger changelevel
 	auto o = PF_Find(pr_global_struct->world, "classname", "trigger_changelevel");
-	if (!o || !strcmp(pr_global_struct->mapname, "start"))
+	if (o == pr_global_struct->world || !strcmp(pr_global_struct->mapname, "start"))
 	{	// go back to same map if no trigger_changelevel
 		o = PF_Spawn();
 		o->v.map = pr_global_struct->mapname;

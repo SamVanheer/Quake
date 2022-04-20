@@ -114,7 +114,7 @@ void walkmonster_start_go(edict_t* self)
 	{
 		self->v.goalentity = self->v.movetarget = PF_Find(pr_global_struct->world, "targetname", self->v.target);
 		self->v.ideal_yaw = PF_vectoyaw(AsVector(self->v.goalentity->v.origin) - AsVector(self->v.origin));
-		if (!self->v.movetarget)
+		if (self->v.movetarget == pr_global_struct->world)
 		{
 			dprint("Monster can't find target at ");
 			dprint(PF_vtos(self->v.origin));
@@ -169,7 +169,7 @@ void flymonster_start_go(edict_t* self)
 	if (self->v.target)
 	{
 		self->v.goalentity = self->v.movetarget = PF_Find(pr_global_struct->world, "targetname", self->v.target);
-		if (!self->v.movetarget)
+		if (self->v.movetarget == pr_global_struct->world)
 		{
 			dprint("Monster can't find target at ");
 			dprint(PF_vtos(self->v.origin));
@@ -220,7 +220,7 @@ void swimmonster_start_go(edict_t* self)
 	if (self->v.target)
 	{
 		self->v.goalentity = self->v.movetarget = PF_Find(pr_global_struct->world, "targetname", self->v.target);
-		if (!self->v.movetarget)
+		if (self->v.movetarget == pr_global_struct->world)
 		{
 			dprint("Monster can't find target at ");
 			dprint(PF_vtos(self->v.origin));
