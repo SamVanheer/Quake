@@ -52,7 +52,6 @@ public:
 // globals
 //
 //TODO: need to reset these on map load
-inline float	movedist;
 inline float	gameover;		// set when a rule exits
 
 inline edict_t* activator;		// the entity that activated a trigger or brush

@@ -471,8 +471,6 @@ The monster is walking it's beat
 */
 void ai_walk(edict_t* self, float dist)
 {
-	movedist = dist;
-
 	if (!strcmp(self->v.classname, "monster_dragon"))
 	{
 		SV_MoveToGoal(self, dist);
@@ -641,7 +639,7 @@ ai_run_slide
 Strafe sideways, but stay at aproximately the same range
 =============
 */
-void ai_run_slide(edict_t* self)
+void ai_run_slide(edict_t* self, float dist)
 {
 	float	ofs;
 
@@ -652,12 +650,12 @@ void ai_run_slide(edict_t* self)
 	else
 		ofs = -90;
 
-	if (PF_walkmove(self, self->v.ideal_yaw + ofs, movedist))
+	if (PF_walkmove(self, self->v.ideal_yaw + ofs, dist))
 		return;
 
 	self->v.lefty = 1 - self->v.lefty;
 
-	PF_walkmove(self, self->v.ideal_yaw - ofs, movedist);
+	PF_walkmove(self, self->v.ideal_yaw - ofs, dist);
 }
 
 
@@ -670,7 +668,6 @@ The monster has an enemy it is trying to kill
 */
 void ai_run(edict_t* self, float dist)
 {
-	movedist = dist;
 	// see if the enemy is dead
 	if (self->v.enemy->v.health <= 0)
 	{
@@ -727,7 +724,7 @@ void ai_run(edict_t* self, float dist)
 
 	if (self->v.attack_state == AS_SLIDING)
 	{
-		ai_run_slide(self);
+		ai_run_slide(self, dist);
 		return;
 	}
 
