@@ -18,3 +18,5 @@
 */
 
 #pragma once
+
+void door_go_down(edict_t* self);

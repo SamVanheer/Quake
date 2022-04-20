@@ -4,6 +4,7 @@ target_sources(winquake
 		ai.h
 		animation.cpp
 		animation.h
+		boss.cpp
 		buttons.cpp
 		buttons.h
 		client.cpp
