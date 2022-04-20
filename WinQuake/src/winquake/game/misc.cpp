@@ -52,12 +52,12 @@ void light_use(edict_t* self, edict_t* other)
 	if ((int)self->v.spawnflags & START_OFF)
 	{
 		PF_lightstyle(self->v.style, "m");
-		self->v.spawnflags = self->v.spawnflags - START_OFF;
+		self->v.spawnflags &= ~START_OFF;
 	}
 	else
 	{
 		PF_lightstyle(self->v.style, "a");
-		self->v.spawnflags = self->v.spawnflags + START_OFF;
+		self->v.spawnflags |= START_OFF;
 	}
 }
 

@@ -138,7 +138,7 @@ void T_Damage(edict_t* self, edict_t* targ, edict_t* inflictor, edict_t* attacke
 	{
 		save = targ->v.armorvalue;
 		targ->v.armortype = 0;	// lost all armor
-		targ->v.items = targ->v.items - ((int)targ->v.items & (IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3));
+		targ->v.items &= ~(IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3);
 	}
 
 	targ->v.armorvalue = targ->v.armorvalue - save;

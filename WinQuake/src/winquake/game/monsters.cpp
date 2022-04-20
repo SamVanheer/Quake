@@ -75,9 +75,9 @@ void monster_death_use(edict_t* self)
 {
 // fall to ground
 	if ((int)self->v.flags & FL_FLY)
-		self->v.flags = self->v.flags - FL_FLY;
+		self->v.flags &= ~FL_FLY;
 	if ((int)self->v.flags & FL_SWIM)
-		self->v.flags = self->v.flags - FL_SWIM;
+		self->v.flags &= ~FL_SWIM;
 
 	if (!self->v.target)
 		return;
@@ -108,7 +108,7 @@ void walkmonster_start_go(edict_t* self)
 	AsVector(self->v.view_ofs) = Vector3D{0, 0, 25};
 	self->v.use = monster_use;
 
-	self->v.flags = (int)self->v.flags | FL_MONSTER;
+	self->v.flags |= FL_MONSTER;
 
 	if (self->v.target)
 	{
@@ -156,8 +156,7 @@ void flymonster_start_go(edict_t* self)
 	AsVector(self->v.view_ofs) = Vector3D{0, 0, 25};
 	self->v.use = monster_use;
 
-	self->v.flags = (int)self->v.flags | FL_FLY;
-	self->v.flags = (int)self->v.flags | FL_MONSTER;
+	self->v.flags |= FL_FLY | FL_MONSTER;
 
 	if (!PF_walkmove(self, 0,0))
 	{
@@ -214,8 +213,7 @@ void swimmonster_start_go(edict_t* self)
 	AsVector(self->v.view_ofs) = Vector3D{0, 0, 10};
 	self->v.use = monster_use;
 
-	self->v.flags = (int)self->v.flags | FL_SWIM;
-	self->v.flags = (int)self->v.flags | FL_MONSTER;
+	self->v.flags |= FL_SWIM | FL_MONSTER;
 
 	if (self->v.target)
 	{

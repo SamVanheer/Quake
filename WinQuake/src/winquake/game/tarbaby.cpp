@@ -127,7 +127,7 @@ void tarbaby_jump_frame(edict_t* self, const Animation* animation, int frame)
 		AsVector(self->v.velocity) = AsVector(pr_global_struct->v_forward) * 600 + Vector3D{0, 0, 200};
 		self->v.velocity[2] = self->v.velocity[2] + random() * 150;
 		if (self->v.flags & FL_ONGROUND)
-			self->v.flags = self->v.flags - FL_ONGROUND;
+			self->v.flags &= ~FL_ONGROUND;
 		self->v.cnt = 0;
 	}
 
@@ -229,7 +229,7 @@ void Tar_JumpTouch(edict_t* self, edict_t* other)
 //			self->v.velocity_x = (random() - 0.5) * 600;
 //			self->v.velocity_y = (random() - 0.5) * 600;
 //			self->v.velocity_z = 200;
-//			self->v.flags = self->v.flags - FL_ONGROUND;
+//			self->v.flags &= ~FL_ONGROUND;
 		}
 		return;	// not on ground yet
 	}

@@ -47,8 +47,7 @@ LINK_ENTITY_TO_CLASS(info_intermission);
 void Game::SetChangeParms(edict_t* self, float* parms)
 {
 	// remove items
-	self->v.items = self->v.items - (((int)self->v.items) &
-		(IT_KEY1 | IT_KEY2 | IT_INVISIBILITY | IT_INVULNERABILITY | IT_SUIT | IT_QUAD));
+	self->v.items &= ~(IT_KEY1 | IT_KEY2 | IT_INVISIBILITY | IT_INVULNERABILITY | IT_SUIT | IT_QUAD);
 
 	// cap super health
 	if (self->v.health > 100)
@@ -785,9 +784,9 @@ void PlayerJump(edict_t* self)
 	if (!((int)self->v.flags & FL_JUMPRELEASED))
 		return;		// don't pogo stick
 
-	self->v.flags = self->v.flags - ((int)self->v.flags & FL_JUMPRELEASED);
+	self->v.flags &= ~FL_JUMPRELEASED;
 
-	self->v.flags = self->v.flags - FL_ONGROUND;	// don't stairwalk
+	self->v.flags &= ~FL_ONGROUND;	// don't stairwalk
 
 	self->v.button2 = 0;
 	// player jumping sound
@@ -836,7 +835,7 @@ void WaterMove(edict_t* self)
 		{
 			// play leave water sound
 			PF_sound(self, CHAN_BODY, "misc/outwater.wav", 1, ATTN_NORM);
-			self->v.flags = self->v.flags - FL_INWATER;
+			self->v.flags &= ~FL_INWATER;
 		}
 		return;
 	}
@@ -874,7 +873,7 @@ void WaterMove(edict_t* self)
 		if (self->v.watertype == CONTENT_SLIME)
 			PF_sound(self, CHAN_BODY, "player/slimbrn2.wav", 1, ATTN_NORM);
 
-		self->v.flags = self->v.flags + FL_INWATER;
+		self->v.flags |= FL_INWATER;
 		self->v.dmgtime = 0;
 	}
 
@@ -902,9 +901,9 @@ void CheckWaterJump(edict_t* self)
 		PF_traceline(start, end, TRUE, self);
 		if (pr_global_struct->trace_fraction == 1)
 		{	// open at eye level
-			self->v.flags = (int)self->v.flags | FL_WATERJUMP;
+			self->v.flags |= FL_WATERJUMP;
 			self->v.velocity[2] = 225;
-			self->v.flags = self->v.flags - ((int)self->v.flags & FL_JUMPRELEASED);
+			self->v.flags &= ~FL_JUMPRELEASED;
 			self->v.teleport_time = pr_global_struct->time + 2;	// safety net
 			return;
 		}
@@ -951,7 +950,7 @@ void Game::PlayerPreThink(edict_t* self)
 		PlayerJump(self);
 	}
 	else
-		self->v.flags = (int)self->v.flags | FL_JUMPRELEASED;
+		self->v.flags |= FL_JUMPRELEASED;
 
 	// teleporters can force a non-moving pause time
 	if (pr_global_struct->time < self->v.pausetime)
@@ -1002,7 +1001,7 @@ void CheckPowerups(edict_t* self)
 
 		if (self->v.invisible_finished < pr_global_struct->time)
 		{	// just stopped
-			self->v.items = self->v.items - IT_INVISIBILITY;
+			self->v.items &= ~IT_INVISIBILITY;
 			self->v.invisible_finished = 0;
 			self->v.invisible_time = 0;
 		}
@@ -1037,14 +1036,14 @@ void CheckPowerups(edict_t* self)
 
 		if (self->v.invincible_finished < pr_global_struct->time)
 		{	// just stopped
-			self->v.items = self->v.items - IT_INVULNERABILITY;
+			self->v.items &= ~IT_INVULNERABILITY;
 			self->v.invincible_time = 0;
 			self->v.invincible_finished = 0;
 		}
 		if (self->v.invincible_finished > pr_global_struct->time)
-			self->v.effects = (int)self->v.effects | EF_DIMLIGHT;
+			self->v.effects |= EF_DIMLIGHT;
 		else
-			self->v.effects = self->v.effects - ((int)self->v.effects & EF_DIMLIGHT);
+			self->v.effects &= ~EF_DIMLIGHT;
 	}
 
 	// super damage
@@ -1072,14 +1071,14 @@ void CheckPowerups(edict_t* self)
 
 		if (self->v.super_damage_finished < pr_global_struct->time)
 		{	// just stopped
-			self->v.items = self->v.items - IT_QUAD;
+			self->v.items &= ~IT_QUAD;
 			self->v.super_damage_finished = 0;
 			self->v.super_time = 0;
 		}
 		if (self->v.super_damage_finished > pr_global_struct->time)
-			self->v.effects = (int)self->v.effects | EF_DIMLIGHT;
+			self->v.effects |= EF_DIMLIGHT;
 		else
-			self->v.effects = self->v.effects - ((int)self->v.effects & EF_DIMLIGHT);
+			self->v.effects &= ~EF_DIMLIGHT;
 	}
 
 	// suit	
@@ -1107,7 +1106,7 @@ void CheckPowerups(edict_t* self)
 
 		if (self->v.radsuit_finished < pr_global_struct->time)
 		{	// just stopped
-			self->v.items = self->v.items - IT_SUIT;
+			self->v.items &= ~IT_SUIT;
 			self->v.rad_time = 0;
 			self->v.radsuit_finished = 0;
 		}

@@ -136,7 +136,7 @@ void wizard_death_frame(edict_t* self, const Animation* animation, int frame)
 		self->v.velocity[0] = -200 + 400 * random();
 		self->v.velocity[1] = -200 + 400 * random();
 		self->v.velocity[2] = 100 + 100 * random();
-		self->v.flags = self->v.flags - (self->v.flags & FL_ONGROUND);
+		self->v.flags &= ~FL_ONGROUND;
 		PF_sound(self, CHAN_VOICE, "wizard/wdeath.wav", 1, ATTN_NORM);
 		break;
 

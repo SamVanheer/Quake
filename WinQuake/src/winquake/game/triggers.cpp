@@ -434,12 +434,9 @@ void teleport_touch(edict_t* self, edict_t* other)
 	{
 		other->v.fixangle = 1;		// turn this way immediately
 		other->v.teleport_time = pr_global_struct->time + 0.7;
-		if (other->v.flags & FL_ONGROUND)
-			other->v.flags = other->v.flags - FL_ONGROUND;
 		AsVector(other->v.velocity) = AsVector(pr_global_struct->v_forward) * 300;
 	}
-	//TODO: need to fix all bitwise operations that are done using math instead of bitwise operators.
-	other->v.flags = other->v.flags - (other->v.flags & FL_ONGROUND);
+	other->v.flags &= ~FL_ONGROUND;
 }
 
 /*QUAKED info_teleport_destination (.5 .5 .5) (-8 -8 -8) (8 8 32)
@@ -650,7 +647,7 @@ void trigger_monsterjump_touch(edict_t* self, edict_t* other)
 	if (!(other->v.flags & FL_ONGROUND))
 		return;
 
-	other->v.flags = other->v.flags - FL_ONGROUND;
+	other->v.flags &= ~FL_ONGROUND;
 
 	other->v.velocity[2] = self->v.height;
 }

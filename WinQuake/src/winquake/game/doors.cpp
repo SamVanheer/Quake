@@ -265,7 +265,7 @@ void door_touch(edict_t* self, edict_t* other)
 		return;
 	}
 
-	other->v.items = other->v.items - self->v.items;
+	other->v.items &= ~self->v.items;
 	self->v.touch = SUB_NullTouch;
 	if (self->v.enemy)
 		self->v.enemy->v.touch = SUB_NullTouch;	// get paired door

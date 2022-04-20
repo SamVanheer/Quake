@@ -784,7 +784,7 @@ void W_SetCurrentAmmo(edict_t* self)
 {
 	player_run(self);		// get out of any weapon firing states
 
-	self->v.items = self->v.items - (self->v.items & (IT_SHELLS | IT_NAILS | IT_ROCKETS | IT_CELLS));
+	self->v.items &= ~(IT_SHELLS | IT_NAILS | IT_ROCKETS | IT_CELLS);
 
 	if (self->v.weapon == IT_AXE)
 	{

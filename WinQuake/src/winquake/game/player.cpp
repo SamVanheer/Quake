@@ -493,7 +493,7 @@ void ThrowHead(edict_t* self, char* gibname, float dm)
 	PF_setsize(self, Vector3D{-16, -16, 0}, Vector3D{16, 16, 56});
 	VelocityForDamage(self, dm, self->v.velocity);
 	self->v.origin[2] -= 24;
-	self->v.flags = self->v.flags - ((int)self->v.flags & FL_ONGROUND);
+	self->v.flags &= ~FL_ONGROUND;
 	AsVector(self->v.avelocity) = crandom() * Vector3D { 0, 600, 0 };
 }
 
@@ -544,7 +544,7 @@ void PlayerDie(edict_t* self)
 	self->v.view_ofs[2] = -8;
 	self->v.deadflag = DEAD_DYING;
 	self->v.solid = SOLID_NOT;
-	self->v.flags = self->v.flags - ((int)self->v.flags & FL_ONGROUND);
+	self->v.flags &= ~FL_ONGROUND;
 	self->v.movetype = MOVETYPE_TOSS;
 	if (self->v.velocity[2] < 10)
 		self->v.velocity[2] += PF_random() * 300;

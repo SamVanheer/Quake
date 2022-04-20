@@ -119,7 +119,7 @@ void dog_leap_frame(edict_t* self, const Animation* animation, int frame)
 		self->v.origin[2] = self->v.origin[2] + 1;
 		AsVector(self->v.velocity) = AsVector(pr_global_struct->v_forward) * 300 + Vector3D{0, 0, 200};
 		if (self->v.flags & FL_ONGROUND)
-			self->v.flags = self->v.flags - FL_ONGROUND;
+			self->v.flags &= ~FL_ONGROUND;
 		break;
 
 	default: break;
@@ -233,7 +233,7 @@ void Dog_JumpTouch(edict_t* self, edict_t* other)
 //			self->v.velocity[0] = (random() - 0.5) * 600;
 //			self->v.velocity[1] = (random() - 0.5) * 600;
 //			self->v.velocity[2] = 200;
-//			self->v.flags = self->v.flags - FL_ONGROUND;
+//			self->v.flags &= ~FL_ONGROUND;
 		}
 		return;	// not on ground yet
 	}

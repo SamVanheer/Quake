@@ -235,7 +235,7 @@ void item_megahealth_rot(edict_t* self)
 
 // it is possible for a player to die and respawn between rots, so don't
 // just blindly subtract the flag off
-	other->v.items = other->v.items - (other->v.items & IT_SUPERHEALTH);
+	other->v.items &= ~(other->v.items & IT_SUPERHEALTH);
 	
 	if (pr_global_struct->deathmatch == 1)	// deathmatch 2 is silly old rules
 	{
@@ -259,7 +259,9 @@ void armor_touch(edict_t* self, edict_t* other)
 	if (strcmp(other->v.classname, "player"))
 		return;
 
-	float type = 0, value = 0, bit = 0;
+	float type = 0, value = 0;
+
+	int bit = 0;
 
 	if (!strcmp(self->v.classname, "item_armor1"))
 	{
@@ -284,7 +286,8 @@ void armor_touch(edict_t* self, edict_t* other)
 		
 	other->v.armortype = type;
 	other->v.armorvalue = value;
-	other->v.items = other->v.items - (other->v.items & (IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3)) + bit;
+	other->v.items &= ~(IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3);
+	other->v.items |= bit;
 
 	self->v.solid = SOLID_NOT;
 	self->v.model = nullptr;
