@@ -39,6 +39,7 @@ target_sources(winquake
 		soldier.cpp
 		subs.cpp
 		subs.h
+		tarbaby.cpp
 		triggers.cpp
 		triggers.h
 		vector.h
