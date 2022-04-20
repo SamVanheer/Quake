@@ -376,12 +376,6 @@ const fielddescription* ED_FindField (const char *name)
 	return nullptr;
 }
 
-eval_t *GetEdictFieldValue(edict_t *ed, const char *field)
-{
-	//TODO: reimplement this functionality by merging in features from expansion packs.
-	return nullptr;
-}
-
 /*
 =============
 ED_Write

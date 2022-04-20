@@ -578,9 +578,6 @@ void SV_WriteClientdataToMessage (edict_t *ent, sizebuf_t *msg)
 	int		i;
 	edict_t	*other;
 	int		items;
-#ifndef QUAKE2
-	eval_t	*val;
-#endif
 
 //
 // send a damage message
@@ -625,10 +622,10 @@ void SV_WriteClientdataToMessage (edict_t *ent, sizebuf_t *msg)
 #ifdef QUAKE2
 	items = (int)ent->v.items | ((int)ent->v.items2 << 23);
 #else
-	val = GetEdictFieldValue(ent, "items2");
+	auto val = ED_FindField("items2");
 
 	if (val)
-		items = (int)ent->v.items | ((int)val->_float << 23);
+		items = (int)ent->v.items | ((int)(ED_GetValue<float>(&ent->v, *val)) << 23);
 	else
 		items = (int)ent->v.items | ((int)pr_global_struct->serverflags << 28);
 #endif

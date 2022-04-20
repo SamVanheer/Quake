@@ -365,11 +365,9 @@ void SV_AddGravity (edict_t *ent)
 	else
 		ent_gravity = 1.0;
 #else
-	eval_t	*val;
-
-	val = GetEdictFieldValue(ent, "gravity");
-	if (val && val->_float)
-		ent_gravity = val->_float;
+	auto val = ED_FindField("gravity");
+	if (val && ED_GetValue<float>(&ent->v, *val))
+		ent_gravity = ED_GetValue<float>(&ent->v, *val);
 	else
 		ent_gravity = 1.0;
 #endif

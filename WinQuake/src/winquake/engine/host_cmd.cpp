@@ -1531,7 +1531,6 @@ void Host_Give_f (void)
 {
 	const char	*t;
 	int		v;
-	eval_t	*val;
 
 	if (cmd_source == src_command)
 	{
@@ -1544,6 +1543,19 @@ void Host_Give_f (void)
 
 	t = Cmd_Argv(1);
 	v = atoi (Cmd_Argv(2));
+
+	auto fieldSetter = [&v](const char* fieldName)
+	{
+		auto field = ED_FindField(fieldName);
+
+		if (field)
+		{
+			ED_SetValue(&sv_player->v, *field, static_cast<float>(v));
+			return true;
+		}
+
+		return false;
+	};
 	
 	switch (t[0])
 	{
@@ -1584,9 +1596,7 @@ void Host_Give_f (void)
     case 's':
 		if (rogue)
 		{
-	        val = GetEdictFieldValue(sv_player, "ammo_shells1");
-		    if (val)
-			    val->_float = v;
+			fieldSetter("ammo_shells1");
 		}
 
         sv_player->v.ammo_shells = v;
@@ -1594,10 +1604,8 @@ void Host_Give_f (void)
     case 'n':
 		if (rogue)
 		{
-			val = GetEdictFieldValue(sv_player, "ammo_nails1");
-			if (val)
+			if (fieldSetter("ammo_nails1"))
 			{
-				val->_float = v;
 				if (sv_player->v.weapon <= IT_LIGHTNING)
 					sv_player->v.ammo_nails = v;
 			}
@@ -1610,10 +1618,8 @@ void Host_Give_f (void)
     case 'l':
 		if (rogue)
 		{
-			val = GetEdictFieldValue(sv_player, "ammo_lava_nails");
-			if (val)
+			if (fieldSetter("ammo_lava_nails"))
 			{
-				val->_float = v;
 				if (sv_player->v.weapon > IT_LIGHTNING)
 					sv_player->v.ammo_nails = v;
 			}
@@ -1622,10 +1628,8 @@ void Host_Give_f (void)
     case 'r':
 		if (rogue)
 		{
-			val = GetEdictFieldValue(sv_player, "ammo_rockets1");
-			if (val)
+			if (fieldSetter("ammo_rockets1"))
 			{
-				val->_float = v;
 				if (sv_player->v.weapon <= IT_LIGHTNING)
 					sv_player->v.ammo_rockets = v;
 			}
@@ -1638,10 +1642,8 @@ void Host_Give_f (void)
     case 'm':
 		if (rogue)
 		{
-			val = GetEdictFieldValue(sv_player, "ammo_multi_rockets");
-			if (val)
+			if (fieldSetter("ammo_multi_rockets"))
 			{
-				val->_float = v;
 				if (sv_player->v.weapon > IT_LIGHTNING)
 					sv_player->v.ammo_rockets = v;
 			}
@@ -1653,10 +1655,8 @@ void Host_Give_f (void)
     case 'c':
 		if (rogue)
 		{
-			val = GetEdictFieldValue(sv_player, "ammo_cells1");
-			if (val)
+			if (fieldSetter("ammo_cells1"))
 			{
-				val->_float = v;
 				if (sv_player->v.weapon <= IT_LIGHTNING)
 					sv_player->v.ammo_cells = v;
 			}
@@ -1669,10 +1669,8 @@ void Host_Give_f (void)
     case 'p':
 		if (rogue)
 		{
-			val = GetEdictFieldValue(sv_player, "ammo_plasma");
-			if (val)
+			if (fieldSetter("ammo_plasma"))
 			{
-				val->_float = v;
 				if (sv_player->v.weapon > IT_LIGHTNING)
 					sv_player->v.ammo_cells = v;
 			}
