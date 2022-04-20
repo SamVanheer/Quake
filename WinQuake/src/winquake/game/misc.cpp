@@ -220,8 +220,12 @@ void misc_fireball(edict_t* self)
 	self->v.classname = "fireball";
 	self->v.nextthink = pr_global_struct->time + (random() * 5);
 	self->v.think = fire_fly;
+
+	//Disabled because the original code never did anything.
+	/*
 	if (!self->v.speed)
 		self->v.speed == 1000;
+		*/
 }
 
 LINK_ENTITY_TO_CLASS(misc_fireball);
