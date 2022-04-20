@@ -142,5 +142,5 @@ inline Animations MakeAnimations(std::initializer_list<AnimationDescriptor> anim
 	return Animations{std::move(result)};
 }
 
-void animation_set(edict_t* self, const char* name);
+void animation_set(edict_t* self, const char* name, int frame = 0);
 void animation_advance(edict_t* self);

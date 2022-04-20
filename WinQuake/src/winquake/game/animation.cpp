@@ -41,7 +41,11 @@ void animation_set_frame(edict_t* self, const Animation* animation, float frame)
 {
 	self->v.frame = frame;
 
-	if (self->v.frame >= animation->GetEnd())
+	if (self->v.frame < 0)
+	{
+		self->v.frame = 0;
+	}
+	else if (self->v.frame >= animation->GetEnd())
 	{
 		if (animation->Flags & AnimationFlag::Looping)
 		{
@@ -59,7 +63,7 @@ void animation_set_frame(edict_t* self, const Animation* animation, float frame)
 	}
 }
 
-void animation_set(edict_t* self, const char* name)
+void animation_set(edict_t* self, const char* name, int frame)
 {
 	auto animations = animations_get(self);
 
@@ -81,7 +85,7 @@ void animation_set(edict_t* self, const char* name)
 		PF_objerror("Animation does not exist");
 	}
 
-	animation_set_frame(self, animation, animation->StartIndex);
+	animation_set_frame(self, animation, animation->StartIndex + frame);
 }
 
 void animation_advance(edict_t* self)
