@@ -33,6 +33,7 @@ target_sources(winquake
 		monsters.cpp
 		monsters.h
 		ogre.cpp
+		oldone.cpp
 		plats.cpp
 		plats.h
 		player.cpp
