@@ -127,7 +127,7 @@ bool SV_movestep (edict_t *ent, vec3_t move, bool relink)
 		{
 			VectorAdd (ent->v.origin, move, neworg);
 			enemy = ent->v.enemy;
-			if (i == 0 && enemy != sv.edicts)
+			if (i == 0 && enemy)
 			{
 				dz = ent->v.origin[2] - ent->v.enemy->v.origin[2];
 				if (dz > 40)
