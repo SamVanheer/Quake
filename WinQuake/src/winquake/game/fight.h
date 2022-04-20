@@ -19,6 +19,7 @@
 
 #pragma once
 
+//These are valid during AI routines only, not persistent.
 inline float enemy_vis, enemy_infront, enemy_range;
 inline float enemy_yaw;
 

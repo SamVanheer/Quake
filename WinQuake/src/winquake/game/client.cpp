@@ -139,14 +139,12 @@ edict_t* FindIntermission(edict_t* self)
 	return nullptr;
 }
 
-const char* nextmap;
-
 void GotoNextMap(edict_t* self)
 {
 	if (PF_cvar("samelevel"))	// if samelevel is set, stay on same level
 		PF_changelevel(pr_global_struct->mapname);
 	else
-		PF_changelevel(nextmap);
+		PF_changelevel(pr_global_struct->nextmap);
 }
 
 void ExitIntermission(edict_t* self)
@@ -303,7 +301,7 @@ void changelevel_touch(edict_t* self, edict_t* other)
 	bprint(other->v.netname);
 	bprint(" exited the level\n");
 
-	nextmap = self->v.map;
+	pr_global_struct->nextmap = self->v.map;
 
 	SUB_UseTargets(self);
 
@@ -658,7 +656,7 @@ void NextLevel(edict_t* self)
 		o->v.map = pr_global_struct->mapname;
 	}
 
-	nextmap = o->v.map;
+	pr_global_struct->nextmap = o->v.map;
 
 	if (o->v.nextthink < pr_global_struct->time)
 	{

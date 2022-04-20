@@ -94,6 +94,19 @@ typedef struct
 	//
 	edict_s* sight_entity;
 	float	sight_entity_time;
+
+	//trigger_changelevel next map to start.
+	const char* nextmap;
+
+	//Hell knight attack type.
+	float	hknight_type;
+
+	//First boss globals.
+	edict_s* le1, * le2;
+	float	lightning_end;
+
+	//final boss global.
+	edict_s* shub;
 } globalvars_t;
 
 struct entvars_t

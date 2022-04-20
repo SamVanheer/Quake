@@ -85,8 +85,6 @@ const Animations OldOneAnimations = MakeAnimations(
 		{"shake", 20, &oldone_shake_frame}
 	});
 
-edict_t* shub;
-
 //void() old_stand     =[      $old1,       old_stand    ] {}
 
 void old_idle1(edict_t* self)
@@ -150,14 +148,14 @@ void finale_2(edict_t* self)
 {
 	// start a teleport splash inside shub
 
-	auto o = AsVector(shub->v.origin) - Vector3D{0, 100, 0};
+	auto o = AsVector(pr_global_struct->shub->v.origin) - Vector3D{0, 100, 0};
 	PF_WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
 	PF_WriteByte (MSG_BROADCAST, TE_TELEPORT);
 	PF_WriteCoord (MSG_BROADCAST, o[0]);
 	PF_WriteCoord (MSG_BROADCAST, o[1]);
 	PF_WriteCoord (MSG_BROADCAST, o[2]);
 
-	PF_sound (shub, CHAN_VOICE, "misc/r_tele1.wav", 1, ATTN_NORM);
+	PF_sound (pr_global_struct->shub, CHAN_VOICE, "misc/r_tele1.wav", 1, ATTN_NORM);
 	
 	self->v.nextthink = pr_global_struct->time + 2;
 	self->v.think = finale_3;
@@ -166,8 +164,8 @@ void finale_2(edict_t* self)
 void finale_3(edict_t* self)
 {
 	// start shub thrashing wildly
-	shub->v.think = old_thrash1;
-	PF_sound (shub, CHAN_VOICE, "boss2/death.wav", 1, ATTN_NORM);
+	pr_global_struct->shub->v.think = old_thrash1;
+	PF_sound (pr_global_struct->shub, CHAN_VOICE, "boss2/death.wav", 1, ATTN_NORM);
 	PF_lightstyle(0, "abcdefghijklmlkjihgfedcb");	
 }
 
@@ -257,7 +255,7 @@ void monster_oldone(edict_t* self)
 	self->v.takedamage = DAMAGE_YES;
 	self->v.th_die = finale_1;
 	self->v.animations_get = [](edict_t* self) { return &OldOneAnimations; };
-	shub = self;
+	pr_global_struct->shub = self;
 	
 	pr_global_struct->total_monsters = pr_global_struct->total_monsters + 1;
 }

@@ -706,21 +706,19 @@ void hknight_pain(edict_t* self, edict_t* attacker, float damage)
 	hknight_pain1 (self);
 }
 
-float	hknight_type;
-
 void hknight_melee(edict_t* self)
 {
-	hknight_type = hknight_type + 1;
+	++pr_global_struct->hknight_type;
 
 	PF_sound (self, CHAN_WEAPON, "hknight/slash1.wav", 1, ATTN_NORM);
-	if (hknight_type == 1)
+	if (pr_global_struct->hknight_type == 1)
 		hknight_slice1 (self);
-	else if (hknight_type == 2)
+	else if (pr_global_struct->hknight_type == 2)
 		hknight_smash1 (self);
-	else if (hknight_type == 3)
+	else if (pr_global_struct->hknight_type == 3)
 	{
 		hknight_watk1 (self);
-		hknight_type = 0;
+		pr_global_struct->hknight_type = 0;
 	}
 }
 

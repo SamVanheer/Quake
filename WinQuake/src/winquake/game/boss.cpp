@@ -311,23 +311,20 @@ LINK_ENTITY_TO_CLASS(monster_boss);
 
 //===========================================================================
 
-edict_t*	le1, * le2;
-float	lightning_end;
-
 void lightning_fire(edict_t* self)
 {
-	if (pr_global_struct->time >= lightning_end)
+	if (pr_global_struct->time >= pr_global_struct->lightning_end)
 	{	// done here, put the terminals back up
-		door_go_down (le1);
-		door_go_down (le2);
+		door_go_down (pr_global_struct->le1);
+		door_go_down (pr_global_struct->le2);
 		return;
 	}
 	
-	auto p1 = (AsVector(le1->v.mins) + AsVector(le1->v.maxs)) * 0.5f;
-	p1[2] = le1->v.absmin[2] - 16;
+	auto p1 = (AsVector(pr_global_struct->le1->v.mins) + AsVector(pr_global_struct->le1->v.maxs)) * 0.5f;
+	p1[2] = pr_global_struct->le1->v.absmin[2] - 16;
 	
-	auto p2 = (AsVector(le2->v.mins) + AsVector(le2->v.maxs)) * 0.5f;
-	p2[2] = le2->v.absmin[2] - 16;
+	auto p2 = (AsVector(pr_global_struct->le2->v.mins) + AsVector(pr_global_struct->le2->v.maxs)) * 0.5f;
+	p2[2] = pr_global_struct->le2->v.absmin[2] - 16;
 	
 	// compensate for length of bolt
 	Vector3D offset;
@@ -351,30 +348,30 @@ void lightning_fire(edict_t* self)
 
 void lightning_use(edict_t* self, edict_t* other)
 {
-	if (lightning_end >= pr_global_struct->time + 1)
+	if (pr_global_struct->lightning_end >= pr_global_struct->time + 1)
 		return;
 
-	le1 = PF_Find(pr_global_struct->world, "target", "lightning");
-	le2 = PF_Find( le1, "target", "lightning");
-	if (le1 == pr_global_struct->world || le2 == pr_global_struct->world)
+	pr_global_struct->le1 = PF_Find(pr_global_struct->world, "target", "lightning");
+	pr_global_struct->le2 = PF_Find(pr_global_struct->le1, "target", "lightning");
+	if (pr_global_struct->le1 == pr_global_struct->world || pr_global_struct->le2 == pr_global_struct->world)
 	{
 		dprint ("missing lightning targets\n");
 		return;
 	}
 	
 	if (
-	 (le1->v.state != STATE_TOP && le1->v.state != STATE_BOTTOM)
-	|| (le2->v.state != STATE_TOP && le2->v.state != STATE_BOTTOM)
-	|| (le1->v.state != le2->v.state) )
+	 (pr_global_struct->le1->v.state != STATE_TOP && pr_global_struct->le1->v.state != STATE_BOTTOM)
+	|| (pr_global_struct->le2->v.state != STATE_TOP && pr_global_struct->le2->v.state != STATE_BOTTOM)
+	|| (pr_global_struct->le1->v.state != pr_global_struct->le2->v.state) )
 	{
 //		dprint ("not aligned\n");
 		return;
 	}
 
 // don't let the electrodes go back up until the bolt is done
-	le1->v.nextthink = -1;
-	le2->v.nextthink = -1;
-	lightning_end = pr_global_struct->time + 1;
+	pr_global_struct->le1->v.nextthink = -1;
+	pr_global_struct->le2->v.nextthink = -1;
+	pr_global_struct->lightning_end = pr_global_struct->time + 1;
 
 	PF_sound (self, CHAN_VOICE, "misc/power.wav", 1, ATTN_NORM);
 	lightning_fire (self);		
@@ -384,7 +381,7 @@ void lightning_use(edict_t* self, edict_t* other)
 	if (self == pr_global_struct->world)
 		return;
 	self->v.enemy = pr_global_struct->activator;
-	if (le1->v.state == STATE_TOP && self->v.health > 0)
+	if (pr_global_struct->le1->v.state == STATE_TOP && self->v.health > 0)
 	{
 		PF_sound (self, CHAN_VOICE, "boss1/pain.wav", 1, ATTN_NORM);
 		self->v.health = self->v.health - 1;
