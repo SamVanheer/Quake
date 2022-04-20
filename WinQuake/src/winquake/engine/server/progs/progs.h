@@ -32,6 +32,13 @@ typedef union eval_s
 	edict_s*		edict;
 } eval_t;	
 
+struct fielddescription
+{
+	const char* Name;
+	const etype_t Type;
+	const std::size_t Offset;
+};
+
 #define	MAX_ENT_LEAFS	16
 typedef struct edict_s
 {
@@ -67,6 +74,20 @@ char	*ED_NewString (const char *string);
 // returns a copy of the string allocated from the server's string heap
 
 void ED_Write (FILE *f, edict_t *ed);
+
+template<typename T>
+T* ED_GetValueAddress(void* base, const fielddescription& field)
+{
+	return reinterpret_cast<T*>(reinterpret_cast<byte*>(base) + field.Offset);
+}
+
+template<typename T>
+void ED_SetValue(void* base, const fielddescription& field, T value)
+{
+	auto address = ED_GetValueAddress<T>(base, field);
+	*address = value;
+}
+
 char *ED_ParseEdict (char *data, edict_t *ent);
 
 void ED_WriteGlobals (FILE *f);

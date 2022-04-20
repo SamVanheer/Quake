@@ -106,13 +106,6 @@ void ED_Free (edict_t *ed)
 //===========================================================================
 
 //TODO: don't rely on a hardcoded list
-struct fielddescription
-{
-	const char* Name;
-	const etype_t Type;
-	const std::size_t Offset;
-};
-
 //Automatically deduce the type. Saves having to update it.
 template<typename T>
 constexpr etype_t DeduceType();
@@ -518,12 +511,6 @@ char *ED_NewString (const char *string)
 	return pszNew;
 }
 
-template<typename T>
-void ED_SetValue(byte* address, T value)
-{
-	*reinterpret_cast<T*>(address) = value;
-}
-
 /*
 =============
 ED_ParseEval
@@ -532,27 +519,25 @@ Can parse either fields or globals
 returns false if error
 =============
 */
-bool ED_ParseEpair (entvars_t *base, const fielddescription* key, const char *s)
+bool ED_ParseEpair (entvars_t *base, const fielddescription& key, const char *s)
 {
-	auto address = reinterpret_cast<byte*>(base) + key->Offset;
-	
-	switch (key->Type & ~DEF_SAVEGLOBAL)
+	switch (key.Type & ~DEF_SAVEGLOBAL)
 	{
 	case ev_string:
-		ED_SetValue(address, ED_NewString(s));
+		ED_SetValue(base, key, ED_NewString(s));
 		break;
 		
 	case ev_float:
-		ED_SetValue(address, static_cast<float>(atof (s)));
+		ED_SetValue(base, key, static_cast<float>(atof (s)));
 		break;
 
 	case ev_int:
-		ED_SetValue(address, atoi(s));
+		ED_SetValue(base, key, atoi(s));
 		break;
 		
 	case ev_vector:
 	{
-		float* vec = reinterpret_cast<float*>(address);
+		float* vec = ED_GetValueAddress<float>(base, key);
 
 		char string[128];
 		strcpy(string, s);
@@ -570,7 +555,7 @@ bool ED_ParseEpair (entvars_t *base, const fielddescription* key, const char *s)
 	}
 		
 	case ev_entity:
-		ED_SetValue(address, EDICT_NUM(atoi (s)));
+		ED_SetValue(base, key, EDICT_NUM(atoi (s)));
 		break;
 		
 	default:
@@ -660,7 +645,7 @@ char *ED_ParseEdict (char *data, edict_t *ent)
 			sprintf (com_token, "0 %s 0", temp);
 		}
 
-		if (!ED_ParseEpair (&ent->v, key, com_token))
+		if (!ED_ParseEpair (&ent->v, *key, com_token))
 			Host_Error ("ED_ParseEdict: parse error");
 	}
 
