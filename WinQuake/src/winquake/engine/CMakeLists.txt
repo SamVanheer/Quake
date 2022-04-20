@@ -81,7 +81,6 @@ target_sources(winquake
 		server/world.h
 		
 		server/progs/pr_cmds.cpp
-		server/progs/pr_comp.h
 		server/progs/pr_edict.cpp
 		server/progs/progdefs.h
 		server/progs/progs.h)

@@ -28,7 +28,9 @@ globalvars_t	*pr_global_struct = &globalVars;
 /**
 *	@brief Size of game variable types, as multiples of 4.
 */
-constexpr int type_size[etypes_count] = {1,sizeof(const char*) / 4,1,3,1,1,sizeof(decltype(entvars_t::think)) / 4,sizeof(void*) / 4, 1};
+constexpr int type_size[etypes_count] = {1,sizeof(const char*) / 4,1,3,1,sizeof(decltype(entvars_t::think)) / 4, 1};
+
+bool ED_ParseEpair(void* base, const fielddescription& key, const char* s);
 
 /*
 =================
@@ -169,6 +171,79 @@ constexpr etype_t DeduceType<decltype(entvars_t::animations_get)>()
 	return ev_function;
 }
 
+#define OBJ_FIELD(name) {#name, DeduceType<decltype(globalvars_t::name)>(), offsetof(globalvars_t, name)}
+
+const fielddescription GlobalvarsFields[] =
+{
+	OBJ_FIELD(world),
+	OBJ_FIELD(time),
+	OBJ_FIELD(frametime),
+	OBJ_FIELD(force_retouch),
+	OBJ_FIELD(mapname),
+	OBJ_FIELD(deathmatch),
+	OBJ_FIELD(coop),
+	OBJ_FIELD(teamplay),
+	OBJ_FIELD(serverflags),
+	OBJ_FIELD(total_secrets),
+	OBJ_FIELD(total_monsters),
+	OBJ_FIELD(found_secrets),
+	OBJ_FIELD(killed_monsters),
+	OBJ_FIELD(parm1),
+	OBJ_FIELD(parm2),
+	OBJ_FIELD(parm3),
+	OBJ_FIELD(parm4),
+	OBJ_FIELD(parm5),
+	OBJ_FIELD(parm6),
+	OBJ_FIELD(parm7),
+	OBJ_FIELD(parm8),
+	OBJ_FIELD(parm9),
+	OBJ_FIELD(parm10),
+	OBJ_FIELD(parm11),
+	OBJ_FIELD(parm12),
+	OBJ_FIELD(parm13),
+	OBJ_FIELD(parm14),
+	OBJ_FIELD(parm15),
+	OBJ_FIELD(parm16),
+	OBJ_FIELD(v_forward),
+	OBJ_FIELD(v_up),
+	OBJ_FIELD(v_right),
+	OBJ_FIELD(trace_allsolid),
+	OBJ_FIELD(trace_startsolid),
+	OBJ_FIELD(trace_fraction),
+	OBJ_FIELD(trace_endpos),
+	OBJ_FIELD(trace_plane_normal),
+	OBJ_FIELD(trace_plane_dist),
+	OBJ_FIELD(trace_ent),
+	OBJ_FIELD(trace_inopen),
+	OBJ_FIELD(trace_inwater),
+	OBJ_FIELD(msg_entity),
+
+	OBJ_FIELD(gameover),
+
+	OBJ_FIELD(activator),
+
+	OBJ_FIELD(damage_attacker),
+	OBJ_FIELD(framecount),
+
+	OBJ_FIELD(game_skill),
+
+	OBJ_FIELD(intermission_running),
+	OBJ_FIELD(intermission_exittime),
+
+	OBJ_FIELD(sight_entity),
+	OBJ_FIELD(sight_entity_time),
+
+	OBJ_FIELD(nextmap),
+
+	OBJ_FIELD(hknight_type),
+
+	OBJ_FIELD(le2),
+	OBJ_FIELD(lightning_end),
+
+	OBJ_FIELD(shub)
+};
+
+#undef OBJ_FIELD
 #define OBJ_FIELD(name) {#name, DeduceType<decltype(entvars_t::name)>(), offsetof(entvars_t, name)}
 
 const fielddescription EntvarsFields[] =
@@ -363,14 +438,12 @@ const fielddescription EntvarsFields[] =
 	OBJ_FIELD(animation_mode)
 };
 
-/*
-============
-ED_FindField
-============
-*/
-const fielddescription* ED_FindField (const char *name)
+#undef OBJ_FIELD
+
+template<size_t Size>
+const fielddescription* ED_FindFieldInTable(const char* name, const fielddescription (&fields)[Size])
 {
-	for (const auto& field : EntvarsFields)
+	for (const auto& field : fields)
 	{
 		if (!strcmp(field.Name, name))
 		{
@@ -379,6 +452,26 @@ const fielddescription* ED_FindField (const char *name)
 	}
 
 	return nullptr;
+}
+
+/*
+============
+ED_FindField
+============
+*/
+const fielddescription* ED_FindGlobal(const char* name)
+{
+	return ED_FindFieldInTable(name, GlobalvarsFields);
+}
+
+/*
+============
+ED_FindField
+============
+*/
+const fielddescription* ED_FindField (const char *name)
+{
+	return ED_FindFieldInTable(name, EntvarsFields);
 }
 
 /*
@@ -392,16 +485,24 @@ char* PR_ValueString(void* base, const fielddescription& field)
 {
 	static char	line[256];
 
-	auto type = field.Type & ~DEF_SAVEGLOBAL;
-
-	switch (type)
+	switch (field.Type)
 	{
 	case ev_string:
 		sprintf(line, "%s", ED_GetValue<const char*>(base, field));
 		break;
 	case ev_entity:
-		sprintf(line, "entity %i", NUM_FOR_EDICT(ED_GetValue<edict_t*>(base, field)));
+	{
+		auto ent = ED_GetValue<edict_t*>(base, field);
+
+		//Entity printing has to use world for null pointers to match the original.
+		if (!ent)
+		{
+			ent = pr_global_struct->world;
+		}
+
+		sprintf(line, "entity %i", NUM_FOR_EDICT(ent));
 		break;
+	}
 		//TODO
 		/*
 	case ev_function:
@@ -421,14 +522,11 @@ char* PR_ValueString(void* base, const fielddescription& field)
 		sprintf(line, "'%5.1f %5.1f %5.1f'", vec[0], vec[1], vec[2]);
 		break;
 	}
-	case ev_pointer:
-		sprintf(line, "pointer");
-		break;
 	case ev_int:
 		sprintf(line, "%5d", ED_GetValue<int>(base, field));
 		break;
 	default:
-		sprintf(line, "bad type %i", type);
+		sprintf(line, "bad type %i", field.Type);
 		break;
 	}
 
@@ -447,16 +545,24 @@ char* PR_UglyValueString(void* base, const fielddescription& field)
 {
 	static char	line[256];
 
-	auto type = field.Type & ~DEF_SAVEGLOBAL;
-
-	switch (type)
+	switch (field.Type)
 	{
 	case ev_string:
 		sprintf(line, "%s", ED_GetValue<const char*>(base, field));
 		break;
 	case ev_entity:
-		sprintf(line, "%i", NUM_FOR_EDICT(ED_GetValue<edict_t*>(base, field)));
+	{
+		auto ent = ED_GetValue<edict_t*>(base, field);
+
+		//Entity printing has to use world for null pointers to match the original.
+		if (!ent)
+		{
+			ent = pr_global_struct->world;
+		}
+
+		sprintf(line, "%i", NUM_FOR_EDICT(ent));
 		break;
+	}
 		//TODO
 		/*
 	case ev_function:
@@ -480,7 +586,7 @@ char* PR_UglyValueString(void* base, const fielddescription& field)
 		sprintf(line, "%d", ED_GetValue<int>(base, field));
 		break;
 	default:
-		sprintf(line, "bad type %i", type);
+		sprintf(line, "bad type %i", field.Type);
 		break;
 	}
 
@@ -499,7 +605,6 @@ void ED_Print(edict_t* ed)
 	int		l;
 	int* v;
 	int		j;
-	int		type;
 
 	if (ed->free)
 	{
@@ -513,12 +618,10 @@ void ED_Print(edict_t* ed)
 		v = ED_GetValueAddress<int>(&ed->v, field);
 
 		// if the value is still all 0, skip the field
-		type = field.Type & ~DEF_SAVEGLOBAL;
-
-		for (j = 0; j < type_size[type]; j++)
+		for (j = 0; j < type_size[field.Type]; j++)
 			if (v[j])
 				break;
-		if (j == type_size[type])
+		if (j == type_size[field.Type])
 			continue;
 
 		Con_Printf("%s", field.Name);
@@ -539,7 +642,33 @@ For savegames
 */
 void ED_Write (FILE *f, edict_t *ed)
 {
-	//TODO: reimplement
+	int* v;
+	int		j;
+
+	fprintf(f, "{\n");
+
+	if (ed->free)
+	{
+		fprintf(f, "}\n");
+		return;
+	}
+
+	for (const auto& field : EntvarsFields)
+	{
+		v = ED_GetValueAddress<int>(&ed->v, field);
+
+		// if the value is still all 0, skip the field
+		for (j = 0; j < type_size[field.Type]; j++)
+			if (v[j])
+				break;
+		if (j == type_size[field.Type])
+			continue;
+
+		fprintf(f, "\"%s\" ", field.Name);
+		fprintf(f, "\"%s\"\n", PR_UglyValueString(&ed->v, field));
+	}
+
+	fprintf(f, "}\n");
 }
 
 void ED_PrintNum(int ent)
@@ -632,7 +761,19 @@ ED_WriteGlobals
 */
 void ED_WriteGlobals (FILE *f)
 {
-	//TODO: reimplement
+	fprintf(f, "{\n");
+	for (const auto& field : GlobalvarsFields)
+	{
+		if (field.Type != ev_string
+			&& field.Type != ev_float
+			&& field.Type != ev_entity
+			&& field.Type != ev_int)
+			continue;
+
+		fprintf(f, "\"%s\" ", field.Name);
+		fprintf(f, "\"%s\"\n", PR_UglyValueString(pr_global_struct, field));
+	}
+	fprintf(f, "}\n");
 }
 
 /*
@@ -642,7 +783,37 @@ ED_ParseGlobals
 */
 void ED_ParseGlobals (char *data)
 {
-	//TODO: reimplement
+	char	keyname[64];
+
+	while (1)
+	{
+		// parse key
+		data = COM_Parse(data);
+		if (com_token[0] == '}')
+			break;
+		if (!data)
+			Sys_Error("ED_ParseEntity: EOF without closing brace");
+
+		strcpy(keyname, com_token);
+
+		// parse value	
+		data = COM_Parse(data);
+		if (!data)
+			Sys_Error("ED_ParseEntity: EOF without closing brace");
+
+		if (com_token[0] == '}')
+			Sys_Error("ED_ParseEntity: closing brace without data");
+
+		auto key = ED_FindGlobal(keyname);
+		if (!key)
+		{
+			Con_Printf("'%s' is not a global\n", keyname);
+			continue;
+		}
+
+		if (!ED_ParseEpair(pr_global_struct, *key, com_token))
+			Host_Error("ED_ParseGlobals: parse error");
+	}
 }
 
 //============================================================================
@@ -684,9 +855,9 @@ Can parse either fields or globals
 returns false if error
 =============
 */
-bool ED_ParseEpair (entvars_t *base, const fielddescription& key, const char *s)
+bool ED_ParseEpair (void *base, const fielddescription& key, const char *s)
 {
-	switch (key.Type & ~DEF_SAVEGLOBAL)
+	switch (key.Type)
 	{
 	case ev_string:
 		ED_SetValue(base, key, ED_NewString(s));
