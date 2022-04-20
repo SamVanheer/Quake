@@ -25,6 +25,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 globalvars_t globalVars;
 globalvars_t	*pr_global_struct = &globalVars;
 
+/**
+*	@brief Size of game variable types, as multiples of 4.
+*/
+constexpr int type_size[etypes_count] = {1,sizeof(const char*) / 4,1,3,1,1,sizeof(decltype(entvars_t::think)) / 4,sizeof(void*) / 4, 1};
+
 /*
 =================
 ED_ClearEdict
@@ -377,6 +382,155 @@ const fielddescription* ED_FindField (const char *name)
 }
 
 /*
+============
+PR_ValueString
+
+Returns a string describing *data in a type specific manner
+=============
+*/
+char* PR_ValueString(void* base, const fielddescription& field)
+{
+	static char	line[256];
+
+	auto type = field.Type & ~DEF_SAVEGLOBAL;
+
+	switch (type)
+	{
+	case ev_string:
+		sprintf(line, "%s", ED_GetValue<const char*>(base, field));
+		break;
+	case ev_entity:
+		sprintf(line, "entity %i", NUM_FOR_EDICT(ED_GetValue<edict_t*>(base, field)));
+		break;
+		//TODO
+		/*
+	case ev_function:
+		f = pr_functions + val->function;
+		sprintf(line, "%s()", pr_strings + f->s_name);
+		break;
+		*/
+	case ev_void:
+		sprintf(line, "void");
+		break;
+	case ev_float:
+		sprintf(line, "%5.1f", ED_GetValue<float>(base, field));
+		break;
+	case ev_vector:
+	{
+		auto vec = ED_GetValueAddress<float>(base, field);
+		sprintf(line, "'%5.1f %5.1f %5.1f'", vec[0], vec[1], vec[2]);
+		break;
+	}
+	case ev_pointer:
+		sprintf(line, "pointer");
+		break;
+	case ev_int:
+		sprintf(line, "%5d", ED_GetValue<int>(base, field));
+		break;
+	default:
+		sprintf(line, "bad type %i", type);
+		break;
+	}
+
+	return line;
+}
+
+/*
+============
+PR_UglyValueString
+
+Returns a string describing *data in a type specific manner
+Easier to parse than PR_ValueString
+=============
+*/
+char* PR_UglyValueString(void* base, const fielddescription& field)
+{
+	static char	line[256];
+
+	auto type = field.Type & ~DEF_SAVEGLOBAL;
+
+	switch (type)
+	{
+	case ev_string:
+		sprintf(line, "%s", ED_GetValue<const char*>(base, field));
+		break;
+	case ev_entity:
+		sprintf(line, "%i", NUM_FOR_EDICT(ED_GetValue<edict_t*>(base, field)));
+		break;
+		//TODO
+		/*
+	case ev_function:
+		f = pr_functions + val->function;
+		sprintf(line, "%s", pr_strings + f->s_name);
+		break;
+		*/
+	case ev_void:
+		sprintf(line, "void");
+		break;
+	case ev_float:
+		sprintf(line, "%f", ED_GetValue<float>(base, field));
+		break;
+	case ev_vector:
+	{
+		auto vec = ED_GetValueAddress<float>(base, field);
+		sprintf(line, "%f %f %f", vec[0], vec[1], vec[2]);
+		break;
+	}
+	case ev_int:
+		sprintf(line, "%d", ED_GetValue<int>(base, field));
+		break;
+	default:
+		sprintf(line, "bad type %i", type);
+		break;
+	}
+
+	return line;
+}
+
+/*
+=============
+ED_Print
+
+For debugging
+=============
+*/
+void ED_Print(edict_t* ed)
+{
+	int		l;
+	int* v;
+	int		j;
+	int		type;
+
+	if (ed->free)
+	{
+		Con_Printf("FREE\n");
+		return;
+	}
+
+	Con_Printf("\nEDICT %i:\n", NUM_FOR_EDICT(ed));
+	for (const auto& field : EntvarsFields)
+	{
+		v = ED_GetValueAddress<int>(&ed->v, field);
+
+		// if the value is still all 0, skip the field
+		type = field.Type & ~DEF_SAVEGLOBAL;
+
+		for (j = 0; j < type_size[type]; j++)
+			if (v[j])
+				break;
+		if (j == type_size[type])
+			continue;
+
+		Con_Printf("%s", field.Name);
+		l = strlen(field.Name);
+		while (l++ < 15)
+			Con_Printf(" ");
+
+		Con_Printf("%s\n", PR_ValueString(&ed->v, field));
+	}
+}
+
+/*
 =============
 ED_Write
 
@@ -388,6 +542,11 @@ void ED_Write (FILE *f, edict_t *ed)
 	//TODO: reimplement
 }
 
+void ED_PrintNum(int ent)
+{
+	ED_Print(EDICT_NUM(ent));
+}
+
 /*
 =============
 ED_PrintEdicts
@@ -395,9 +554,13 @@ ED_PrintEdicts
 For debugging, prints all the entities in the current server
 =============
 */
-void ED_PrintEdicts ()
+void ED_PrintEdicts(void)
 {
-	//TODO: reimplement
+	int		i;
+
+	Con_Printf("%i entities\n", sv.num_edicts);
+	for (i = 0; i < sv.num_edicts; i++)
+		ED_PrintNum(i);
 }
 
 /*
@@ -407,9 +570,17 @@ ED_PrintEdict_f
 For debugging, prints a single edicy
 =============
 */
-void ED_PrintEdict_f ()
+void ED_PrintEdict_f(void)
 {
-	//TODO: reimplement
+	int		i;
+
+	i = Q_atoi(Cmd_Argv(1));
+	if (i >= sv.num_edicts)
+	{
+		Con_Printf("Bad edict number\n");
+		return;
+	}
+	ED_PrintNum(i);
 }
 
 /*
@@ -746,6 +917,8 @@ PR_Init
 */
 void PR_Init (void)
 {
+	Cmd_AddCommand("edict", ED_PrintEdict_f);
+	Cmd_AddCommand("edicts", ED_PrintEdicts);
 	Cmd_AddCommand ("edictcount", ED_Count);
 }
 

@@ -26,4 +26,6 @@ typedef intptr_t func_t;
 
 typedef enum : unsigned short {ev_void, ev_string, ev_float, ev_vector, ev_entity, ev_field, ev_function, ev_pointer, ev_int} etype_t;
 
+constexpr int etypes_count = ev_int + 1;
+
 #define	DEF_SAVEGLOBAL	(1<<15)
