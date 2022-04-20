@@ -58,7 +58,7 @@ void fish_run_frame(edict_t* self, const Animation* animation, int frame)
 
 void fish_swim_frame(edict_t* self, const Animation* animation, int frame)
 {
-	switch (static_cast<FishSwimMode>(self->v.fish_swim_mode))
+	switch (static_cast<FishSwimMode>(self->v.animation_mode))
 	{
 	default:
 	case FishSwimMode::Stand:
@@ -132,19 +132,19 @@ const Animations FishAnimations = MakeAnimations(
 
 void f_stand1(edict_t* self)
 {
-	self->v.fish_swim_mode = static_cast<int>(FishSwimMode::Stand);
+	self->v.animation_mode = static_cast<int>(FishSwimMode::Stand);
 	animation_set(self, "swim");
 }
 
 void f_walk1(edict_t* self)
 {
-	self->v.fish_swim_mode = static_cast<int>(FishSwimMode::Walk);
+	self->v.animation_mode = static_cast<int>(FishSwimMode::Walk);
 	animation_set(self, "swim");
 }
 
 void f_run1(edict_t* self)
 {
-	self->v.fish_swim_mode = static_cast<int>(FishSwimMode::Run);
+	self->v.animation_mode = static_cast<int>(FishSwimMode::Run);
 	animation_set(self, "swim");
 }
 

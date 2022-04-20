@@ -295,7 +295,5 @@ struct entvars_t
 	//New variables
 	const char* animation;
 	const Animations* (*animations_get)(edict_s*);
-
-	//monster_fish
-	int fish_swim_mode;
+	int animation_mode;
 };
