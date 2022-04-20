@@ -55,9 +55,6 @@ public:
 inline float	movedist;
 inline float	gameover;		// set when a rule exits
 
-inline const char* string_null = "";	// null string, nothing should be held here
-inline float	empty_float;
-
 inline edict_t*	newmis;			// launch_spike sets this after spawning it
 
 inline edict_t* activator;		// the entity that activated a trigger or brush
