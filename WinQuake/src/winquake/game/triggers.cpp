@@ -23,8 +23,6 @@
 #include "subs.h"
 #include "triggers.h"
 
-edict_t* stemp, * otemp, * s, * old;
-
 void trigger_reactivate(edict_t* self)
 {
 	self->v.solid = SOLID_TRIGGER;
@@ -329,7 +327,7 @@ void play_teleport(edict_t* self)
 
 void spawn_tfog(edict_t* self, vec3_t org)
 {
-	s = PF_Spawn();
+	auto s = PF_Spawn();
 	VectorCopy(org, s->v.origin);
 	s->v.nextthink = pr_global_struct->time + 0.2;
 	s->v.think = play_teleport;
