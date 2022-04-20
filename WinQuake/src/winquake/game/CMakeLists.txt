@@ -18,6 +18,7 @@ target_sources(winquake
 		entitymap.h
 		fight.cpp
 		fight.h
+		fish.cpp
 		Game.cpp
 		Game.h
 		game_world.cpp

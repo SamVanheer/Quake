@@ -361,7 +361,9 @@ const fielddescription EntvarsFields[] =
 	ENT_FIELD(inpain),
 
 	ENT_FIELD(animation),
-	ENT_FIELD(animations_get)
+	ENT_FIELD(animations_get),
+
+	ENT_FIELD(fish_swim_mode)
 };
 
 /*
