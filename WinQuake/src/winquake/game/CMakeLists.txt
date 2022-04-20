@@ -24,6 +24,7 @@ target_sources(winquake
 		Game.h
 		game_world.cpp
 		game_world.h
+		hknight.cpp
 		IGame.h
 		items.cpp
 		items.h
