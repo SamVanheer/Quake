@@ -404,7 +404,7 @@ float FindTarget(edict_t* self)
 	if (strcmp(self->v.enemy->v.classname, "player"))
 	{
 		self->v.enemy = self->v.enemy->v.enemy;
-		if (strcmp(self->v.enemy->v.classname, "player"))
+		if (!self->v.enemy || strcmp(self->v.enemy->v.classname, "player"))
 		{
 			self->v.enemy = pr_global_struct->world;
 			return FALSE;
