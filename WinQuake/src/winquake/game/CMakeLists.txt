@@ -39,6 +39,7 @@ target_sources(winquake
 		player.cpp
 		player.h
 		shalrath.cpp
+		shambler.cpp
 		soldier.cpp
 		subs.cpp
 		subs.h

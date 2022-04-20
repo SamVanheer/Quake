@@ -28,6 +28,7 @@ void FireBullets(edict_t* self, float shotcount, vec3_t dir, vec3_t spread);
 void s_explode1(edict_t* self);
 void BecomeExplosion(edict_t* self);
 void T_MissileTouch(edict_t* self, edict_t* other);
+void LightningDamage(edict_t* self, vec3_t p1, vec3_t p2, edict_t* from, float damage);
 void W_FireLightning(edict_t* self);
 void launch_spike(edict_t* self, vec3_t org, vec3_t dir);
 void W_FireSpikes(edict_t* self, float ox);
