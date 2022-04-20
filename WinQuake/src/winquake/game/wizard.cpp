@@ -321,7 +321,7 @@ void Wiz_FastFire(edict_t* self)
 		Vector3D vec;
 		PF_normalize(dst - AsVector(self->v.origin), vec);
 		PF_sound (self, CHAN_WEAPON, "wizard/wattack.wav", 1, ATTN_NORM);
-		launch_spike (self, self->v.origin, vec);
+		auto newmis = launch_spike (self, self->v.origin, vec);
 		AsVector(newmis->v.velocity) = vec*600;
 		newmis->v.owner = self->v.owner;
 		newmis->v.classname = "wizspike";

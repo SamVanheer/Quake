@@ -520,7 +520,7 @@ void hknight_shot(edict_t* self, float offset)
 	PF_normalize (pr_global_struct->v_forward, vec);
 	vec[2] = 0 - vec[2] + (random() - 0.5) * 0.1;
 	
-	launch_spike (self, org, vec);
+	auto newmis = launch_spike (self, org, vec);
 	newmis->v.classname = "knightspike";
 	PF_setmodel (newmis, "progs/k_spike.mdl");
 	PF_setsize (newmis, VEC_ORIGIN, VEC_ORIGIN);		

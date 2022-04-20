@@ -335,28 +335,35 @@ LINK_ENTITY_TO_CLASS(misc_explobox2);
 constexpr int SPAWNFLAG_SUPERSPIKE = 1;
 constexpr int SPAWNFLAG_LASER = 2;
 
-void LaunchLaser(edict_t* self, vec3_t org, vec3_t vec);
+edict_t* LaunchLaser(edict_t* self, vec3_t org, vec3_t vec);
 
-void spikeshooter_use(edict_t* self, edict_t* other)
+edict_t* spikeshooter_fire(edict_t* self, edict_t* other)
 {
 	if (self->v.spawnflags & SPAWNFLAG_LASER)
 	{
 		PF_sound(self, CHAN_VOICE, "enforcer/enfire.wav", 1, ATTN_NORM);
-		LaunchLaser(self, self->v.origin, self->v.movedir);
+		return LaunchLaser(self, self->v.origin, self->v.movedir);
 	}
 	else
 	{
 		PF_sound(self, CHAN_VOICE, "weapons/spike2.wav", 1, ATTN_NORM);
-		launch_spike(self, self->v.origin, self->v.movedir);
+		auto newmis = launch_spike(self, self->v.origin, self->v.movedir);
 		AsVector(newmis->v.velocity) = AsVector(self->v.movedir) * 500;
 		if (self->v.spawnflags & SPAWNFLAG_SUPERSPIKE)
 			newmis->v.touch = superspike_touch;
+
+		return newmis;
 	}
+}
+
+void spikeshooter_use(edict_t* self, edict_t* other)
+{
+	spikeshooter_fire(self, other);
 }
 
 void shooter_think(edict_t* self)
 {
-	spikeshooter_use(self, nullptr);
+	auto newmis = spikeshooter_fire(self, nullptr);
 	self->v.nextthink = pr_global_struct->time + self->v.wait;
 	AsVector(newmis->v.velocity) = AsVector(self->v.movedir) * 500;
 }

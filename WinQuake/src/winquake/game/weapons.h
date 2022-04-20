@@ -30,7 +30,7 @@ void BecomeExplosion(edict_t* self);
 void T_MissileTouch(edict_t* self, edict_t* other);
 void LightningDamage(edict_t* self, vec3_t p1, vec3_t p2, edict_t* from, float damage);
 void W_FireLightning(edict_t* self);
-void launch_spike(edict_t* self, vec3_t org, vec3_t dir);
+edict_t* launch_spike(edict_t* self, vec3_t org, vec3_t dir);
 void W_FireSpikes(edict_t* self, float ox);
 void spike_touch(edict_t* self, edict_t* other);
 void superspike_touch(edict_t* self, edict_t* other);

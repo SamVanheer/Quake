@@ -313,14 +313,14 @@ void Laser_Touch(edict_t* self, edict_t* other)
 	PF_Remove(self);
 }
 
-void LaunchLaser(edict_t* self, vec3_t org, vec3_t vec)
+edict_t* LaunchLaser(edict_t* self, vec3_t org, vec3_t vec)
 {
 	if (!strcmp(self->v.classname, "monster_enforcer"))
 		PF_sound(self, CHAN_WEAPON, "enforcer/enfire.wav", 1, ATTN_NORM);
 
 	PF_normalize(vec, vec);
 
-	newmis = PF_Spawn();
+	auto newmis = PF_Spawn();
 	newmis->v.owner = self;
 	newmis->v.movetype = MOVETYPE_FLY;
 	newmis->v.solid = SOLID_BBOX;
@@ -337,6 +337,8 @@ void LaunchLaser(edict_t* self, vec3_t org, vec3_t vec)
 	newmis->v.nextthink = pr_global_struct->time + 5;
 	newmis->v.think = SUB_Remove;
 	newmis->v.touch = Laser_Touch;
+
+	return newmis;
 }
 
 void enforcer_fire(edict_t* self)

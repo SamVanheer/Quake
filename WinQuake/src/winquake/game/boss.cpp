@@ -240,7 +240,7 @@ void boss_missile(edict_t* self, vec3_t p)
 	
 	PF_normalize (d - org, vec);
 
-	launch_spike (self, org, vec);
+	auto newmis = launch_spike (self, org, vec);
 	PF_setmodel (newmis, "progs/lavaball.mdl");
 	AsVector(newmis->v.avelocity) = Vector3D{200, 100, 300};
 	PF_setsize (newmis, VEC_ORIGIN, VEC_ORIGIN);		

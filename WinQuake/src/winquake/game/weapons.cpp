@@ -636,9 +636,9 @@ launch_spike
 Used for both the player and the ogre
 ===============
 */
-void launch_spike(edict_t* self, vec3_t org, vec3_t dir)
+edict_t* launch_spike(edict_t* self, vec3_t org, vec3_t dir)
 {
-	newmis = PF_Spawn();
+	auto newmis = PF_Spawn();
 	newmis->v.owner = self;
 	newmis->v.movetype = MOVETYPE_FLYMISSILE;
 	newmis->v.solid = SOLID_BBOX;
@@ -654,6 +654,8 @@ void launch_spike(edict_t* self, vec3_t org, vec3_t dir)
 	PF_setorigin(newmis, org);
 
 	AsVector(newmis->v.velocity) = AsVector(dir) * 1000;
+
+	return newmis;
 }
 
 void W_FireSuperSpikes(edict_t* self)
@@ -664,7 +666,7 @@ void W_FireSuperSpikes(edict_t* self)
 	self->v.attack_finished = pr_global_struct->time + 0.2;
 	self->v.currentammo = self->v.ammo_nails = self->v.ammo_nails - 2;
 	PF_aim(self, 1000, dir);
-	launch_spike(self, AsVector(self->v.origin) + Vector3D{0, 0, 16}, dir);
+	auto newmis = launch_spike(self, AsVector(self->v.origin) + Vector3D{0, 0, 16}, dir);
 	newmis->v.touch = superspike_touch;
 	PF_setmodel(newmis, "progs/s_spike.mdl");
 	PF_setsize(newmis, VEC_ORIGIN, VEC_ORIGIN);
