@@ -71,7 +71,7 @@ void multi_trigger(edict_t* self)
 	// don't trigger again until reset
 	self->v.takedamage = DAMAGE_NO;
 
-	activator = self->v.enemy;
+	pr_global_struct->activator = self->v.enemy;
 
 	SUB_UseTargets(self);
 
@@ -91,13 +91,13 @@ void multi_trigger(edict_t* self)
 
 void multi_killed(edict_t* self)
 {
-	self->v.enemy = damage_attacker;
+	self->v.enemy = pr_global_struct->damage_attacker;
 	multi_trigger(self);
 }
 
 void multi_use(edict_t* self, edict_t* other)
 {
-	self->v.enemy = activator;
+	self->v.enemy = pr_global_struct->activator;
 	multi_trigger(self);
 }
 
@@ -256,25 +256,25 @@ void counter_use(edict_t* self, edict_t* other)
 
 	if (self->v.count != 0)
 	{
-		if (!strcmp(activator->v.classname, "player")
+		if (!strcmp(pr_global_struct->activator->v.classname, "player")
 			&& (self->v.spawnflags & SPAWNFLAG_NOMESSAGE) == 0)
 		{
 			if (self->v.count >= 4)
-				PF_centerprint(activator, "There are more to go...");
+				PF_centerprint(pr_global_struct->activator, "There are more to go...");
 			else if (self->v.count == 3)
-				PF_centerprint(activator, "Only 3 more to go...");
+				PF_centerprint(pr_global_struct->activator, "Only 3 more to go...");
 			else if (self->v.count == 2)
-				PF_centerprint(activator, "Only 2 more to go...");
+				PF_centerprint(pr_global_struct->activator, "Only 2 more to go...");
 			else
-				PF_centerprint(activator, "Only 1 more to go...");
+				PF_centerprint(pr_global_struct->activator, "Only 1 more to go...");
 		}
 		return;
 	}
 
-	if (!strcmp(activator->v.classname, "player")
+	if (!strcmp(pr_global_struct->activator->v.classname, "player")
 		&& (self->v.spawnflags & SPAWNFLAG_NOMESSAGE) == 0)
-		PF_centerprint(activator, "Sequence completed!");
-	self->v.enemy = activator;
+		PF_centerprint(pr_global_struct->activator, "Sequence completed!");
+	self->v.enemy = pr_global_struct->activator;
 	multi_trigger(self);
 }
 

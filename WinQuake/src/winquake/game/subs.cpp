@@ -219,7 +219,7 @@ void SUB_CalcAngleMoveDone(edict_t* self)
 
 void DelayThink(edict_t* self)
 {
-	activator = self->v.enemy;
+	pr_global_struct->activator = self->v.enemy;
 	SUB_UseTargets(self);
 	PF_Remove(self);
 }
@@ -255,7 +255,7 @@ void SUB_UseTargets(edict_t* self, edict_t* other)
 		t->v.classname = "DelayedUse";
 		t->v.nextthink = pr_global_struct->time + self->v.delay;
 		t->v.think = DelayThink;
-		t->v.enemy = activator;
+		t->v.enemy = pr_global_struct->activator;
 		t->v.message = self->v.message;
 		t->v.killtarget = self->v.killtarget;
 		t->v.target = self->v.target;
@@ -266,11 +266,11 @@ void SUB_UseTargets(edict_t* self, edict_t* other)
 	//
 	// print the message
 	//
-	if (!strcmp(activator->v.classname, "player") && (self->v.message && strcmp(self->v.message, "")))
+	if (!strcmp(pr_global_struct->activator->v.classname, "player") && (self->v.message && strcmp(self->v.message, "")))
 	{
-		PF_centerprint(activator, self->v.message);
+		PF_centerprint(pr_global_struct->activator, self->v.message);
 		if (!self->v.noise)
-			PF_sound(activator, CHAN_VOICE, "misc/talk.wav", 1, ATTN_NORM);
+			PF_sound(pr_global_struct->activator, CHAN_VOICE, "misc/talk.wav", 1, ATTN_NORM);
 	}
 
 	//
@@ -293,7 +293,7 @@ void SUB_UseTargets(edict_t* self, edict_t* other)
 	//
 	if (self->v.target)
 	{
-		auto act = activator;
+		auto act = pr_global_struct->activator;
 		auto t = pr_global_struct->world;
 		do
 		{
@@ -307,7 +307,7 @@ void SUB_UseTargets(edict_t* self, edict_t* other)
 				if (t->v.use)
 					t->v.use(t, self);
 			}
-			activator = act;
+			pr_global_struct->activator = act;
 		} while (1);
 	}
 
@@ -324,13 +324,13 @@ some monsters refire twice automatically
 void SUB_AttackFinished(edict_t* self, float normal)
 {
 	self->v.cnt = 0;		// refire count for nightmare
-	if (game_skill != 3)
+	if (pr_global_struct->game_skill != 3)
 		self->v.attack_finished = pr_global_struct->time + normal;
 }
 
 void SUB_CheckRefire(edict_t* self, void (*thinkst)(edict_t*))
 {
-	if (game_skill != 3)
+	if (pr_global_struct->game_skill != 3)
 		return;
 	if (self->v.cnt == 1)
 		return;

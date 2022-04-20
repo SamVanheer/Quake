@@ -49,16 +49,16 @@ void monster_use(edict_t* self, edict_t* other)
 		return;
 	if (self->v.health <= 0)
 		return;
-	if ((int)activator->v.items & IT_INVISIBILITY)
+	if ((int)pr_global_struct->activator->v.items & IT_INVISIBILITY)
 		return;
-	if ((int)activator->v.flags & FL_NOTARGET)
+	if ((int)pr_global_struct->activator->v.flags & FL_NOTARGET)
 		return;
-	if (strcmp(activator->v.classname, "player"))
+	if (strcmp(pr_global_struct->activator->v.classname, "player"))
 		return;
 
 	// delay reaction so if the monster is teleported, its sound is still
 	// heard
-	self->v.enemy = activator;
+	self->v.enemy = pr_global_struct->activator;
 	self->v.nextthink = pr_global_struct->time + 0.1;
 	self->v.think = FoundTarget;
 }
@@ -82,7 +82,7 @@ void monster_death_use(edict_t* self)
 	if (!self->v.target)
 		return;
 
-	activator = self->v.enemy;
+	pr_global_struct->activator = self->v.enemy;
 	SUB_UseTargets(self);
 }
 

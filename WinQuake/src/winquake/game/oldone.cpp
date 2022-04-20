@@ -106,8 +106,8 @@ void finale_1(edict_t* self)
 	//TODO: figure out what other is supposed to be here.
 	edict_t* other = pr_global_struct->world;
 
-	intermission_exittime = pr_global_struct->time + 10000000;	// never allow exit
-	intermission_running = 1;
+	pr_global_struct->intermission_exittime = pr_global_struct->time + 10000000;	// never allow exit
+	pr_global_struct->intermission_running = 1;
 
 	// find the intermission spot
 	auto pos = PF_Find (pr_global_struct->world, "classname", "info_intermission");

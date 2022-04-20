@@ -67,6 +67,33 @@ typedef struct
 	float	trace_inopen;
 	float	trace_inwater;
 	edict_s* msg_entity;
+
+	//
+	// globals
+	//
+	float	gameover;		// set when a rule exits
+
+	edict_s* activator;		// the entity that activated a trigger or brush
+
+	edict_s* damage_attacker;	// set by T_Damage
+	float	framecount;
+
+	float	game_skill;
+
+	float	intermission_running;
+	float	intermission_exittime;
+
+	//
+	// AI globals
+	//
+
+	//
+	// when a monster becomes angry at a player, that monster will be used
+	// as the sight target the next frame so that monsters near that one
+	// will wake up even if they wouldn't have noticed the player
+	//
+	edict_s* sight_entity;
+	float	sight_entity_time;
 } globalvars_t;
 
 struct entvars_t

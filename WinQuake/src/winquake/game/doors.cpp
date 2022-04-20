@@ -181,7 +181,7 @@ void door_trigger_touch(edict_t* self, edict_t* other)
 		return;
 	self->v.attack_finished = pr_global_struct->time + 1;
 
-	activator = other;
+	pr_global_struct->activator = other;
 
 	auto owner = self->v.owner;
 	door_use(owner);

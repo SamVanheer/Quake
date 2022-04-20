@@ -226,7 +226,7 @@ void boss_missile(edict_t* self, vec3_t p)
 	auto org = AsVector(self->v.origin) + p[0]* AsVector(pr_global_struct->v_forward) + p[1]* AsVector(pr_global_struct->v_right) + p[2] * Vector3D{0, 0, 1};
 	
 // lead the player on hard mode
-	if (game_skill > 1)
+	if (pr_global_struct->game_skill > 1)
 	{
 		const float t = PF_vlen(AsVector(self->v.enemy->v.origin) - org) / 300;
 		vec = AsVector(self->v.enemy->v.velocity);
@@ -263,12 +263,12 @@ void boss_awake(edict_t* self, edict_t* other)
 	PF_setmodel (self, "progs/boss.mdl");
 	PF_setsize (self, Vector3D{-128, -128, -24}, Vector3D{128, 128, 256});
 	
-	if (game_skill == 0)
+	if (pr_global_struct->game_skill == 0)
 		self->v.health = 1;
 	else
 		self->v.health = 3;
 
-	self->v.enemy = activator;
+	self->v.enemy = pr_global_struct->activator;
 
 	PF_WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
 	PF_WriteByte (MSG_BROADCAST, TE_LAVASPLASH);
@@ -383,7 +383,7 @@ void lightning_use(edict_t* self, edict_t* other)
 	self = PF_Find(pr_global_struct->world, "classname", "monster_boss");
 	if (self == pr_global_struct->world)
 		return;
-	self->v.enemy = activator;
+	self->v.enemy = pr_global_struct->activator;
 	if (le1->v.state == STATE_TOP && self->v.health > 0)
 	{
 		PF_sound (self, CHAN_VOICE, "boss1/pain.wav", 1, ATTN_NORM);

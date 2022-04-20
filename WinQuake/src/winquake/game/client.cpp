@@ -158,13 +158,13 @@ void ExitIntermission(edict_t* self)
 		return;
 	}
 
-	intermission_exittime = pr_global_struct->time + 1;
-	intermission_running = intermission_running + 1;
+	pr_global_struct->intermission_exittime = pr_global_struct->time + 1;
+	++pr_global_struct->intermission_running;
 
 	//
 	// run some text if at the end of an episode
 	//
-	if (intermission_running == 2)
+	if (pr_global_struct->intermission_running == 2)
 	{
 		if (!strcmp(pr_global_struct->world->v.model, "maps/e1m7.bsp"))
 		{
@@ -217,7 +217,7 @@ void ExitIntermission(edict_t* self)
 		GotoNextMap(self);
 	}
 
-	if (intermission_running == 3)
+	if (pr_global_struct->intermission_running == 3)
 	{
 		if (!PF_cvar("registered"))
 		{	// shareware episode has been completed, go to sell screen
@@ -246,7 +246,7 @@ When the player presses attack or jump, change to the next level
 */
 void IntermissionThink(edict_t* self)
 {
-	if (pr_global_struct->time < intermission_exittime)
+	if (pr_global_struct->time < pr_global_struct->intermission_exittime)
 		return;
 
 	if (!self->v.button0 && !self->v.button1 && !self->v.button2)
@@ -257,13 +257,13 @@ void IntermissionThink(edict_t* self)
 
 void execute_changelevel(edict_t* self)
 {
-	intermission_running = 1;
+	pr_global_struct->intermission_running = 1;
 
 	// enforce a wait time before allowing changelevel
 	if (pr_global_struct->deathmatch)
-		intermission_exittime = pr_global_struct->time + 5;
+		pr_global_struct->intermission_exittime = pr_global_struct->time + 5;
 	else
-		intermission_exittime = pr_global_struct->time + 2;
+		pr_global_struct->intermission_exittime = pr_global_struct->time + 2;
 
 	PF_WriteByte(MSG_ALL, SVC_CDTRACK);
 	PF_WriteByte(MSG_ALL, 3);
@@ -676,7 +676,7 @@ Exit deathmatch games upon conditions
 */
 void CheckRules(edict_t* self)
 {
-	if (gameover)	// someone else quit the game already
+	if (pr_global_struct->gameover)	// someone else quit the game already
 		return;
 
 	float timelimit = PF_cvar("timelimit") * 60;
@@ -686,7 +686,7 @@ void CheckRules(edict_t* self)
 	{
 		NextLevel(self);
 		/*
-				gameover = TRUE;
+				pr_global_struct->gameover = TRUE;
 				bprint ("\n\n\n==============================\n");
 				bprint ("game exited after ");
 				bprint (ftos(timelimit/60));
@@ -701,7 +701,7 @@ void CheckRules(edict_t* self)
 	{
 		NextLevel(self);
 		/*
-				gameover = TRUE;
+				pr_global_struct->gameover = TRUE;
 				bprint ("\n\n\n==============================\n");
 				bprint ("game exited after ");
 				bprint (ftos(self->v.frags));
@@ -919,7 +919,7 @@ Called every frame before physics are run
 */
 void Game::PlayerPreThink(edict_t* self)
 {
-	if (intermission_running)
+	if (pr_global_struct->intermission_running)
 	{
 		IntermissionThink(self);	// otherwise a button could be missed between
 		return;					// the think tics
@@ -1168,7 +1168,7 @@ void Game::ClientConnect(edict_t* self)
 	bprint(" entered the game\n");
 
 	// a client connecting during an intermission can cause problems
-	if (intermission_running)
+	if (pr_global_struct->intermission_running)
 		ExitIntermission(self);
 };
 
@@ -1181,7 +1181,7 @@ called when a player disconnects from a server
 */
 void Game::ClientDisconnect(edict_t* self)
 {
-	if (gameover)
+	if (pr_global_struct->gameover)
 		return;
 	// if the level end trigger has been activated, just return
 	// since they aren't *really* leaving

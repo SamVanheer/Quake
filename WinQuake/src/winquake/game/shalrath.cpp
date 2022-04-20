@@ -299,7 +299,7 @@ void ShalHome(edict_t* self)
 
 	Vector3D dir;
 	PF_normalize(vtemp - AsVector(self->v.origin), dir);
-	if (game_skill == 3)
+	if (pr_global_struct->game_skill == 3)
 		AsVector(self->v.velocity) = dir * 350;
 	else
 		AsVector(self->v.velocity) = dir * 250;

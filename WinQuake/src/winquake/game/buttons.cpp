@@ -32,7 +32,7 @@ void button_wait(edict_t* self)
 	self->v.state = STATE_TOP;
 	self->v.nextthink = self->v.ltime + self->v.wait;
 	self->v.think = button_return;
-	activator = self->v.enemy;
+	pr_global_struct->activator = self->v.enemy;
 	SUB_UseTargets(self);
 	self->v.frame = 1;			// use alternate textures
 }
@@ -68,7 +68,7 @@ void button_fire(edict_t* self)
 
 void button_use(edict_t* self, edict_t* other)
 {
-	self->v.enemy = activator;
+	self->v.enemy = pr_global_struct->activator;
 	button_fire(self);
 }
 
@@ -82,7 +82,7 @@ void button_touch(edict_t* self, edict_t* other)
 
 void button_killed(edict_t* self)
 {
-	self->v.enemy = damage_attacker;
+	self->v.enemy = pr_global_struct->damage_attacker;
 	self->v.health = self->v.max_health;
 	self->v.takedamage = DAMAGE_NO;	// wil be reset upon return
 	button_fire(self);

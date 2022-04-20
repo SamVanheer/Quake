@@ -260,7 +260,7 @@ void PainSound(edict_t* self)
 	if (self->v.health < 0)
 		return;
 
-	if (!strcmp(damage_attacker->v.classname, "teledeath"))
+	if (!strcmp(pr_global_struct->damage_attacker->v.classname, "teledeath"))
 	{
 		PF_sound(self, CHAN_VOICE, "player/teledth1.wav", 1, ATTN_NONE);
 		return;
@@ -506,13 +506,13 @@ void GibPlayer(edict_t* self)
 
 	self->v.deadflag = DEAD_DEAD;
 
-	if (!strcmp(damage_attacker->v.classname, "teledeath"))
+	if (!strcmp(pr_global_struct->damage_attacker->v.classname, "teledeath"))
 	{
 		PF_sound(self, CHAN_VOICE, "player/teledth1.wav", 1, ATTN_NONE);
 		return;
 	}
 
-	if (!strcmp(damage_attacker->v.classname, "teledeath2"))
+	if (!strcmp(pr_global_struct->damage_attacker->v.classname, "teledeath2"))
 	{
 		PF_sound(self, CHAN_VOICE, "player/teledth1.wav", 1, ATTN_NONE);
 		return;

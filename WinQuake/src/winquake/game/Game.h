@@ -49,34 +49,6 @@ public:
 };
 
 //
-// globals
-//
-//TODO: need to reset these on map load
-inline float	gameover;		// set when a rule exits
-
-inline edict_t* activator;		// the entity that activated a trigger or brush
-
-inline edict_t* damage_attacker;	// set by T_Damage
-inline float	framecount;
-
-inline float	game_skill;
-
-inline float	intermission_running;
-inline float	intermission_exittime;
-
-//
-// AI globals
-//
-
-//
-// when a monster becomes angry at a player, that monster will be used
-// as the sight target the next frame so that monsters near that one
-// will wake up even if they wouldn't have noticed the player
-//
-inline edict_t* sight_entity;
-inline float	sight_entity_time;
-
-//
 // constants
 //
 

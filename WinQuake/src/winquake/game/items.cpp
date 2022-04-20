@@ -218,7 +218,7 @@ void health_touch(edict_t* self, edict_t* other)
 		}
 	}
 	
-	activator = other;
+	pr_global_struct->activator = other;
 	SUB_UseTargets(self);				// fire all targets / killtargets
 }	
 
@@ -300,7 +300,7 @@ void armor_touch(edict_t* self, edict_t* other)
 	PF_sound(other, CHAN_ITEM, "items/armor1.wav", 1, ATTN_NORM);
 	PF_stuffcmd (other, "bf\n");
 	
-	activator = other;
+	pr_global_struct->activator = other;
 	SUB_UseTargets(self);				// fire all targets / killtargets
 }
 
@@ -513,7 +513,7 @@ void weapon_touch(edict_t* self, edict_t* other)
 		self->v.nextthink = pr_global_struct->time + 30;
 	self->v.think = SUB_regen;
 	
-	activator = other;
+	pr_global_struct->activator = other;
 	SUB_UseTargets(self);				// fire all targets / killtargets
 }
 
@@ -693,7 +693,7 @@ void ammo_touch(edict_t* self, edict_t* other)
 	
 	self->v.think = SUB_regen;
 
-	activator = other;
+	pr_global_struct->activator = other;
 	SUB_UseTargets(self);				// fire all targets / killtargets
 }
 
@@ -913,7 +913,7 @@ void key_touch(edict_t* self, edict_t* other)
 		self->v.model = nullptr;
 	}
 
-	activator = other;
+	pr_global_struct->activator = other;
 	SUB_UseTargets(self);				// fire all targets / killtargets
 }
 
@@ -1041,7 +1041,7 @@ void sigil_touch(edict_t* self, edict_t* other)
 	pr_global_struct->serverflags = pr_global_struct->serverflags | (self->v.spawnflags & 15);
 	self->v.classname = "";		// so rune doors won't find it
 	
-	activator = other;
+	pr_global_struct->activator = other;
 	SUB_UseTargets(self);				// fire all targets / killtargets
 }
 
@@ -1148,7 +1148,7 @@ void powerup_touch(edict_t* self, edict_t* other)
 		other->v.super_damage_finished = pr_global_struct->time + 30;
 	}	
 
-	activator = other;
+	pr_global_struct->activator = other;
 	SUB_UseTargets(self);				// fire all targets / killtargets
 }
 

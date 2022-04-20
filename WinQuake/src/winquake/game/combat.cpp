@@ -125,7 +125,7 @@ void T_Damage(edict_t* self, edict_t* targ, edict_t* inflictor, edict_t* attacke
 		return;
 
 	// used by buttons and triggers to set activator for target firing
-	damage_attacker = attacker;
+	pr_global_struct->damage_attacker = attacker;
 
 	// check for quad damage powerup on the attacker
 	if (attacker->v.super_damage_finished > pr_global_struct->time)
@@ -216,7 +216,7 @@ void T_Damage(edict_t* self, edict_t* targ, edict_t* inflictor, edict_t* attacke
 	{
 		self->v.th_pain(self, attacker, take);
 		// nightmare mode monsters don't go into pain frames often
-		if (game_skill == 3)
+		if (pr_global_struct->game_skill == 3)
 			self->v.pain_finished = pr_global_struct->time + 5;
 	}
 

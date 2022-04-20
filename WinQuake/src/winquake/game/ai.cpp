@@ -264,8 +264,8 @@ void FoundTarget(edict_t* self)
 {
 	if (!strcmp(self->v.enemy->v.classname, "player"))
 	{	// let other monsters see this monster for a while
-		sight_entity = self;
-		sight_entity_time = pr_global_struct->time;
+		pr_global_struct->sight_entity = self;
+		pr_global_struct->sight_entity_time = pr_global_struct->time;
 	}
 
 	self->v.show_hostile = pr_global_struct->time + 1;		// wake up other monsters
@@ -301,9 +301,9 @@ float FindTarget(edict_t* self)
 	// spawnflags & 3 is a big hack, because zombie crucified used the first
 	// spawn flag prior to the ambush flag, and I forgot about it, so the second
 	// spawn flag works as well
-	if (sight_entity_time >= pr_global_struct->time - 0.1 && !(self->v.spawnflags & 3))
+	if (pr_global_struct->sight_entity_time >= pr_global_struct->time - 0.1 && !(self->v.spawnflags & 3))
 	{
-		client = sight_entity;
+		client = pr_global_struct->sight_entity;
 		if (client->v.enemy == self->v.enemy)
 			return false;
 	}
