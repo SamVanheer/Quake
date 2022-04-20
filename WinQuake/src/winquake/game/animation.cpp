@@ -24,7 +24,7 @@ static const Animations* animations_get(edict_t* self)
 {
 	if (!self->v.animations_get)
 	{
-		PF_objerror("Cannot advance animations without get_animations");
+		PF_objerror("Cannot advance animations without animations_get");
 	}
 
 	auto animations = self->v.animations_get(self);
@@ -71,7 +71,7 @@ void animation_set(edict_t* self, const char* name, int frame)
 
 	if (!self->v.animation)
 	{
-		PF_objerror("Cannot set animation without animation");
+		PF_objerror("Cannot set animation without animation name");
 	}
 
 	//Set before calling animation think so it can override.
@@ -94,7 +94,7 @@ void animation_advance(edict_t* self)
 
 	if (!self->v.animation)
 	{
-		PF_objerror("Cannot advance animation without animation");
+		PF_objerror("Cannot advance animation without animation name");
 	}
 
 	//Set before calling animation think so it can override.
