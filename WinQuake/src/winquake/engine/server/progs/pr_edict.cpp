@@ -106,12 +106,11 @@ void ED_Free (edict_t *ed)
 //===========================================================================
 
 //TODO: don't rely on a hardcoded list
-//Quick and dirty field list so entity spawning works.
 struct fielddescription
 {
 	const char* Name;
 	const etype_t Type;
-	eval_t entvars_t::* const Member;
+	const std::size_t Offset;
 };
 
 //Automatically deduce the type. Saves having to update it.
@@ -172,198 +171,198 @@ constexpr etype_t DeduceType<decltype(entvars_t::animations_get)>()
 	return ev_function;
 }
 
-#define ENT_FIELD(name) {#name, DeduceType<decltype(entvars_t::name)>(), reinterpret_cast<decltype(fielddescription::Member)>(&entvars_t::name)}
+#define OBJ_FIELD(name) {#name, DeduceType<decltype(entvars_t::name)>(), offsetof(entvars_t, name)}
 
 const fielddescription EntvarsFields[] =
 {
-	ENT_FIELD(modelindex),
-	ENT_FIELD(absmin),
-	ENT_FIELD(absmax),
-	ENT_FIELD(ltime),
-	ENT_FIELD(movetype),
-	ENT_FIELD(solid),
-	ENT_FIELD(origin),
-	ENT_FIELD(oldorigin),
-	ENT_FIELD(velocity),
-	ENT_FIELD(angles),
-	ENT_FIELD(avelocity),
-	ENT_FIELD(punchangle),
-	ENT_FIELD(classname),
-	ENT_FIELD(model),
-	ENT_FIELD(frame),
-	ENT_FIELD(skin),
-	ENT_FIELD(effects),
-	ENT_FIELD(mins),
-	ENT_FIELD(maxs),
-	ENT_FIELD(size),
-	ENT_FIELD(touch),
-	ENT_FIELD(use),
-	ENT_FIELD(think),
-	ENT_FIELD(blocked),
-	ENT_FIELD(nextthink),
-	ENT_FIELD(groundentity),
-	ENT_FIELD(health),
-	ENT_FIELD(frags),
-	ENT_FIELD(weapon),
-	ENT_FIELD(weaponmodel),
-	ENT_FIELD(weaponframe),
-	ENT_FIELD(currentammo),
-	ENT_FIELD(ammo_shells),
-	ENT_FIELD(ammo_nails),
-	ENT_FIELD(ammo_rockets),
-	ENT_FIELD(ammo_cells),
-	ENT_FIELD(items),
-	ENT_FIELD(takedamage),
-	ENT_FIELD(chain),
-	ENT_FIELD(deadflag),
-	ENT_FIELD(view_ofs),
-	ENT_FIELD(button0),
-	ENT_FIELD(button1),
-	ENT_FIELD(button2),
-	ENT_FIELD(impulse),
-	ENT_FIELD(fixangle),
-	ENT_FIELD(v_angle),
-	ENT_FIELD(idealpitch),
-	ENT_FIELD(netname),
-	ENT_FIELD(enemy),
-	ENT_FIELD(flags),
-	ENT_FIELD(colormap),
-	ENT_FIELD(team),
-	ENT_FIELD(max_health),
-	ENT_FIELD(teleport_time),
-	ENT_FIELD(armortype),
-	ENT_FIELD(armorvalue),
-	ENT_FIELD(waterlevel),
-	ENT_FIELD(watertype),
-	ENT_FIELD(ideal_yaw),
-	ENT_FIELD(yaw_speed),
-	ENT_FIELD(aiment),
-	ENT_FIELD(goalentity),
-	ENT_FIELD(spawnflags),
-	ENT_FIELD(target),
-	ENT_FIELD(targetname),
-	ENT_FIELD(dmg_take),
-	ENT_FIELD(dmg_save),
-	ENT_FIELD(dmg_inflictor),
-	ENT_FIELD(owner),
-	ENT_FIELD(movedir),
-	ENT_FIELD(message),
-	ENT_FIELD(sounds),
-	ENT_FIELD(noise),
-	ENT_FIELD(noise1),
-	ENT_FIELD(noise2),
-	ENT_FIELD(noise3),
+	OBJ_FIELD(modelindex),
+	OBJ_FIELD(absmin),
+	OBJ_FIELD(absmax),
+	OBJ_FIELD(ltime),
+	OBJ_FIELD(movetype),
+	OBJ_FIELD(solid),
+	OBJ_FIELD(origin),
+	OBJ_FIELD(oldorigin),
+	OBJ_FIELD(velocity),
+	OBJ_FIELD(angles),
+	OBJ_FIELD(avelocity),
+	OBJ_FIELD(punchangle),
+	OBJ_FIELD(classname),
+	OBJ_FIELD(model),
+	OBJ_FIELD(frame),
+	OBJ_FIELD(skin),
+	OBJ_FIELD(effects),
+	OBJ_FIELD(mins),
+	OBJ_FIELD(maxs),
+	OBJ_FIELD(size),
+	OBJ_FIELD(touch),
+	OBJ_FIELD(use),
+	OBJ_FIELD(think),
+	OBJ_FIELD(blocked),
+	OBJ_FIELD(nextthink),
+	OBJ_FIELD(groundentity),
+	OBJ_FIELD(health),
+	OBJ_FIELD(frags),
+	OBJ_FIELD(weapon),
+	OBJ_FIELD(weaponmodel),
+	OBJ_FIELD(weaponframe),
+	OBJ_FIELD(currentammo),
+	OBJ_FIELD(ammo_shells),
+	OBJ_FIELD(ammo_nails),
+	OBJ_FIELD(ammo_rockets),
+	OBJ_FIELD(ammo_cells),
+	OBJ_FIELD(items),
+	OBJ_FIELD(takedamage),
+	OBJ_FIELD(chain),
+	OBJ_FIELD(deadflag),
+	OBJ_FIELD(view_ofs),
+	OBJ_FIELD(button0),
+	OBJ_FIELD(button1),
+	OBJ_FIELD(button2),
+	OBJ_FIELD(impulse),
+	OBJ_FIELD(fixangle),
+	OBJ_FIELD(v_angle),
+	OBJ_FIELD(idealpitch),
+	OBJ_FIELD(netname),
+	OBJ_FIELD(enemy),
+	OBJ_FIELD(flags),
+	OBJ_FIELD(colormap),
+	OBJ_FIELD(team),
+	OBJ_FIELD(max_health),
+	OBJ_FIELD(teleport_time),
+	OBJ_FIELD(armortype),
+	OBJ_FIELD(armorvalue),
+	OBJ_FIELD(waterlevel),
+	OBJ_FIELD(watertype),
+	OBJ_FIELD(ideal_yaw),
+	OBJ_FIELD(yaw_speed),
+	OBJ_FIELD(aiment),
+	OBJ_FIELD(goalentity),
+	OBJ_FIELD(spawnflags),
+	OBJ_FIELD(target),
+	OBJ_FIELD(targetname),
+	OBJ_FIELD(dmg_take),
+	OBJ_FIELD(dmg_save),
+	OBJ_FIELD(dmg_inflictor),
+	OBJ_FIELD(owner),
+	OBJ_FIELD(movedir),
+	OBJ_FIELD(message),
+	OBJ_FIELD(sounds),
+	OBJ_FIELD(noise),
+	OBJ_FIELD(noise1),
+	OBJ_FIELD(noise2),
+	OBJ_FIELD(noise3),
 
-	ENT_FIELD(wad),
-	ENT_FIELD(map),
-	ENT_FIELD(worldtype),
+	OBJ_FIELD(wad),
+	OBJ_FIELD(map),
+	OBJ_FIELD(worldtype),
 
-	ENT_FIELD(killtarget),
+	OBJ_FIELD(killtarget),
 
-	ENT_FIELD(light_lev),
-	ENT_FIELD(style),
+	OBJ_FIELD(light_lev),
+	OBJ_FIELD(style),
 
-	ENT_FIELD(touch),
+	OBJ_FIELD(touch),
 
-	ENT_FIELD(th_stand),
-	ENT_FIELD(th_walk),
-	ENT_FIELD(th_run),
-	ENT_FIELD(th_missile),
-	ENT_FIELD(th_melee),
-	ENT_FIELD(th_pain),
-	ENT_FIELD(th_die),
+	OBJ_FIELD(th_stand),
+	OBJ_FIELD(th_walk),
+	OBJ_FIELD(th_run),
+	OBJ_FIELD(th_missile),
+	OBJ_FIELD(th_melee),
+	OBJ_FIELD(th_pain),
+	OBJ_FIELD(th_die),
 
-	ENT_FIELD(oldenemy),
+	OBJ_FIELD(oldenemy),
 
-	ENT_FIELD(speed),
-	ENT_FIELD(lefty),
+	OBJ_FIELD(speed),
+	OBJ_FIELD(lefty),
 
-	ENT_FIELD(search_time),
-	ENT_FIELD(attack_state),
+	OBJ_FIELD(search_time),
+	OBJ_FIELD(attack_state),
 
-	ENT_FIELD(walkframe),
+	OBJ_FIELD(walkframe),
 
-	ENT_FIELD(attack_finished),
-	ENT_FIELD(pain_finished),
+	OBJ_FIELD(attack_finished),
+	OBJ_FIELD(pain_finished),
 
-	ENT_FIELD(invincible_finished),
-	ENT_FIELD(invisible_finished),
-	ENT_FIELD(super_damage_finished),
-	ENT_FIELD(radsuit_finished),
+	OBJ_FIELD(invincible_finished),
+	OBJ_FIELD(invisible_finished),
+	OBJ_FIELD(super_damage_finished),
+	OBJ_FIELD(radsuit_finished),
 
-	ENT_FIELD(invincible_time),
-	ENT_FIELD(invincible_sound),
-	ENT_FIELD(invisible_time),
-	ENT_FIELD(invisible_sound),
-	ENT_FIELD(super_time),
-	ENT_FIELD(super_sound),
-	ENT_FIELD(rad_time),
-	ENT_FIELD(fly_sound),
+	OBJ_FIELD(invincible_time),
+	OBJ_FIELD(invincible_sound),
+	OBJ_FIELD(invisible_time),
+	OBJ_FIELD(invisible_sound),
+	OBJ_FIELD(super_time),
+	OBJ_FIELD(super_sound),
+	OBJ_FIELD(rad_time),
+	OBJ_FIELD(fly_sound),
 
-	ENT_FIELD(axhitme),
+	OBJ_FIELD(axhitme),
 
-	ENT_FIELD(show_hostile),
+	OBJ_FIELD(show_hostile),
 
-	ENT_FIELD(jump_flag),
-	ENT_FIELD(swim_flag),
-	ENT_FIELD(air_finished),
-	ENT_FIELD(bubble_count),
-	ENT_FIELD(deathtype),
+	OBJ_FIELD(jump_flag),
+	OBJ_FIELD(swim_flag),
+	OBJ_FIELD(air_finished),
+	OBJ_FIELD(bubble_count),
+	OBJ_FIELD(deathtype),
 
-	ENT_FIELD(mdl),
-	ENT_FIELD(mangle),
+	OBJ_FIELD(mdl),
+	OBJ_FIELD(mangle),
 
-	ENT_FIELD(t_length),
-	ENT_FIELD(t_width),
+	OBJ_FIELD(t_length),
+	OBJ_FIELD(t_width),
 
-	ENT_FIELD(dest),
-	ENT_FIELD(dest1),
-	ENT_FIELD(dest2),
+	OBJ_FIELD(dest),
+	OBJ_FIELD(dest1),
+	OBJ_FIELD(dest2),
 
-	ENT_FIELD(wait),
-	ENT_FIELD(delay),
+	OBJ_FIELD(wait),
+	OBJ_FIELD(delay),
 
-	ENT_FIELD(trigger_field),
-	ENT_FIELD(noise4),
+	OBJ_FIELD(trigger_field),
+	OBJ_FIELD(noise4),
 
-	ENT_FIELD(pausetime),
-	ENT_FIELD(movetarget),
-
-
-	ENT_FIELD(aflag),
-	ENT_FIELD(dmg),
-
-	ENT_FIELD(cnt),
-
-	ENT_FIELD(think1),
-	ENT_FIELD(finaldest),
-	ENT_FIELD(finalangle),
-
-	ENT_FIELD(count),
+	OBJ_FIELD(pausetime),
+	OBJ_FIELD(movetarget),
 
 
-	ENT_FIELD(lip),
-	ENT_FIELD(state),
-	ENT_FIELD(pos1),
-	ENT_FIELD(pos2),
-	ENT_FIELD(height),
+	OBJ_FIELD(aflag),
+	OBJ_FIELD(dmg),
 
-	ENT_FIELD(waitmin),
-	ENT_FIELD(waitmax),
-	ENT_FIELD(distance),
-	ENT_FIELD(volume),
+	OBJ_FIELD(cnt),
 
-	ENT_FIELD(dmgtime),
+	OBJ_FIELD(think1),
+	OBJ_FIELD(finaldest),
+	OBJ_FIELD(finalangle),
 
-	ENT_FIELD(healamount),
-	ENT_FIELD(healtype),
+	OBJ_FIELD(count),
 
-	ENT_FIELD(inpain),
 
-	ENT_FIELD(animation),
-	ENT_FIELD(animations_get),
+	OBJ_FIELD(lip),
+	OBJ_FIELD(state),
+	OBJ_FIELD(pos1),
+	OBJ_FIELD(pos2),
+	OBJ_FIELD(height),
 
-	ENT_FIELD(animation_mode)
+	OBJ_FIELD(waitmin),
+	OBJ_FIELD(waitmax),
+	OBJ_FIELD(distance),
+	OBJ_FIELD(volume),
+
+	OBJ_FIELD(dmgtime),
+
+	OBJ_FIELD(healamount),
+	OBJ_FIELD(healtype),
+
+	OBJ_FIELD(inpain),
+
+	OBJ_FIELD(animation),
+	OBJ_FIELD(animations_get),
+
+	OBJ_FIELD(animation_mode)
 };
 
 /*
@@ -519,6 +518,11 @@ char *ED_NewString (const char *string)
 	return pszNew;
 }
 
+template<typename T>
+void ED_SetValue(byte* address, T value)
+{
+	*reinterpret_cast<T*>(address) = value;
+}
 
 /*
 =============
@@ -530,24 +534,26 @@ returns false if error
 */
 bool ED_ParseEpair (entvars_t *base, const fielddescription* key, const char *s)
 {
-	auto d = &(base->*key->Member);
+	auto address = reinterpret_cast<byte*>(base) + key->Offset;
 	
 	switch (key->Type & ~DEF_SAVEGLOBAL)
 	{
 	case ev_string:
-		d->string = ED_NewString (s);
+		ED_SetValue(address, ED_NewString(s));
 		break;
 		
 	case ev_float:
-		d->_float = atof (s);
+		ED_SetValue(address, static_cast<float>(atof (s)));
 		break;
 
 	case ev_int:
-		d->_int = atoi(s);
+		ED_SetValue(address, atoi(s));
 		break;
 		
 	case ev_vector:
 	{
+		float* vec = reinterpret_cast<float*>(address);
+
 		char string[128];
 		strcpy(string, s);
 		auto v = string;
@@ -557,14 +563,14 @@ bool ED_ParseEpair (entvars_t *base, const fielddescription* key, const char *s)
 			while (*v && *v != ' ')
 				v++;
 			*v = 0;
-			d->vector[i] = atof(w);
+			vec[i] = atof(w);
 			w = v = v + 1;
 		}
 		break;
 	}
 		
 	case ev_entity:
-		d->edict = EDICT_NUM(atoi (s));
+		ED_SetValue(address, EDICT_NUM(atoi (s)));
 		break;
 		
 	default:
