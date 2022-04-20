@@ -67,7 +67,6 @@ inline float	intermission_exittime;
 //
 // AI globals
 //
-inline float	current_yaw;
 
 //
 // when a monster becomes angry at a player, that monster will be used

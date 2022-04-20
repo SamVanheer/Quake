@@ -209,63 +209,6 @@ bool infront(edict_t* self, edict_t* targ)
 	return false;
 }
 
-
-//============================================================================
-
-/*
-===========
-ChangeYaw
-
-Turns towards self->v.ideal_yaw at self->v.yaw_speed
-Sets the global variable current_yaw
-Called every 0.1 sec by monsters
-============
-*/
-/*
-
-void ChangeYaw(edict_t* self)
-{
-	local float		ideal, move;
-
-//current_yaw = self->v.ideal_yaw;
-// mod down the current angle
-	current_yaw = game_anglemod( self->v.angles_y );
-	ideal = self->v.ideal_yaw;
-
-	if (current_yaw == ideal)
-		return;
-
-	move = ideal - current_yaw;
-	if (ideal > current_yaw)
-	{
-		if (move > 180)
-			move = move - 360;
-	}
-	else
-	{
-		if (move < -180)
-			move = move + 360;
-	}
-
-	if (move > 0)
-	{
-		if (move > self->v.yaw_speed)
-			move = self->v.yaw_speed;
-	}
-	else
-	{
-		if (move < 0-self->v.yaw_speed )
-			move = 0-self->v.yaw_speed;
-	}
-
-	current_yaw = game_anglemod (current_yaw + move);
-
-	self->v.angles_y = current_yaw;
-}
-
-*/
-
-
 //============================================================================
 
 void HuntTarget(edict_t* self)
