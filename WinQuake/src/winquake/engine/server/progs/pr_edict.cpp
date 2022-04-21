@@ -768,6 +768,16 @@ void ED_WriteGlobals (FILE *f)
 			&& field.Type != ev_int)
 			continue;
 
+		auto v = ED_GetValueAddress<int>(pr_global_struct, field);
+
+		// if the value is still all 0, skip the field
+		int j;
+		for (j = 0; j < type_size[field.Type]; j++)
+			if (v[j])
+				break;
+		if (j == type_size[field.Type])
+			continue;
+
 		fprintf(f, "\"%s\" ", field.Name);
 		fprintf(f, "\"%s\"\n", PR_UglyValueString(pr_global_struct, field));
 	}
