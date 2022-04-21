@@ -296,13 +296,11 @@ void CL_ParseServerInfo(void)
 		CL_KeepaliveMessage();
 	}
 
-	S_BeginPrecaching();
 	for (i = 1; i < numsounds; i++)
 	{
 		cl.sound_precache[i] = S_PrecacheSound(sound_precache[i]);
 		CL_KeepaliveMessage();
 	}
-	S_EndPrecaching();
 
 
 	// local state

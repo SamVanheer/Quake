@@ -21,23 +21,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 
-#define	PAINTBUFFER_SIZE	512
+constexpr int PAINTBUFFER_SIZE = 512;
 portable_samplepair_t paintbuffer[PAINTBUFFER_SIZE];
-int		snd_scaletable[32][256];
+int snd_scaletable[32][256];
 int* snd_p, snd_linear_count, snd_vol;
 short* snd_out;
 
-void Snd_WriteLinearBlastStereo16(void)
+void Snd_WriteLinearBlastStereo16()
 {
 	const short MinimumValue = -0x8000;
 	const short MaximumValue = 0x7FFF;
 
-	int		i;
-	int		val;
-
-	for (i = 0; i < snd_linear_count; i += 2)
+	for (int i = 0; i < snd_linear_count; i += 2)
 	{
-		val = (snd_p[i] * snd_vol) >> 8;
+		int val = (snd_p[i] * snd_vol) >> 8;
 		if (val > MaximumValue)
 			snd_out[i] = MaximumValue;
 		else if (val < MinimumValue)
@@ -57,20 +54,16 @@ void Snd_WriteLinearBlastStereo16(void)
 
 void S_TransferStereo16(int endtime)
 {
-	int		lpos;
-	int		lpaintedtime;
-
 	snd_vol = volume.value * 256;
 
 	snd_p = (int*)paintbuffer;
-	lpaintedtime = paintedtime;
-
+	
 	void* pbuf = shm->buffer;
 
-	while (lpaintedtime < endtime)
+	for (int lpaintedtime = paintedtime; lpaintedtime < endtime; lpaintedtime += (snd_linear_count >> 1))
 	{
 		// handle recirculating buffer issues
-		lpos = lpaintedtime & ((shm->samples >> 1) - 1);
+		const int lpos = lpaintedtime & ((shm->samples >> 1) - 1);
 
 		snd_out = (short*)pbuf + (lpos << 1);
 
@@ -84,32 +77,23 @@ void S_TransferStereo16(int endtime)
 		Snd_WriteLinearBlastStereo16();
 
 		snd_p += snd_linear_count;
-		lpaintedtime += (snd_linear_count >> 1);
 	}
 }
 
 void S_TransferPaintBuffer(int endtime)
 {
-	int 	out_idx;
-	int 	count;
-	int 	out_mask;
-	int* p;
-	int 	step;
-	int		val;
-	int		snd_vol;
-
 	if (shm->samplebits == 16 && shm->channels == 2)
 	{
 		S_TransferStereo16(endtime);
 		return;
 	}
 
-	p = (int*)paintbuffer;
-	count = (endtime - paintedtime) * shm->channels;
-	out_mask = shm->samples - 1;
-	out_idx = paintedtime * shm->channels & out_mask;
-	step = 3 - shm->channels;
-	snd_vol = volume.value * 256;
+	auto p = (int*)paintbuffer;
+	int count = (endtime - paintedtime) * shm->channels;
+	const int out_mask = shm->samples - 1;
+	int out_idx = paintedtime * shm->channels & out_mask;
+	const int step = 3 - shm->channels;
+	const int snd_vol = volume.value * 256;
 
 	void* pbuf = shm->buffer;
 
@@ -118,7 +102,7 @@ void S_TransferPaintBuffer(int endtime)
 		short* out = (short*)pbuf;
 		while (count--)
 		{
-			val = (*p * snd_vol) >> 8;
+			int val = (*p * snd_vol) >> 8;
 			p += step;
 			if (val > INT16_MAX)
 				val = INT16_MAX;
@@ -133,7 +117,7 @@ void S_TransferPaintBuffer(int endtime)
 		unsigned char* out = (unsigned char*)pbuf;
 		while (count--)
 		{
-			val = (*p * snd_vol) >> 8;
+			int val = (*p * snd_vol) >> 8;
 			p += step;
 			if (val > INT16_MAX)
 				val = INT16_MAX;
@@ -158,16 +142,10 @@ void SND_PaintChannelFrom16(channel_t* ch, sfxcache_t* sc, int endtime);
 
 void S_PaintChannels(int endtime)
 {
-	int 	i;
-	int 	end;
-	channel_t* ch;
-	sfxcache_t* sc;
-	int		ltime, count;
-
 	while (paintedtime < endtime)
 	{
 		// if paintbuffer is smaller than DMA buffer
-		end = endtime;
+		int end = endtime;
 		if (endtime - paintedtime > PAINTBUFFER_SIZE)
 			end = paintedtime + PAINTBUFFER_SIZE;
 
@@ -175,21 +153,22 @@ void S_PaintChannels(int endtime)
 		Q_memset(paintbuffer, 0, (end - paintedtime) * sizeof(portable_samplepair_t));
 
 		// paint in the channels.
-		ch = channels;
-		for (i = 0; i < total_channels; i++, ch++)
+		channel_t* ch = channels;
+		for (int i = 0; i < total_channels; i++, ch++)
 		{
 			if (!ch->sfx)
 				continue;
 			if (!ch->leftvol && !ch->rightvol)
 				continue;
-			sc = S_LoadSound(ch->sfx);
+			auto sc = S_LoadSound(ch->sfx);
 			if (!sc)
 				continue;
 
-			ltime = paintedtime;
+			int ltime = paintedtime;
 
 			while (ltime < end)
 			{	// paint up to end
+				int count;
 				if (ch->end < end)
 					count = ch->end - ltime;
 				else
@@ -229,34 +208,31 @@ void S_PaintChannels(int endtime)
 	}
 }
 
-void SND_InitScaletable(void)
+void SND_InitScaletable()
 {
-	int		i, j;
-
-	for (i = 0; i < 32; i++)
-		for (j = 0; j < 256; j++)
+	for (int i = 0; i < 32; i++)
+	{
+		for (int j = 0; j < 256; j++)
+		{
 			snd_scaletable[i][j] = ((signed char)j) * i * 8;
+		}
+	}
 }
 
 void SND_PaintChannelFrom8(channel_t* ch, sfxcache_t* sc, int count)
 {
-	int 	data;
-	int* lscale, * rscale;
-	unsigned char* sfx;
-	int		i;
-
 	if (ch->leftvol > 255)
 		ch->leftvol = 255;
 	if (ch->rightvol > 255)
 		ch->rightvol = 255;
 
-	lscale = snd_scaletable[ch->leftvol >> 3];
-	rscale = snd_scaletable[ch->rightvol >> 3];
-	sfx = (unsigned char*)sc->data + ch->pos;
+	int* lscale = snd_scaletable[ch->leftvol >> 3];
+	int* rscale = snd_scaletable[ch->rightvol >> 3];
+	auto sfx = (unsigned char*)sc->data + ch->pos;
 
-	for (i = 0; i < count; i++)
+	for (int i = 0; i < count; i++)
 	{
-		data = sfx[i];
+		const int data = sfx[i];
 		paintbuffer[i].left += lscale[data];
 		paintbuffer[i].right += rscale[data];
 	}
@@ -264,28 +240,20 @@ void SND_PaintChannelFrom8(channel_t* ch, sfxcache_t* sc, int count)
 	ch->pos += count;
 }
 
-
 void SND_PaintChannelFrom16(channel_t* ch, sfxcache_t* sc, int count)
 {
-	int data;
-	int left, right;
-	int leftvol, rightvol;
-	signed short* sfx;
-	int	i;
+	const int leftvol = ch->leftvol;
+	const int rightvol = ch->rightvol;
+	auto sfx = (signed short*)sc->data + ch->pos;
 
-	leftvol = ch->leftvol;
-	rightvol = ch->rightvol;
-	sfx = (signed short*)sc->data + ch->pos;
-
-	for (i = 0; i < count; i++)
+	for (int i = 0; i < count; i++)
 	{
-		data = sfx[i];
-		left = (data * leftvol) >> 8;
-		right = (data * rightvol) >> 8;
+		const int data = sfx[i];
+		const int left = (data * leftvol) >> 8;
+		const int right = (data * rightvol) >> 8;
 		paintbuffer[i].left += left;
 		paintbuffer[i].right += right;
 	}
 
 	ch->pos += count;
 }
-
