@@ -465,7 +465,7 @@ void VelocityForDamage(edict_t* self, float dm, vec3_t result)
 		VectorScale(result, 10, result);
 }
 
-void ThrowGib(edict_t* self, char* gibname, float dm)
+void ThrowGib(edict_t* self, const char* gibname, float dm)
 {
 	auto ent = PF_Spawn();
 	VectorCopy(self->v.origin, ent->v.origin);
@@ -484,7 +484,7 @@ void ThrowGib(edict_t* self, char* gibname, float dm)
 	ent->v.flags = 0;
 }
 
-void ThrowHead(edict_t* self, char* gibname, float dm)
+void ThrowHead(edict_t* self, const char* gibname, float dm)
 {
 	PF_setmodel(self, gibname);
 	self->v.frame = 0;

@@ -481,7 +481,7 @@ WinMain
 ==================
 */
 
-int EngineMain (int argc, char* argv[])
+int EngineMain (int argc, const char* argv[])
 {
 	//TODO: need to rework this so SDL2's setup code is used instead.
 	SDL_SetMainReady();
@@ -618,8 +618,7 @@ int EngineMain (int argc, char* argv[])
 }
 
 #ifdef WIN32
-char* argv[MAX_NUM_ARGVS];
-static char* empty_string = "";
+const char* argv[MAX_NUM_ARGVS];
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
@@ -631,7 +630,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	}
 
 	int argc = 1;
-	argv[0] = empty_string;
+	argv[0] = "";
 
 	while (*lpCmdLine && (argc < MAX_NUM_ARGVS))
 	{
