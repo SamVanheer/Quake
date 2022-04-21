@@ -65,6 +65,11 @@ The Winsock2 API is now used directly and the IPX driver has been removed (no lo
 
 OpenAL provides a cross-platform sound API. This implementation is based on the Wave sound system implementation so there is a small amount of latency.
 
+## Converted QuakeC game code to C++.
+
+The QuakeC game code is now implemented in C++ to allow direct use of engine APIs, as well as better ways to handle some things like animation.
+This change removes the last remaining roadblock preventing a 64 bit engine build from working.
+
 ## More work to be done.
 
 # Original readme.txt contents
