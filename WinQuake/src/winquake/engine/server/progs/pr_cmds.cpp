@@ -305,7 +305,7 @@ PF_vlen
 scalar vlen(vector)
 =================
 */
-float PF_vlen (float* value1)
+float PF_vlen (const float* value1)
 {
 	return sqrt(value1[0] * value1[0] + value1[1] * value1[1] + value1[2]*value1[2]);
 }
@@ -317,7 +317,7 @@ PF_vectoyaw
 float vectoyaw(vector)
 =================
 */
-float PF_vectoyaw (float* value1)
+float PF_vectoyaw (const float* value1)
 {
 	float yaw;
 
