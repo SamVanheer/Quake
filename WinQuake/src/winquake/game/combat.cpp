@@ -42,7 +42,7 @@ bool CanDamage(edict_t* self, edict_t* targ, edict_t* inflictor)
 	// bmodels need special checking because their origin is 0,0,0
 	if (targ->v.movetype == MOVETYPE_PUSH)
 	{
-		PF_traceline(inflictor->v.origin, 0.5 * (AsVector(targ->v.absmin) + AsVector(targ->v.absmax)), TRUE, self);
+		PF_traceline(inflictor->v.origin, 0.5 * (AsVector(targ->v.absmin) + AsVector(targ->v.absmax)), MOVE_NOMONSTERS, self);
 		if (pr_global_struct->trace_fraction == 1)
 			return true;
 		if (pr_global_struct->trace_ent == targ)
@@ -50,19 +50,19 @@ bool CanDamage(edict_t* self, edict_t* targ, edict_t* inflictor)
 		return false;
 	}
 
-	PF_traceline(inflictor->v.origin, targ->v.origin, TRUE, self);
+	PF_traceline(inflictor->v.origin, targ->v.origin, MOVE_NOMONSTERS, self);
 	if (pr_global_struct->trace_fraction == 1)
 		return true;
-	PF_traceline(inflictor->v.origin, AsVector(targ->v.origin) + Vector3D{15, 15, 0}, TRUE, self);
+	PF_traceline(inflictor->v.origin, AsVector(targ->v.origin) + Vector3D{15, 15, 0}, MOVE_NOMONSTERS, self);
 	if (pr_global_struct->trace_fraction == 1)
 		return true;
-	PF_traceline(inflictor->v.origin, AsVector(targ->v.origin) + Vector3D{-15, -15, 0}, TRUE, self);
+	PF_traceline(inflictor->v.origin, AsVector(targ->v.origin) + Vector3D{-15, -15, 0}, MOVE_NOMONSTERS, self);
 	if (pr_global_struct->trace_fraction == 1)
 		return true;
-	PF_traceline(inflictor->v.origin, AsVector(targ->v.origin) + Vector3D{-15, 15, 0}, TRUE, self);
+	PF_traceline(inflictor->v.origin, AsVector(targ->v.origin) + Vector3D{-15, 15, 0}, MOVE_NOMONSTERS, self);
 	if (pr_global_struct->trace_fraction == 1)
 		return true;
-	PF_traceline(inflictor->v.origin, AsVector(targ->v.origin) + Vector3D{15, -15, 0}, TRUE, self);
+	PF_traceline(inflictor->v.origin, AsVector(targ->v.origin) + Vector3D{15, -15, 0}, MOVE_NOMONSTERS, self);
 	if (pr_global_struct->trace_fraction == 1)
 		return true;
 

@@ -177,7 +177,7 @@ bool visible(edict_t* self, edict_t* targ)
 {
 	auto spot1 = AsVector(self->v.origin) + AsVector(self->v.view_ofs);
 	auto spot2 = AsVector(targ->v.origin) + AsVector(targ->v.view_ofs);
-	PF_traceline(spot1, spot2, TRUE, self);	// see through other monsters
+	PF_traceline(spot1, spot2, MOVE_NOMONSTERS, self);	// see through other monsters
 
 	if (pr_global_struct->trace_inopen && pr_global_struct->trace_inwater)
 		return false;			// sight line crossed contents
@@ -293,7 +293,7 @@ checked each frame.  This means multi player games will have slightly
 slower noticing monsters.
 ============
 */
-float FindTarget(edict_t* self)
+bool FindTarget(edict_t* self)
 {
 	edict_t* client;
 
@@ -313,33 +313,33 @@ float FindTarget(edict_t* self)
 	{
 		client = PF_checkclient(self);
 		if (!client)
-			return FALSE;	// current check entity isn't in PVS
+			return false;	// current check entity isn't in PVS
 	}
 
 	if (client == self->v.enemy)
-		return FALSE;
+		return false;
 
 	if (client->v.flags & FL_NOTARGET)
-		return FALSE;
+		return false;
 	if (client->v.items & IT_INVISIBILITY)
-		return FALSE;
+		return false;
 
 	const float r = range(self, client);
 	if (r == RANGE_FAR)
-		return FALSE;
+		return false;
 
 	if (!visible(self, client))
-		return FALSE;
+		return false;
 
 	if (r == RANGE_NEAR)
 	{
 		if (client->v.show_hostile < pr_global_struct->time && !infront(self, client))
-			return FALSE;
+			return false;
 	}
 	else if (r == RANGE_MID)
 	{
 		if ( /* client.show_hostile < pr_global_struct->time || */ !infront(self, client))
-			return FALSE;
+			return false;
 	}
 
 	//
@@ -352,13 +352,13 @@ float FindTarget(edict_t* self)
 		if (!self->v.enemy || strcmp(self->v.enemy->v.classname, "player"))
 		{
 			self->v.enemy = pr_global_struct->world;
-			return FALSE;
+			return false;
 		}
 	}
 
 	FoundTarget(self);
 
-	return TRUE;
+	return true;
 }
 
 

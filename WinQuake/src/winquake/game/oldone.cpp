@@ -135,7 +135,7 @@ void finale_1(edict_t* self)
 	{
 		AsVector(pl->v.view_ofs) = AsVector(vec3_origin);
 		AsVector(pl->v.angles) = AsVector(other->v.v_angle) = AsVector(pos->v.mangle);
-		pl->v.fixangle = TRUE;		// turn this way immediately
+		pl->v.fixangle = 1;		// turn this way immediately
 		pl->v.map = self->v.map;
 		pl->v.nextthink = pr_global_struct->time + 0.5;
 		pl->v.takedamage = DAMAGE_NO;

@@ -23,9 +23,9 @@
 inline float enemy_vis, enemy_infront, enemy_range;
 inline float enemy_yaw;
 
-float SoldierCheckAttack(edict_t* self);
-float OgreCheckAttack(edict_t* self);
-float ShamCheckAttack(edict_t* self);
+bool SoldierCheckAttack(edict_t* self);
+bool OgreCheckAttack(edict_t* self);
+bool ShamCheckAttack(edict_t* self);
 bool DemonCheckAttack(edict_t* self);
 bool CheckAttack(edict_t* self);
 

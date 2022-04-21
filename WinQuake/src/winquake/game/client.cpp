@@ -275,7 +275,7 @@ void execute_changelevel(edict_t* self)
 		VectorCopy(vec3_origin, other->v.view_ofs);
 		VectorCopy(pos->v.mangle, other->v.angles);
 		VectorCopy(pos->v.mangle, other->v.v_angle);
-		other->v.fixangle = TRUE;		// turn this way immediately
+		other->v.fixangle = 1;		// turn this way immediately
 		other->v.nextthink = pr_global_struct->time + 0.5;
 		other->v.takedamage = DAMAGE_NO;
 		other->v.solid = SOLID_NOT;
@@ -483,7 +483,7 @@ void Game::PutClientInServer(edict_t* self)
 	VectorCopy(spot->v.origin, self->v.origin);
 	self->v.origin[2] += 1;
 	VectorCopy(spot->v.angles, self->v.angles);
-	self->v.fixangle = TRUE;		// turn this way immediately
+	self->v.fixangle = 1;		// turn this way immediately
 
 // oh, this is a hack!
 	PF_setmodel(self, "progs/eyes.mdl");
@@ -894,13 +894,13 @@ void CheckWaterJump(edict_t* self)
 	pr_global_struct->v_forward[2] = 0;
 	PF_normalize(pr_global_struct->v_forward, pr_global_struct->v_forward);
 	auto end = start + AsVector(pr_global_struct->v_forward) * 24;
-	PF_traceline(start, end, TRUE, self);
+	PF_traceline(start, end, MOVE_NOMONSTERS, self);
 	if (pr_global_struct->trace_fraction < 1)
 	{	// solid at waist
 		start[2] = start[2] + self->v.maxs[2] - 8;
 		end = start + AsVector(pr_global_struct->v_forward) * 24;
 		AsVector(self->v.movedir) = AsVector(pr_global_struct->trace_plane_normal) * -50;
-		PF_traceline(start, end, TRUE, self);
+		PF_traceline(start, end, MOVE_NOMONSTERS, self);
 		if (pr_global_struct->trace_fraction == 1)
 		{	// open at eye level
 			self->v.flags |= FL_WATERJUMP;

@@ -482,7 +482,7 @@ void CastLightning(edict_t* self)
 	auto dir = AsVector(self->v.enemy->v.origin) + Vector3D{0, 0, 16} - org;
 	PF_normalize (dir, dir);
 
-	PF_traceline (org, AsVector(self->v.origin) + AsVector(dir)*600, TRUE, self);
+	PF_traceline (org, AsVector(self->v.origin) + AsVector(dir)*600, MOVE_NOMONSTERS, self);
 
 	PF_WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
 	PF_WriteByte (MSG_BROADCAST, TE_LIGHTNING1);

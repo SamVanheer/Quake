@@ -240,7 +240,7 @@ bool WizardCheckAttack(edict_t* self)
 	auto spot1 = AsVector(self->v.origin) + AsVector(self->v.view_ofs);
 	auto spot2 = AsVector(targ->v.origin) + AsVector(targ->v.view_ofs);
 
-	PF_traceline (spot1, spot2, FALSE, self);
+	PF_traceline (spot1, spot2, MOVE_NORMAL, self);
 
 	if (pr_global_struct->trace_ent != targ)
 	{	// don't have a clear shot, so move to a side

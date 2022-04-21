@@ -54,7 +54,7 @@ W_FireAxe
 void W_FireAxe(edict_t* self)
 {
 	auto source = AsVector(self->v.origin) + Vector3D{0, 0, 16};
-	PF_traceline(source, source + AsVector(pr_global_struct->v_forward) * 64, FALSE, self);
+	PF_traceline(source, source + AsVector(pr_global_struct->v_forward) * 64, MOVE_NORMAL, self);
 	if (pr_global_struct->trace_fraction == 1.0)
 		return;
 
@@ -251,7 +251,7 @@ void FireBullets(edict_t* self, float shotcount, vec3_t dir, vec3_t spread)
 	{
 		direction = AsVector(dir) + crandom() * spread[0] * AsVector(pr_global_struct->v_right) + crandom() * spread[1] * AsVector(pr_global_struct->v_up);
 
-		PF_traceline(src, src + direction * 2048, FALSE, self);
+		PF_traceline(src, src + direction * 2048, MOVE_NORMAL, self);
 		if (pr_global_struct->trace_fraction != 1.0)
 			TraceAttack(self, 4, direction);
 
@@ -481,7 +481,7 @@ void LightningDamage(edict_t* self, vec3_t p1, vec3_t p2, edict_t* from, float d
 	auto e1 = pr_global_struct->world;
 	auto e2 = pr_global_struct->world;
 
-	PF_traceline(p1, p2, FALSE, self);
+	PF_traceline(p1, p2, MOVE_NORMAL, self);
 	if (pr_global_struct->trace_ent->v.takedamage)
 	{
 		PF_particle(pr_global_struct->trace_endpos, Vector3D{0, 0, 100}, 225, damage * 4);
@@ -494,7 +494,7 @@ void LightningDamage(edict_t* self, vec3_t p1, vec3_t p2, edict_t* from, float d
 	}
 	e1 = pr_global_struct->trace_ent;
 
-	PF_traceline(AsVector(p1) + f, AsVector(p2) + f, FALSE, self);
+	PF_traceline(AsVector(p1) + f, AsVector(p2) + f, MOVE_NORMAL, self);
 	if (pr_global_struct->trace_ent != e1 && pr_global_struct->trace_ent->v.takedamage)
 	{
 		PF_particle(pr_global_struct->trace_endpos, Vector3D{0, 0, 100}, 225, damage * 4);
@@ -502,7 +502,7 @@ void LightningDamage(edict_t* self, vec3_t p1, vec3_t p2, edict_t* from, float d
 	}
 	e2 = pr_global_struct->trace_ent;
 
-	PF_traceline(AsVector(p1) - f, AsVector(p2) - f, FALSE, self);
+	PF_traceline(AsVector(p1) - f, AsVector(p2) - f, MOVE_NORMAL, self);
 	if (pr_global_struct->trace_ent != e1 && pr_global_struct->trace_ent != e2 && pr_global_struct->trace_ent->v.takedamage)
 	{
 		PF_particle(pr_global_struct->trace_endpos, Vector3D{0, 0, 100}, 225, damage * 4);
@@ -540,7 +540,7 @@ void W_FireLightning(edict_t* self)
 
 	auto org = AsVector(self->v.origin) + Vector3D{0, 0, 16};
 
-	PF_traceline(org, AsVector(org) + AsVector(pr_global_struct->v_forward) * 600, TRUE, self);
+	PF_traceline(org, AsVector(org) + AsVector(pr_global_struct->v_forward) * 600, MOVE_NOMONSTERS, self);
 
 	PF_WriteByte(MSG_BROADCAST, SVC_TEMPENTITY);
 	PF_WriteByte(MSG_BROADCAST, TE_LIGHTNING2);

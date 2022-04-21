@@ -76,7 +76,7 @@ bool CheckAttack(edict_t* self)
 	auto spot1 = AsVector(self->v.origin) + AsVector(self->v.view_ofs);
 	auto spot2 = AsVector(targ->v.origin) + AsVector(targ->v.view_ofs);
 
-	PF_traceline(spot1, spot2, FALSE, self);
+	PF_traceline(spot1, spot2, MOVE_NORMAL, self);
 
 	if (pr_global_struct->trace_ent != targ)
 		return false;		// don't have a clear shot
@@ -232,7 +232,7 @@ The player is in view, so decide to move or launch an attack
 Returns FALSE if movement should continue
 ============
 */
-float SoldierCheckAttack(edict_t* self)
+bool SoldierCheckAttack(edict_t* self)
 {
 	auto targ = self->v.enemy;
 
@@ -240,21 +240,21 @@ float SoldierCheckAttack(edict_t* self)
 	auto spot1 = AsVector(self->v.origin) + AsVector(self->v.view_ofs);
 	auto spot2 = AsVector(targ->v.origin) + AsVector(targ->v.view_ofs);
 
-	PF_traceline(spot1, spot2, FALSE, self);
+	PF_traceline(spot1, spot2, MOVE_NORMAL, self);
 
 	if (pr_global_struct->trace_inopen && pr_global_struct->trace_inwater)
-		return FALSE;			// sight line crossed contents
+		return false;			// sight line crossed contents
 
 	if (pr_global_struct->trace_ent != targ)
-		return FALSE;	// don't have a clear shot
+		return false;	// don't have a clear shot
 
 
 // missile attack
 	if (pr_global_struct->time < self->v.attack_finished)
-		return FALSE;
+		return false;
 
 	if (enemy_range == RANGE_FAR)
-		return FALSE;
+		return false;
 
 	float chance;
 
@@ -274,10 +274,10 @@ float SoldierCheckAttack(edict_t* self)
 		if (PF_random() < 0.3)
 			self->v.lefty = !self->v.lefty;
 
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 //=============================================================================
 
@@ -289,22 +289,22 @@ The player is in view, so decide to move or launch an attack
 Returns FALSE if movement should continue
 ============
 */
-float ShamCheckAttack(edict_t* self)
+bool ShamCheckAttack(edict_t* self)
 {
 	if (enemy_range == RANGE_MELEE)
 	{
 		if (CanDamage(self, self->v.enemy, self))
 		{
 			self->v.attack_state = AS_MELEE;
-			return TRUE;
+			return true;
 		}
 	}
 
 	if (pr_global_struct->time < self->v.attack_finished)
-		return FALSE;
+		return false;
 
 	if (!enemy_vis)
-		return FALSE;
+		return false;
 
 	auto targ = self->v.enemy;
 
@@ -313,25 +313,25 @@ float ShamCheckAttack(edict_t* self)
 	auto spot2 = AsVector(targ->v.origin) + AsVector(targ->v.view_ofs);
 
 	if (PF_vlen(spot1 - spot2) > 600)
-		return FALSE;
+		return false;
 
-	PF_traceline(spot1, spot2, FALSE, self);
+	PF_traceline(spot1, spot2, MOVE_NORMAL, self);
 
 	if (pr_global_struct->trace_inopen && pr_global_struct->trace_inwater)
-		return FALSE;			// sight line crossed contents
+		return false;			// sight line crossed contents
 
 	if (pr_global_struct->trace_ent != targ)
 	{
-		return FALSE;	// don't have a clear shot
+		return false;	// don't have a clear shot
 	}
 
 	// missile attack
 	if (enemy_range == RANGE_FAR)
-		return FALSE;
+		return false;
 
 	self->v.attack_state = AS_MISSILE;
 	SUB_AttackFinished(self, 2 + 2 * PF_random());
-	return TRUE;
+	return true;
 }
 
 //============================================================================
@@ -344,22 +344,22 @@ The player is in view, so decide to move or launch an attack
 Returns FALSE if movement should continue
 ============
 */
-float OgreCheckAttack(edict_t* self)
+bool OgreCheckAttack(edict_t* self)
 {
 	if (enemy_range == RANGE_MELEE)
 	{
 		if (CanDamage(self, self->v.enemy, self))
 		{
 			self->v.attack_state = AS_MELEE;
-			return TRUE;
+			return true;
 		}
 	}
 
 	if (pr_global_struct->time < self->v.attack_finished)
-		return FALSE;
+		return false;
 
 	if (!enemy_vis)
-		return FALSE;
+		return false;
 
 	auto targ = self->v.enemy;
 
@@ -367,24 +367,24 @@ float OgreCheckAttack(edict_t* self)
 	auto spot1 = AsVector(self->v.origin) + AsVector(self->v.view_ofs);
 	auto spot2 = AsVector(targ->v.origin) + AsVector(targ->v.view_ofs);
 
-	PF_traceline(spot1, spot2, FALSE, self);
+	PF_traceline(spot1, spot2, MOVE_NORMAL, self);
 
 	if (pr_global_struct->trace_inopen && pr_global_struct->trace_inwater)
-		return FALSE;			// sight line crossed contents
+		return false;			// sight line crossed contents
 
 	if (pr_global_struct->trace_ent != targ)
 	{
-		return FALSE;	// don't have a clear shot
+		return false;	// don't have a clear shot
 	}
 
 	// missile attack
 	if (pr_global_struct->time < self->v.attack_finished)
-		return FALSE;
+		return false;
 
 	float chance;
 
 	if (enemy_range == RANGE_FAR)
-		return FALSE;
+		return false;
 
 	else if (enemy_range == RANGE_NEAR)
 		chance = 0.10f;
@@ -395,5 +395,5 @@ float OgreCheckAttack(edict_t* self)
 
 	self->v.attack_state = AS_MISSILE;
 	SUB_AttackFinished(self, 1 + 2 * PF_random());
-	return TRUE;
+	return true;
 }
