@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -78,16 +78,16 @@ lmode_t	lowresmodes[] = {
 	{512, 384},
 };
 
-const char *gl_vendor;
-const char *gl_renderer;
-const char *gl_version;
-const char *gl_extensions;
+const char* gl_vendor;
+const char* gl_renderer;
+const char* gl_version;
+const char* gl_extensions;
 
 bool			scr_skipupdate;
 
 static vmode_t	modelist[MAX_MODE_LIST];
 static int		nummodes;
-static vmode_t	*pcurrentmode;
+static vmode_t* pcurrentmode;
 static vmode_t	badmode;
 
 static bool vid_initialized = false;
@@ -100,13 +100,13 @@ extern bool	mouseactive;  // from in_win.c
 int			DIBWidth, DIBHeight;
 Rect		WindowRect;
 
-SDL_Window*	mainwindow;
+SDL_Window* mainwindow;
 
 int			vid_modenum = NO_MODE;
 int			vid_realmode;
 int			vid_default = MODE_WINDOWED;
 static int	windowed_default;
-unsigned char	vid_curpal[256*3];
+unsigned char	vid_curpal[256 * 3];
 static bool fullsbardraw = false;
 
 static float vid_gamma = 1.0;
@@ -123,14 +123,14 @@ float		gldepthmin, gldepthmax;
 
 modestate_t	modestate = MS_UNINIT;
 
-void VID_MenuDraw (void);
-void VID_MenuKey (int key);
+void VID_MenuDraw(void);
+void VID_MenuKey(int key);
 
 void AppActivate(bool fActive, bool minimize);
-char *VID_GetModeDescription (int mode);
-void ClearAllStates (void);
-void VID_UpdateWindowStatus (void);
-void GL_Init (void);
+char* VID_GetModeDescription(int mode);
+void ClearAllStates(void);
+void VID_UpdateWindowStatus(void);
+void GL_Init(void);
 
 bool gl_mtexable = false;
 
@@ -561,20 +561,20 @@ bool VID_CreateWindow(int modenum, bool windowed)
 	return true;
 }
 
-int VID_SetMode (int modenum, unsigned char *palette)
+int VID_SetMode(int modenum, unsigned char* palette)
 {
 	if ((windowed && (modenum != 0)) ||
 		(!windowed && (modenum < 1)) ||
 		(!windowed && (modenum >= nummodes)))
 	{
-		Sys_Error ("Bad video mode\n");
+		Sys_Error("Bad video mode\n");
 	}
 
-// so Con_Printfs don't mess us up by forcing vid and snd updates
+	// so Con_Printfs don't mess us up by forcing vid and snd updates
 	const bool temp = scr_disabled_for_loading;
 	scr_disabled_for_loading = true;
 
-	CDAudio_Pause ();
+	CDAudio_Pause();
 
 	bool stat;
 
@@ -584,49 +584,49 @@ int VID_SetMode (int modenum, unsigned char *palette)
 		if (_windowed_mouse.value && key_dest == key_game)
 		{
 			stat = VID_CreateWindow(modenum, true);
-			IN_ActivateMouse ();
-			IN_HideMouse ();
+			IN_ActivateMouse();
+			IN_HideMouse();
 		}
 		else
 		{
-			IN_DeactivateMouse ();
-			IN_ShowMouse ();
+			IN_DeactivateMouse();
+			IN_ShowMouse();
 			stat = VID_CreateWindow(modenum, true);
 		}
 	}
 	else if (modelist[modenum].type == MS_FULLDIB)
 	{
 		stat = VID_CreateWindow(modenum, false);
-		IN_ActivateMouse ();
-		IN_HideMouse ();
+		IN_ActivateMouse();
+		IN_HideMouse();
 	}
 	else
 	{
-		Sys_Error ("VID_SetMode: Bad mode type in modelist");
+		Sys_Error("VID_SetMode: Bad mode type in modelist");
 	}
 
 	window_width = DIBWidth;
 	window_height = DIBHeight;
-	VID_UpdateWindowStatus ();
+	VID_UpdateWindowStatus();
 
-	CDAudio_Resume ();
+	CDAudio_Resume();
 	scr_disabled_for_loading = temp;
 
 	if (!stat)
 	{
-		Sys_Error ("Couldn't set video mode");
+		Sys_Error("Couldn't set video mode");
 	}
 
-// now we try to make sure we get the focus on the mode switch, because
-// sometimes in some systems we don't.  We grab the foreground, then
-// finish setting up, pump all our messages, and sleep for a little while
-// to let messages finish bouncing around the system, then we put
-// ourselves at the top of the z order, then grab the foreground again,
-// Who knows if it helps, but it probably doesn't hurt
-	SDL_RaiseWindow (mainwindow);
-	VID_SetPalette (palette);
+	// now we try to make sure we get the focus on the mode switch, because
+	// sometimes in some systems we don't.  We grab the foreground, then
+	// finish setting up, pump all our messages, and sleep for a little while
+	// to let messages finish bouncing around the system, then we put
+	// ourselves at the top of the z order, then grab the foreground again,
+	// Who knows if it helps, but it probably doesn't hurt
+	SDL_RaiseWindow(mainwindow);
+	VID_SetPalette(palette);
 	vid_modenum = modenum;
-	Cvar_SetValue ("vid_mode", (float)vid_modenum);
+	Cvar_SetValue("vid_mode", (float)vid_modenum);
 
 	if (!VID_AllocBuffers(vid.width, vid.height))
 	{
@@ -641,12 +641,12 @@ int VID_SetMode (int modenum, unsigned char *palette)
 
 	SDL_RaiseWindow(mainwindow);
 
-// fix the leftover Alt from any Alt-Tab or the like that switched us away
-	ClearAllStates ();
+	// fix the leftover Alt from any Alt-Tab or the like that switched us away
+	ClearAllStates();
 
-	Con_SafePrintf ("Video mode %s initialized.\n", VID_GetModeDescription (vid_modenum));
+	Con_SafePrintf("Video mode %s initialized.\n", VID_GetModeDescription(vid_modenum));
 
-	VID_SetPalette (palette);
+	VID_SetPalette(palette);
 
 	vid.recalc_refdef = 1;
 
@@ -659,7 +659,7 @@ int VID_SetMode (int modenum, unsigned char *palette)
 VID_UpdateWindowStatus
 ================
 */
-void VID_UpdateWindowStatus (void)
+void VID_UpdateWindowStatus(void)
 {
 	window_rect.left = window_x;
 	window_rect.top = window_y;
@@ -684,7 +684,7 @@ int		texture_extension_number = 1;
 lpMTexFUNC qglMTexCoord2fSGIS = nullptr;
 lpSelTexFUNC qglSelectTextureSGIS = nullptr;
 
-void CheckMultiTextureExtensions() 
+void CheckMultiTextureExtensions()
 {
 	if (strstr(gl_extensions, "GL_SGIS_multitexture ") && !COM_CheckParm("-nomtex"))
 	{
@@ -704,43 +704,43 @@ void CheckMultiTextureExtensions()
 GL_Init
 ===============
 */
-void GL_Init (void)
+void GL_Init(void)
 {
-	gl_vendor = reinterpret_cast<const char*>( glGetString (GL_VENDOR) );
-	Con_Printf ("GL_VENDOR: %s\n", gl_vendor);
-	gl_renderer = reinterpret_cast<const char*>( glGetString (GL_RENDERER) );
-	Con_Printf ("GL_RENDERER: %s\n", gl_renderer);
+	gl_vendor = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
+	Con_Printf("GL_VENDOR: %s\n", gl_vendor);
+	gl_renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+	Con_Printf("GL_RENDERER: %s\n", gl_renderer);
 
-	gl_version = reinterpret_cast<const char*>( glGetString (GL_VERSION) );
-	Con_Printf ("GL_VERSION: %s\n", gl_version);
-	gl_extensions = reinterpret_cast<const char*>( glGetString (GL_EXTENSIONS) );
-	Con_Printf ("GL_EXTENSIONS: %s\n", gl_extensions);
+	gl_version = reinterpret_cast<const char*>(glGetString(GL_VERSION));
+	Con_Printf("GL_VERSION: %s\n", gl_version);
+	gl_extensions = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
+	Con_Printf("GL_EXTENSIONS: %s\n", gl_extensions);
 
-//	Con_Printf ("%s %s\n", gl_renderer, gl_version);
+	//	Con_Printf ("%s %s\n", gl_renderer, gl_version);
 
-    if (strnicmp(gl_renderer,"PowerVR",7)==0)
-         fullsbardraw = true;
+	if (strnicmp(gl_renderer, "PowerVR", 7) == 0)
+		fullsbardraw = true;
 
-	CheckMultiTextureExtensions ();
+	CheckMultiTextureExtensions();
 
-	glClearColor (1,0,0,0);
+	glClearColor(1, 0, 0, 0);
 	glCullFace(GL_FRONT);
 	glEnable(GL_TEXTURE_2D);
 
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER, 0.666f);
 
-	glPolygonMode (GL_FRONT_AND_BACK, GL_FILL);
-	glShadeModel (GL_FLAT);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glShadeModel(GL_FLAT);
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-//	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	//	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
 
@@ -750,7 +750,7 @@ GL_BeginRendering
 
 =================
 */
-void GL_BeginRendering (int *x, int *y, int *width, int *height)
+void GL_BeginRendering(int* x, int* y, int* width, int* height)
 {
 	extern cvar_t gl_clear;
 
@@ -758,35 +758,37 @@ void GL_BeginRendering (int *x, int *y, int *width, int *height)
 	*width = WindowRect.right - WindowRect.left;
 	*height = WindowRect.bottom - WindowRect.top;
 
-//    if (!SDL_GL_MakeCurrent( mainwindow, GLContext ))
-//		Sys_Error ("SDL_GL_MakeCurrent failed");
+	//    if (!SDL_GL_MakeCurrent( mainwindow, GLContext ))
+	//		Sys_Error ("SDL_GL_MakeCurrent failed");
 
-//	glViewport (*x, *y, *width, *height);
+	//	glViewport (*x, *y, *width, *height);
 }
 
 
-void GL_EndRendering (void)
+void GL_EndRendering(void)
 {
 	if (!scr_skipupdate || block_drawing)
 		SDL_GL_SwapWindow(mainwindow);
 
-// handle the mouse state when windowed if that's changed
+	// handle the mouse state when windowed if that's changed
 	if (modestate == MS_WINDOWED)
 	{
 		if (!_windowed_mouse.value) {
-			if (windowed_mouse)	{
-				IN_DeactivateMouse ();
-				IN_ShowMouse ();
+			if (windowed_mouse) {
+				IN_DeactivateMouse();
+				IN_ShowMouse();
 				windowed_mouse = false;
 			}
-		} else {
+		}
+		else {
 			windowed_mouse = true;
 			if (key_dest == key_game && !mouseactive && ActiveApp) {
-				IN_ActivateMouse ();
-				IN_HideMouse ();
-			} else if (mouseactive && key_dest != key_game) {
-				IN_DeactivateMouse ();
-				IN_ShowMouse ();
+				IN_ActivateMouse();
+				IN_HideMouse();
+			}
+			else if (mouseactive && key_dest != key_game) {
+				IN_DeactivateMouse();
+				IN_ShowMouse();
 			}
 		}
 	}
@@ -794,26 +796,26 @@ void GL_EndRendering (void)
 		Sbar_Changed();
 }
 
-void	VID_SetPalette (unsigned char *palette)
+void	VID_SetPalette(unsigned char* palette)
 {
-	unsigned r,g,b;
+	unsigned r, g, b;
 	unsigned v;
 
-//
-// 8 8 8 encoding
-//
+	//
+	// 8 8 8 encoding
+	//
 	byte* pal = palette;
 	unsigned* table = d_8to24table;
-	for (int i=0 ; i<256 ; i++)
+	for (int i = 0; i < 256; i++)
 	{
 		r = pal[0];
 		g = pal[1];
 		b = pal[2];
 		pal += 3;
-		
-//		v = (255<<24) + (r<<16) + (g<<8) + (b<<0);
-//		v = (255<<0) + (r<<8) + (g<<16) + (b<<24);
-		v = (255<<24) + (r<<0) + (g<<8) + (b<<16);
+
+		//		v = (255<<24) + (r<<16) + (g<<8) + (b<<0);
+		//		v = (255<<0) + (r<<8) + (g<<16) + (b<<24);
+		v = (255 << 24) + (r << 0) + (g << 8) + (b << 16);
 		*table++ = v;
 	}
 	d_8to24table[255] &= 0xffffff;	// 255 is transparent
@@ -823,50 +825,50 @@ void	VID_SetPalette (unsigned char *palette)
 
 	// JACK: 3D distance calcs - k is last closest, l is the distance.
 	// FIXME: Precalculate this and cache to disk.
-	for (unsigned short i=0; i < (1<<15); i++) {
+	for (unsigned short i = 0; i < (1 << 15); i++) {
 		/* Maps
 			000000000000000
 			000000000011111 = Red  = 0x1F
 			000001111100000 = Blue = 0x03E0
 			111110000000000 = Grn  = 0x7C00
 		*/
-		r = ((i & 0x1F) << 3)+4;
-		g = ((i & 0x03E0) >> 2)+4;
-		b = ((i & 0x7C00) >> 7)+4;
-		pal = (unsigned char *)d_8to24table;
-		for (v=0,k=0,l=10000*10000; v<256; v++,pal+=4) {
-			r1 = r-pal[0];
-			g1 = g-pal[1];
-			b1 = b-pal[2];
-			j = (r1*r1)+(g1*g1)+(b1*b1);
-			if (j<l) {
-				k=v;
-				l=j;
+		r = ((i & 0x1F) << 3) + 4;
+		g = ((i & 0x03E0) >> 2) + 4;
+		b = ((i & 0x7C00) >> 7) + 4;
+		pal = (unsigned char*)d_8to24table;
+		for (v = 0, k = 0, l = 10000 * 10000; v < 256; v++, pal += 4) {
+			r1 = r - pal[0];
+			g1 = g - pal[1];
+			b1 = b - pal[2];
+			j = (r1 * r1) + (g1 * g1) + (b1 * b1);
+			if (j < l) {
+				k = v;
+				l = j;
 			}
 		}
-		d_15to8table[i]=k;
+		d_15to8table[i] = k;
 	}
 }
 
 bool	gammaworks;
 
-void	VID_ShiftPalette (unsigned char *palette)
+void	VID_ShiftPalette(unsigned char* palette)
 {
 	extern	byte ramps[3][256];
-	
-//	VID_SetPalette (palette);
 
-//	gammaworks = SetDeviceGammaRamp (maindc, ramps) != FALSE;
+	//	VID_SetPalette (palette);
+
+	//	gammaworks = SetDeviceGammaRamp (maindc, ramps) != FALSE;
 }
 
 
-void VID_SetDefaultMode (void)
+void VID_SetDefaultMode(void)
 {
-	IN_DeactivateMouse ();
+	IN_DeactivateMouse();
 }
 
 
-void	VID_Shutdown (void)
+void	VID_Shutdown(void)
 {
 	if (vid_initialized)
 	{
@@ -896,7 +898,7 @@ MapKey
 Map from windows to quake keynums
 =======
 */
-int MapKey (SDL_Keycode key)
+int MapKey(SDL_Keycode key)
 {
 	if (key >= SDLK_a && key <= SDLK_z)
 	{
@@ -992,16 +994,16 @@ MAIN WINDOW
 ClearAllStates
 ================
 */
-void ClearAllStates (void)
+void ClearAllStates(void)
 {
-// send an up event for each key, to make sure the server clears them all
-	for (int i=0 ; i<256 ; i++)
+	// send an up event for each key, to make sure the server clears them all
+	for (int i = 0; i < 256; i++)
 	{
-		Key_Event (i, false);
+		Key_Event(i, false);
 	}
 
-	Key_ClearStates ();
-	IN_ClearStates ();
+	Key_ClearStates();
+	IN_ClearStates();
 }
 
 void AppActivate(bool fActive, bool minimize)
@@ -1019,7 +1021,7 @@ void AppActivate(bool fActive, bool minimize)
 	ActiveApp = fActive;
 	Minimized = minimize;
 
-// enable/disable sound on focus gain/loss
+	// enable/disable sound on focus gain/loss
 	if (!ActiveApp && !g_SoundSystem->IsBlocked())
 	{
 		g_SoundSystem->Block();
@@ -1033,8 +1035,8 @@ void AppActivate(bool fActive, bool minimize)
 	{
 		if (modestate == MS_FULLDIB)
 		{
-			IN_ActivateMouse ();
-			IN_HideMouse ();
+			IN_ActivateMouse();
+			IN_HideMouse();
 			if (vid_canalttab && vid_wassuspended) {
 				vid_wassuspended = false;
 				SDL_ShowWindow(mainwindow);
@@ -1042,8 +1044,8 @@ void AppActivate(bool fActive, bool minimize)
 		}
 		else if ((modestate == MS_WINDOWED) && _windowed_mouse.value && key_dest == key_game)
 		{
-			IN_ActivateMouse ();
-			IN_HideMouse ();
+			IN_ActivateMouse();
+			IN_HideMouse();
 		}
 	}
 
@@ -1051,16 +1053,16 @@ void AppActivate(bool fActive, bool minimize)
 	{
 		if (modestate == MS_FULLDIB)
 		{
-			IN_DeactivateMouse ();
-			IN_ShowMouse ();
-			if (vid_canalttab) { 
+			IN_DeactivateMouse();
+			IN_ShowMouse();
+			if (vid_canalttab) {
 				vid_wassuspended = true;
 			}
 		}
 		else if ((modestate == MS_WINDOWED) && _windowed_mouse.value)
 		{
-			IN_DeactivateMouse ();
-			IN_ShowMouse ();
+			IN_DeactivateMouse();
+			IN_ShowMouse();
 		}
 	}
 }
@@ -1170,9 +1172,9 @@ void VID_ProcessEvent(SDL_Event& event)
 		break;
 	}
 
-		// JACK: This is the mouse wheel with the Intellimouse
-		// Its delta is either positive or neg, and we generate the proper
-		// Event.
+	// JACK: This is the mouse wheel with the Intellimouse
+	// Its delta is either positive or neg, and we generate the proper
+	// Event.
 	case SDL_MOUSEWHEEL:
 		if (event.wheel.y > 0)
 		{
@@ -1186,12 +1188,12 @@ void VID_ProcessEvent(SDL_Event& event)
 		}
 		break;
 
-	//TODO
-	/*
-	case MM_MCINOTIFY:
-		lRet = CDAudio_MessageHandler(hWnd, uMsg, wParam, lParam);
-		break;
-		*/
+		//TODO
+		/*
+		case MM_MCINOTIFY:
+			lRet = CDAudio_MessageHandler(hWnd, uMsg, wParam, lParam);
+			break;
+			*/
 	}
 }
 
@@ -1201,18 +1203,18 @@ void VID_ProcessEvent(SDL_Event& event)
 VID_NumModes
 =================
 */
-int VID_NumModes (void)
+int VID_NumModes(void)
 {
 	return nummodes;
 }
 
-	
+
 /*
 =================
 VID_GetModePtr
 =================
 */
-vmode_t *VID_GetModePtr (int modenum)
+vmode_t* VID_GetModePtr(int modenum)
 {
 
 	if ((modenum >= 0) && (modenum < nummodes))
@@ -1227,46 +1229,46 @@ vmode_t *VID_GetModePtr (int modenum)
 VID_GetModeDescription
 =================
 */
-char *VID_GetModeDescription (int mode)
+char* VID_GetModeDescription(int mode)
 {
 	if ((mode < 0) || (mode >= nummodes))
 		return NULL;
 
 	if (!leavecurrentmode)
 	{
-		auto pv = VID_GetModePtr (mode);
+		auto pv = VID_GetModePtr(mode);
 		return pv->modedesc;
 	}
 
 	static char	temp[100];
-	sprintf (temp, "Desktop resolution (%dx%d)",
-				modelist[MODE_FULLSCREEN_DEFAULT].width,
-				modelist[MODE_FULLSCREEN_DEFAULT].height);
+	sprintf(temp, "Desktop resolution (%dx%d)",
+		modelist[MODE_FULLSCREEN_DEFAULT].width,
+		modelist[MODE_FULLSCREEN_DEFAULT].height);
 	return temp;
 }
 
 
 // KJB: Added this to return the mode driver name in description for console
 
-char *VID_GetExtModeDescription (int mode)
+char* VID_GetExtModeDescription(int mode)
 {
 	if ((mode < 0) || (mode >= nummodes))
 		return NULL;
 
 	static char	pinfo[40];
 
-	auto pv = VID_GetModePtr (mode);
+	auto pv = VID_GetModePtr(mode);
 	if (modelist[mode].type == MS_FULLDIB)
 	{
 		if (!leavecurrentmode)
 		{
-			sprintf(pinfo,"%s fullscreen", pv->modedesc);
+			sprintf(pinfo, "%s fullscreen", pv->modedesc);
 		}
 		else
 		{
-			sprintf (pinfo, "Desktop resolution (%dx%d)",
-					 modelist[MODE_FULLSCREEN_DEFAULT].width,
-					 modelist[MODE_FULLSCREEN_DEFAULT].height);
+			sprintf(pinfo, "Desktop resolution (%dx%d)",
+				modelist[MODE_FULLSCREEN_DEFAULT].width,
+				modelist[MODE_FULLSCREEN_DEFAULT].height);
 		}
 	}
 	else
@@ -1286,9 +1288,9 @@ char *VID_GetExtModeDescription (int mode)
 VID_DescribeCurrentMode_f
 =================
 */
-void VID_DescribeCurrentMode_f (void)
+void VID_DescribeCurrentMode_f(void)
 {
-	Con_Printf ("%s\n", VID_GetExtModeDescription (vid_modenum));
+	Con_Printf("%s\n", VID_GetExtModeDescription(vid_modenum));
 }
 
 
@@ -1297,13 +1299,13 @@ void VID_DescribeCurrentMode_f (void)
 VID_NumModes_f
 =================
 */
-void VID_NumModes_f (void)
+void VID_NumModes_f(void)
 {
 
 	if (nummodes == 1)
-		Con_Printf ("%d video mode is available\n", nummodes);
+		Con_Printf("%d video mode is available\n", nummodes);
 	else
-		Con_Printf ("%d video modes are available\n", nummodes);
+		Con_Printf("%d video modes are available\n", nummodes);
 }
 
 
@@ -1312,14 +1314,14 @@ void VID_NumModes_f (void)
 VID_DescribeMode_f
 =================
 */
-void VID_DescribeMode_f (void)
+void VID_DescribeMode_f(void)
 {
-	const int modenum = Q_atoi (Cmd_Argv(1));
+	const int modenum = Q_atoi(Cmd_Argv(1));
 
 	const bool t = leavecurrentmode;
 	leavecurrentmode = false;
 
-	Con_Printf ("%s\n", VID_GetExtModeDescription (modenum));
+	Con_Printf("%s\n", VID_GetExtModeDescription(modenum));
 
 	leavecurrentmode = t;
 }
@@ -1330,29 +1332,29 @@ void VID_DescribeMode_f (void)
 VID_DescribeModes_f
 =================
 */
-void VID_DescribeModes_f (void)
+void VID_DescribeModes_f(void)
 {
-	const int lnummodes = VID_NumModes ();
+	const int lnummodes = VID_NumModes();
 
 	const bool t = leavecurrentmode;
 	leavecurrentmode = false;
 
-	for (int i=1 ; i<lnummodes ; i++)
+	for (int i = 1; i < lnummodes; i++)
 	{
-		auto pinfo = VID_GetExtModeDescription (i);
-		Con_Printf ("%2d: %s\n", i, pinfo);
+		auto pinfo = VID_GetExtModeDescription(i);
+		Con_Printf("%2d: %s\n", i, pinfo);
 	}
 
 	leavecurrentmode = t;
 }
 
 
-void VID_InitDIB ()
+void VID_InitDIB()
 {
 	modelist[0].type = MS_WINDOWED;
 
 	if (COM_CheckParm("-width"))
-		modelist[0].width = Q_atoi(com_argv[COM_CheckParm("-width")+1]);
+		modelist[0].width = Q_atoi(com_argv[COM_CheckParm("-width") + 1]);
 	else
 		modelist[0].width = 640 * 2; //Double the windowed mode size
 
@@ -1360,15 +1362,15 @@ void VID_InitDIB ()
 		modelist[0].width = 320;
 
 	if (COM_CheckParm("-height"))
-		modelist[0].height= Q_atoi(com_argv[COM_CheckParm("-height")+1]);
+		modelist[0].height = Q_atoi(com_argv[COM_CheckParm("-height") + 1]);
 	else
-		modelist[0].height = modelist[0].width * 240/320;
+		modelist[0].height = modelist[0].width * 240 / 320;
 
 	if (modelist[0].height < 240)
 		modelist[0].height = 240;
 
-	sprintf (modelist[0].modedesc, "%dx%d",
-			 modelist[0].width, modelist[0].height);
+	sprintf(modelist[0].modedesc, "%dx%d",
+		modelist[0].width, modelist[0].height);
 
 	modelist[0].modenum = MODE_WINDOWED;
 	modelist[0].dib = 1;
@@ -1451,7 +1453,7 @@ void VID_InitDIB ()
 		Con_SafePrintf("No fullscreen DIB modes found\n");
 }
 
-static void Check_Gamma (unsigned char *pal)
+static void Check_Gamma(unsigned char* pal)
 {
 	if (int i = COM_CheckParm("-gamma"); i == 0) {
 		if ((gl_renderer && strstr(gl_renderer, "Voodoo")) ||
@@ -1459,16 +1461,17 @@ static void Check_Gamma (unsigned char *pal)
 			vid_gamma = 1;
 		else
 			vid_gamma = 0.7f; // default to 0.7 on non-3dfx hardware
-	} else
-		vid_gamma = Q_atof(com_argv[i+1]);
+	}
+	else
+		vid_gamma = Q_atof(com_argv[i + 1]);
 
 	float	f, inf;
 	unsigned char	palette[768];
 
-	for (int i=0 ; i<768 ; i++)
+	for (int i = 0; i < 768; i++)
 	{
-		f = pow ( (pal[i]+1)/256.0 , vid_gamma );
-		inf = f*255 + 0.5;
+		f = pow((pal[i] + 1) / 256.0, vid_gamma);
+		inf = f * 255 + 0.5;
 		if (inf < 0)
 			inf = 0;
 		if (inf > 255)
@@ -1476,7 +1479,7 @@ static void Check_Gamma (unsigned char *pal)
 		palette[i] = inf;
 	}
 
-	memcpy (pal, palette, sizeof(palette));
+	memcpy(pal, palette, sizeof(palette));
 }
 
 /*
@@ -1484,31 +1487,31 @@ static void Check_Gamma (unsigned char *pal)
 VID_Init
 ===================
 */
-void	VID_Init (unsigned char *palette)
+void	VID_Init(unsigned char* palette)
 {
 	if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
 	{
 		Sys_Error("Couldn't initialize video subsystem: %s", SDL_GetError());
 	}
 
-	Cvar_RegisterVariable (&vid_mode);
-	Cvar_RegisterVariable (&vid_wait);
-	Cvar_RegisterVariable (&vid_nopageflip);
-	Cvar_RegisterVariable (&_vid_wait_override);
-	Cvar_RegisterVariable (&_vid_default_mode);
-	Cvar_RegisterVariable (&_vid_default_mode_win);
-	Cvar_RegisterVariable (&vid_config_x);
-	Cvar_RegisterVariable (&vid_config_y);
-	Cvar_RegisterVariable (&vid_stretch_by_2);
-	Cvar_RegisterVariable (&_windowed_mouse);
-	Cvar_RegisterVariable (&gl_ztrick);
+	Cvar_RegisterVariable(&vid_mode);
+	Cvar_RegisterVariable(&vid_wait);
+	Cvar_RegisterVariable(&vid_nopageflip);
+	Cvar_RegisterVariable(&_vid_wait_override);
+	Cvar_RegisterVariable(&_vid_default_mode);
+	Cvar_RegisterVariable(&_vid_default_mode_win);
+	Cvar_RegisterVariable(&vid_config_x);
+	Cvar_RegisterVariable(&vid_config_y);
+	Cvar_RegisterVariable(&vid_stretch_by_2);
+	Cvar_RegisterVariable(&_windowed_mouse);
+	Cvar_RegisterVariable(&gl_ztrick);
 
-	Cmd_AddCommand ("vid_nummodes", VID_NumModes_f);
-	Cmd_AddCommand ("vid_describecurrentmode", VID_DescribeCurrentMode_f);
-	Cmd_AddCommand ("vid_describemode", VID_DescribeMode_f);
-	Cmd_AddCommand ("vid_describemodes", VID_DescribeModes_f);
+	Cmd_AddCommand("vid_nummodes", VID_NumModes_f);
+	Cmd_AddCommand("vid_describecurrentmode", VID_DescribeCurrentMode_f);
+	Cmd_AddCommand("vid_describemode", VID_DescribeMode_f);
+	Cmd_AddCommand("vid_describemodes", VID_DescribeModes_f);
 
-	VID_InitDIB ();
+	VID_InitDIB();
 
 	if (COM_CheckParm("-window"))
 	{
@@ -1519,13 +1522,13 @@ void	VID_Init (unsigned char *palette)
 	else
 	{
 		if (nummodes == 1)
-			Sys_Error ("No RGB fullscreen modes available");
+			Sys_Error("No RGB fullscreen modes available");
 
 		windowed = false;
 
 		if (COM_CheckParm("-mode"))
 		{
-			vid_default = Q_atoi(com_argv[COM_CheckParm("-mode")+1]);
+			vid_default = Q_atoi(com_argv[COM_CheckParm("-mode") + 1]);
 		}
 		else
 		{
@@ -1550,7 +1553,7 @@ void	VID_Init (unsigned char *palette)
 
 				if (COM_CheckParm("-width"))
 				{
-					width = Q_atoi(com_argv[COM_CheckParm("-width")+1]);
+					width = Q_atoi(com_argv[COM_CheckParm("-width") + 1]);
 				}
 				else
 				{
@@ -1580,7 +1583,7 @@ void	VID_Init (unsigned char *palette)
 					height = 480;
 				}
 
-			// if they want to force it, add the specified mode to the list
+				// if they want to force it, add the specified mode to the list
 				if (COM_CheckParm("-force") && (nummodes < MAX_MODE_LIST))
 				{
 					modelist[nummodes].type = MS_FULLDIB;
@@ -1591,13 +1594,13 @@ void	VID_Init (unsigned char *palette)
 					modelist[nummodes].dib = 1;
 					modelist[nummodes].fullscreen = 1;
 					modelist[nummodes].bpp = bpp;
-					sprintf (modelist[nummodes].modedesc, "%dx%dx%d", width, height, bpp);
+					sprintf(modelist[nummodes].modedesc, "%dx%dx%d", width, height, bpp);
 
 					bool existingmode = false;
 
-					for (int i=nummodes; i<nummodes ; i++)
+					for (int i = nummodes; i < nummodes; i++)
 					{
-						if ((modelist[nummodes].width == modelist[i].width)   &&
+						if ((modelist[nummodes].width == modelist[i].width) &&
 							(modelist[nummodes].height == modelist[i].height) &&
 							(modelist[nummodes].bpp == modelist[i].bpp))
 						{
@@ -1618,9 +1621,9 @@ void	VID_Init (unsigned char *palette)
 				{
 					if (COM_CheckParm("-height"))
 					{
-						height = Q_atoi(com_argv[COM_CheckParm("-height")+1]);
+						height = Q_atoi(com_argv[COM_CheckParm("-height") + 1]);
 
-						for (int i=1, vid_default=0 ; i<nummodes ; i++)
+						for (int i = 1, vid_default = 0; i < nummodes; i++)
 						{
 							if ((modelist[i].width == width) &&
 								(modelist[i].height == height) &&
@@ -1634,7 +1637,7 @@ void	VID_Init (unsigned char *palette)
 					}
 					else
 					{
-						for (int i=1, vid_default=0 ; i<nummodes ; i++)
+						for (int i = 1, vid_default = 0; i < nummodes; i++)
 						{
 							if ((modelist[i].width == width) && (modelist[i].bpp == bpp))
 							{
@@ -1709,7 +1712,7 @@ void	VID_Init (unsigned char *palette)
 	vid_initialized = true;
 
 	if (int i = COM_CheckParm("-conwidth"); i != 0)
-		vid.conwidth = Q_atoi(com_argv[i+1]);
+		vid.conwidth = Q_atoi(com_argv[i + 1]);
 	else
 		vid.conwidth = 640;
 
@@ -1719,35 +1722,35 @@ void	VID_Init (unsigned char *palette)
 		vid.conwidth = 320;
 
 	// pick a conheight that matches with correct aspect
-	vid.conheight = vid.conwidth*3 / 4;
+	vid.conheight = vid.conwidth * 3 / 4;
 
 	if (int i = COM_CheckParm("-conheight"); i != 0)
-		vid.conheight = Q_atoi(com_argv[i+1]);
+		vid.conheight = Q_atoi(com_argv[i + 1]);
 	if (vid.conheight < 200)
 		vid.conheight = 200;
 
 	vid.maxwarpwidth = WARP_WIDTH;
 	vid.maxwarpheight = WARP_HEIGHT;
 	vid.colormap = host_colormap;
-	vid.fullbright = 256 - LittleLong (*((int *)vid.colormap + 2048));
+	vid.fullbright = 256 - LittleLong(*((int*)vid.colormap + 2048));
 
 	Check_Gamma(palette);
-	VID_SetPalette (palette);
+	VID_SetPalette(palette);
 
-	VID_SetMode (vid_default, palette);
+	VID_SetMode(vid_default, palette);
 
-	GL_Init ();
+	GL_Init();
 
 	char	gldir[MAX_OSPATH];
-	sprintf (gldir, "%s/glquake", com_gamedir);
-	Sys_mkdir (gldir);
+	sprintf(gldir, "%s/glquake", com_gamedir);
+	Sys_mkdir(gldir);
 
 	vid_realmode = vid_modenum;
 
 	vid_menudrawfn = VID_MenuDraw;
 	vid_menukeyfn = VID_MenuKey;
 
-	strcpy (badmode.modedesc, "Bad mode");
+	strcpy(badmode.modedesc, "Bad mode");
 	vid_canalttab = true;
 
 	if (COM_CheckParm("-fullsbar"))
@@ -1759,19 +1762,19 @@ void	VID_Init (unsigned char *palette)
 // Video menu stuff
 //========================================================
 
-extern void M_Menu_Options_f (void);
-extern void M_Print (int cx, int cy, const char *str);
-extern void M_PrintWhite (int cx, int cy, const char *str);
-extern void M_DrawCharacter (int cx, int line, int num);
-extern void M_DrawTransPic (int x, int y, qpic_t *pic);
-extern void M_DrawPic (int x, int y, qpic_t *pic);
+extern void M_Menu_Options_f(void);
+extern void M_Print(int cx, int cy, const char* str);
+extern void M_PrintWhite(int cx, int cy, const char* str);
+extern void M_DrawCharacter(int cx, int line, int num);
+extern void M_DrawTransPic(int x, int y, qpic_t* pic);
+extern void M_DrawPic(int x, int y, qpic_t* pic);
 
 static int	vid_line, vid_wmodes;
 
 typedef struct
 {
 	int		modenum;
-	char	*desc;
+	char* desc;
 	int		iscur;
 } modedesc_t;
 
@@ -1786,17 +1789,17 @@ static modedesc_t	modedescs[MAX_MODEDESCS];
 VID_MenuDraw
 ================
 */
-void VID_MenuDraw (void)
+void VID_MenuDraw(void)
 {
-	auto p = Draw_CachePic ("gfx/vidmodes.lmp");
-	M_DrawPic ( (320-p->width)/2, 4, p);
+	auto p = Draw_CachePic("gfx/vidmodes.lmp");
+	M_DrawPic((320 - p->width) / 2, 4, p);
 
 	vid_wmodes = 0;
-	const int lnummodes = VID_NumModes ();
-	
-	for (int i=1 ; (i<lnummodes) && (vid_wmodes < MAX_MODEDESCS) ; i++)
+	const int lnummodes = VID_NumModes();
+
+	for (int i = 1; (i < lnummodes) && (vid_wmodes < MAX_MODEDESCS); i++)
 	{
-		auto ptr = VID_GetModeDescription (i);
+		auto ptr = VID_GetModeDescription(i);
 
 		const int k = vid_wmodes;
 
@@ -1813,19 +1816,19 @@ void VID_MenuDraw (void)
 
 	if (vid_wmodes > 0)
 	{
-		M_Print (2*8, 36+0*8, "Fullscreen Modes (WIDTHxHEIGHTxBPP)");
+		M_Print(2 * 8, 36 + 0 * 8, "Fullscreen Modes (WIDTHxHEIGHTxBPP)");
 
 		int column = 8;
-		int row = 36+2*8;
+		int row = 36 + 2 * 8;
 
-		for (int i=0 ; i<vid_wmodes ; i++)
+		for (int i = 0; i < vid_wmodes; i++)
 		{
 			if (modedescs[i].iscur)
-				M_PrintWhite (column, row, modedescs[i].desc);
+				M_PrintWhite(column, row, modedescs[i].desc);
 			else
-				M_Print (column, row, modedescs[i].desc);
+				M_Print(column, row, modedescs[i].desc);
 
-			column += 13*8;
+			column += 13 * 8;
 
 			if ((i % VID_ROW_SIZE) == (VID_ROW_SIZE - 1))
 			{
@@ -1835,14 +1838,14 @@ void VID_MenuDraw (void)
 		}
 	}
 
-	M_Print (3*8, 36 + MODE_AREA_HEIGHT * 8 + 8*2,
-			 "Video modes must be set from the");
-	M_Print (3*8, 36 + MODE_AREA_HEIGHT * 8 + 8*3,
-			 "command line with -width <width>");
-	M_Print (3*8, 36 + MODE_AREA_HEIGHT * 8 + 8*4,
-			 "and -bpp <bits-per-pixel>");
-	M_Print (3*8, 36 + MODE_AREA_HEIGHT * 8 + 8*6,
-			 "Select windowed mode with -window");
+	M_Print(3 * 8, 36 + MODE_AREA_HEIGHT * 8 + 8 * 2,
+		"Video modes must be set from the");
+	M_Print(3 * 8, 36 + MODE_AREA_HEIGHT * 8 + 8 * 3,
+		"command line with -width <width>");
+	M_Print(3 * 8, 36 + MODE_AREA_HEIGHT * 8 + 8 * 4,
+		"and -bpp <bits-per-pixel>");
+	M_Print(3 * 8, 36 + MODE_AREA_HEIGHT * 8 + 8 * 6,
+		"Select windowed mode with -window");
 }
 
 
@@ -1851,13 +1854,13 @@ void VID_MenuDraw (void)
 VID_MenuKey
 ================
 */
-void VID_MenuKey (int key)
+void VID_MenuKey(int key)
 {
 	switch (key)
 	{
 	case K_ESCAPE:
-		S_LocalSound ("misc/menu1.wav");
-		M_Menu_Options_f ();
+		S_LocalSound("misc/menu1.wav");
+		M_Menu_Options_f();
 		break;
 
 	default:

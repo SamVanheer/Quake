@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -63,13 +63,13 @@ typedef struct
 } lumpinfo_t;
 
 extern	int			wad_numlumps;
-extern	lumpinfo_t	*wad_lumps;
-extern	byte		*wad_base;
+extern	lumpinfo_t* wad_lumps;
+extern	byte* wad_base;
 
-void	W_LoadWadFile (const char *filename);
-void	W_CleanupName (const char *in, char *out);
-lumpinfo_t	*W_GetLumpinfo (const char *name);
-void	*W_GetLumpName (const char *name);
-void	*W_GetLumpNum (int num);
+void	W_LoadWadFile(const char* filename);
+void	W_CleanupName(const char* in, char* out);
+lumpinfo_t* W_GetLumpinfo(const char* name);
+void* W_GetLumpName(const char* name);
+void* W_GetLumpNum(int num);
 
-void SwapPic (qpic_t *pic);
+void SwapPic(qpic_t* pic);

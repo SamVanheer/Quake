@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -45,9 +45,9 @@ extern menustate_t m_state;
 //
 // menus
 //
-void M_Init (void);
-void M_Keydown (int key);
-void M_Draw (void);
-void M_ToggleMenu_f (void);
+void M_Init(void);
+void M_Keydown(int key);
+void M_Draw(void);
+void M_ToggleMenu_f(void);
 
 

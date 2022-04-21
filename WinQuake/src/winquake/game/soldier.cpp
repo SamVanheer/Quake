@@ -345,19 +345,19 @@ void army_pain(edict_t* self, edict_t* attacker, float damage)
 	if (r < 0.2)
 	{
 		self->v.pain_finished = pr_global_struct->time + 0.6;
-		army_pain1 (self);
+		army_pain1(self);
 		PF_sound(self, CHAN_VOICE, "soldier/pain1.wav", 1, ATTN_NORM);
 	}
 	else if (r < 0.6)
 	{
 		self->v.pain_finished = pr_global_struct->time + 1.1;
-		army_painb1 (self);
+		army_painb1(self);
 		PF_sound(self, CHAN_VOICE, "soldier/pain2.wav", 1, ATTN_NORM);
 	}
 	else
 	{
 		self->v.pain_finished = pr_global_struct->time + 1.1;
-		army_painc1 (self);
+		army_painc1(self);
 		PF_sound(self, CHAN_VOICE, "soldier/pain2.wav", 1, ATTN_NORM);
 	}
 }
@@ -367,37 +367,37 @@ LINK_FUNCTION_TO_NAME(army_pain);
 void army_fire(edict_t* self)
 {
 	ai_face(self);
-	
+
 	PF_sound(self, CHAN_WEAPON, "soldier/sattck1.wav", 1, ATTN_NORM);
 
-// fire somewhat behind the player, so a dodging player is harder to hit
+	// fire somewhat behind the player, so a dodging player is harder to hit
 	auto en = self->v.enemy;
-	
-	auto dir = AsVector(en->v.origin) - AsVector(en->v.velocity)*0.2f;
-	PF_normalize (dir - AsVector(self->v.origin), dir);
-	
+
+	auto dir = AsVector(en->v.origin) - AsVector(en->v.velocity) * 0.2f;
+	PF_normalize(dir - AsVector(self->v.origin), dir);
+
 	FireBullets(self, 4, dir, Vector3D{0.1f, 0.1f, 0});
 }
 
 void army_die(edict_t* self)
 {
-// check for gib
+	// check for gib
 	if (self->v.health < -35)
 	{
-		PF_sound (self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
-		ThrowHead (self, "progs/h_guard.mdl", self->v.health);
-		ThrowGib (self, "progs/gib1.mdl", self->v.health);
-		ThrowGib (self, "progs/gib2.mdl", self->v.health);
-		ThrowGib (self, "progs/gib3.mdl", self->v.health);
+		PF_sound(self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
+		ThrowHead(self, "progs/h_guard.mdl", self->v.health);
+		ThrowGib(self, "progs/gib1.mdl", self->v.health);
+		ThrowGib(self, "progs/gib2.mdl", self->v.health);
+		ThrowGib(self, "progs/gib3.mdl", self->v.health);
 		return;
 	}
 
-// regular death
+	// regular death
 	PF_sound(self, CHAN_VOICE, "soldier/death1.wav", 1, ATTN_NORM);
 	if (PF_random() < 0.5)
-		army_die1 (self);
+		army_die1(self);
 	else
-		army_cdie1 (self);
+		army_cdie1(self);
 }
 
 LINK_FUNCTION_TO_NAME(army_die);
@@ -405,24 +405,24 @@ LINK_FUNCTION_TO_NAME(army_die);
 /*QUAKED monster_army (1 0 0) (-16 -16 -24) (16 16 40) Ambush
 */
 void monster_army(edict_t* self)
-{	
+{
 	if (pr_global_struct->deathmatch)
 	{
 		PF_Remove(self);
 		return;
 	}
-	PF_precache_model ("progs/soldier.mdl");
-	PF_precache_model ("progs/h_guard.mdl");
-	PF_precache_model ("progs/gib1.mdl");
-	PF_precache_model ("progs/gib2.mdl");
-	PF_precache_model ("progs/gib3.mdl");
+	PF_precache_model("progs/soldier.mdl");
+	PF_precache_model("progs/h_guard.mdl");
+	PF_precache_model("progs/gib1.mdl");
+	PF_precache_model("progs/gib2.mdl");
+	PF_precache_model("progs/gib3.mdl");
 
-	PF_precache_sound ("soldier/death1.wav");
-	PF_precache_sound ("soldier/idle.wav");
-	PF_precache_sound ("soldier/pain1.wav");
-	PF_precache_sound ("soldier/pain2.wav");
-	PF_precache_sound ("soldier/sattck1.wav");
-	PF_precache_sound ("soldier/sight1.wav");
+	PF_precache_sound("soldier/death1.wav");
+	PF_precache_sound("soldier/idle.wav");
+	PF_precache_sound("soldier/pain1.wav");
+	PF_precache_sound("soldier/pain2.wav");
+	PF_precache_sound("soldier/sattck1.wav");
+	PF_precache_sound("soldier/sight1.wav");
 
 	PF_precache_sound("player/udeath.wav");		// gib death
 
@@ -430,9 +430,9 @@ void monster_army(edict_t* self)
 	self->v.solid = SOLID_SLIDEBOX;
 	self->v.movetype = MOVETYPE_STEP;
 
-	PF_setmodel (self, "progs/soldier.mdl");
+	PF_setmodel(self, "progs/soldier.mdl");
 
-	PF_setsize (self, Vector3D{-16, -16, -24}, Vector3D{16, 16, 40});
+	PF_setsize(self, Vector3D{-16, -16, -24}, Vector3D{16, 16, 40});
 	self->v.health = 30;
 
 	self->v.th_stand = army_stand1;
@@ -443,7 +443,7 @@ void monster_army(edict_t* self)
 	self->v.th_die = army_die;
 	self->v.animations_get = &army_animations_get;
 
-	walkmonster_start (self);
+	walkmonster_start(self);
 }
 
 LINK_ENTITY_TO_CLASS(monster_army);

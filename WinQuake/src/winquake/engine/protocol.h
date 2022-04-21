@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -92,7 +92,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define	svc_stufftext		9	// [string] stuffed into client's console buffer
 								// the string should be \n terminated
 #define	svc_setangle		10	// [angle3] set the view angle to this absolute value
-	
+
 #define	svc_serverinfo		11	// [long] version
 						// [string] signon string
 						// [string]..[0]model cache
@@ -105,11 +105,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define	svc_updatecolors	17	// [byte] [byte]
 #define	svc_particle		18	// [vec3] <variable>
 #define	svc_damage			19
-	
+
 #define	svc_spawnstatic		20
 //	svc_spawnbinary		21
 #define	svc_spawnbaseline	22
-	
+
 #define	svc_temp_entity		23
 
 #define	svc_setpause		24	// [byte] on / off

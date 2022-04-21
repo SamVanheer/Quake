@@ -262,12 +262,12 @@ match (string)self.target and call their .use function
 */
 void SUB_UseTargets(edict_t* self, edict_t* other)
 {
-//
-// check for a delay
-//
+	//
+	// check for a delay
+	//
 	if (self->v.delay)
 	{
-	// create a temp object to fire at a later time
+		// create a temp object to fire at a later time
 		auto t = PF_Spawn();
 		t->v.classname = "DelayedUse";
 		t->v.nextthink = pr_global_struct->time + self->v.delay;

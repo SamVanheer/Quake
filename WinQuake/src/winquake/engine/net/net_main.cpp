@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -22,8 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "net_vcr.h"
 
-qsocket_t	*net_activeSockets = NULL;
-qsocket_t	*net_freeSockets = NULL;
+qsocket_t* net_activeSockets = NULL;
+qsocket_t* net_freeSockets = NULL;
 int			net_numsockets = 0;
 
 bool		tcpipAvailable = false;
@@ -89,9 +89,9 @@ Called by drivers when a new communications endpoint is required
 The sequence and buffer fields will be filled in properly
 ===================
 */
-qsocket_t *NET_NewQSocket (void)
+qsocket_t* NET_NewQSocket(void)
 {
-	qsocket_t	*sock;
+	qsocket_t* sock;
 
 	if (net_freeSockets == NULL)
 		return NULL;
@@ -109,7 +109,7 @@ qsocket_t *NET_NewQSocket (void)
 
 	sock->disconnected = false;
 	sock->connecttime = net_time;
-	Q_strcpy (sock->address,"UNSET ADDRESS");
+	Q_strcpy(sock->address, "UNSET ADDRESS");
 	sock->driver = net_driverlevel;
 	sock->socket = 0;
 	sock->driverdata = NULL;
@@ -128,9 +128,9 @@ qsocket_t *NET_NewQSocket (void)
 }
 
 
-void NET_FreeQSocket(qsocket_t *sock)
+void NET_FreeQSocket(qsocket_t* sock)
 {
-	qsocket_t	*s;
+	qsocket_t* s;
 
 	// remove it from active list
 	if (sock == net_activeSockets)
@@ -144,7 +144,7 @@ void NET_FreeQSocket(qsocket_t *sock)
 				break;
 			}
 		if (!s)
-			Sys_Error ("NET_FreeQSocket: not active\n");
+			Sys_Error("NET_FreeQSocket: not active\n");
 	}
 
 	// add it to free list
@@ -154,38 +154,38 @@ void NET_FreeQSocket(qsocket_t *sock)
 }
 
 
-static void NET_Listen_f (void)
+static void NET_Listen_f(void)
 {
-	if (Cmd_Argc () != 2)
+	if (Cmd_Argc() != 2)
 	{
-		Con_Printf ("\"listen\" is \"%d\"\n", static_cast<int>(listening));
+		Con_Printf("\"listen\" is \"%d\"\n", static_cast<int>(listening));
 		return;
 	}
 
 	listening = Q_atoi(Cmd_Argv(1)) != 0;
 
-	for (net_driverlevel=0 ; net_driverlevel<net_numdrivers; net_driverlevel++)
+	for (net_driverlevel = 0; net_driverlevel < net_numdrivers; net_driverlevel++)
 	{
 		if (!net_drivers[net_driverlevel].initialized)
 			continue;
-		dfunc.Listen (listening);
+		dfunc.Listen(listening);
 	}
 }
 
 
-static void MaxPlayers_f (void)
+static void MaxPlayers_f(void)
 {
 	int 	n;
 
-	if (Cmd_Argc () != 2)
+	if (Cmd_Argc() != 2)
 	{
-		Con_Printf ("\"maxplayers\" is \"%u\"\n", svs.maxclients);
+		Con_Printf("\"maxplayers\" is \"%u\"\n", svs.maxclients);
 		return;
 	}
 
 	if (sv.active)
 	{
-		Con_Printf ("maxplayers can not be changed while a server is running.\n");
+		Con_Printf("maxplayers can not be changed while a server is running.\n");
 		return;
 	}
 
@@ -195,37 +195,37 @@ static void MaxPlayers_f (void)
 	if (n > svs.maxclientslimit)
 	{
 		n = svs.maxclientslimit;
-		Con_Printf ("\"maxplayers\" set to \"%u\"\n", n);
+		Con_Printf("\"maxplayers\" set to \"%u\"\n", n);
 	}
 
 	if ((n == 1) && listening)
-		Cbuf_AddText ("listen 0\n");
+		Cbuf_AddText("listen 0\n");
 
 	if ((n > 1) && (!listening))
-		Cbuf_AddText ("listen 1\n");
+		Cbuf_AddText("listen 1\n");
 
 	svs.maxclients = n;
 	if (n == 1)
-		Cvar_Set ("deathmatch", "0");
+		Cvar_Set("deathmatch", "0");
 	else
-		Cvar_Set ("deathmatch", "1");
+		Cvar_Set("deathmatch", "1");
 }
 
 
-static void NET_Port_f (void)
+static void NET_Port_f(void)
 {
 	int 	n;
 
-	if (Cmd_Argc () != 2)
+	if (Cmd_Argc() != 2)
 	{
-		Con_Printf ("\"port\" is \"%u\"\n", net_hostport);
+		Con_Printf("\"port\" is \"%u\"\n", net_hostport);
 		return;
 	}
 
 	n = Q_atoi(Cmd_Argv(1));
 	if (n < 1 || n > 65534)
 	{
-		Con_Printf ("Bad value, must be between 1 and 65534\n");
+		Con_Printf("Bad value, must be between 1 and 65534\n");
 		return;
 	}
 
@@ -235,8 +235,8 @@ static void NET_Port_f (void)
 	if (listening)
 	{
 		// force a change to the new port
-		Cbuf_AddText ("listen 0\n");
-		Cbuf_AddText ("listen 1\n");
+		Cbuf_AddText("listen 0\n");
+		Cbuf_AddText("listen 1\n");
 	}
 }
 
@@ -273,12 +273,12 @@ static void PrintSlistTrailer(void)
 }
 
 
-void NET_Slist_f (void)
+void NET_Slist_f(void)
 {
 	if (slistInProgress)
 		return;
 
-	if (! slistSilent)
+	if (!slistSilent)
 	{
 		Con_Printf("Looking for Quake servers...\n");
 		PrintSlistHeader();
@@ -296,13 +296,13 @@ void NET_Slist_f (void)
 
 static void Slist_Send(void)
 {
-	for (net_driverlevel=0; net_driverlevel < net_numdrivers; net_driverlevel++)
+	for (net_driverlevel = 0; net_driverlevel < net_numdrivers; net_driverlevel++)
 	{
 		if (!slistLocal && net_driverlevel == 0)
 			continue;
 		if (net_drivers[net_driverlevel].initialized == false)
 			continue;
-		dfunc.SearchForHosts (true);
+		dfunc.SearchForHosts(true);
 	}
 
 	if ((Sys_FloatTime() - slistStartTime) < 0.5)
@@ -312,16 +312,16 @@ static void Slist_Send(void)
 
 static void Slist_Poll(void)
 {
-	for (net_driverlevel=0; net_driverlevel < net_numdrivers; net_driverlevel++)
+	for (net_driverlevel = 0; net_driverlevel < net_numdrivers; net_driverlevel++)
 	{
 		if (!slistLocal && net_driverlevel == 0)
 			continue;
 		if (net_drivers[net_driverlevel].initialized == false)
 			continue;
-		dfunc.SearchForHosts (false);
+		dfunc.SearchForHosts(false);
 	}
 
-	if (! slistSilent)
+	if (!slistSilent)
 		PrintSlist();
 
 	if ((Sys_FloatTime() - slistStartTime) < 1.5)
@@ -330,7 +330,7 @@ static void Slist_Poll(void)
 		return;
 	}
 
-	if (! slistSilent)
+	if (!slistSilent)
 		PrintSlistTrailer();
 	slistInProgress = false;
 	slistSilent = false;
@@ -347,9 +347,9 @@ NET_Connect
 int hostCacheCount = 0;
 hostcache_t hostcache[HOSTCACHESIZE];
 
-qsocket_t *NET_Connect (const char *host)
+qsocket_t* NET_Connect(const char* host)
 {
-	qsocket_t		*ret;
+	qsocket_t* ret;
 	int				n;
 	int				numdrivers = net_numdrivers;
 
@@ -360,7 +360,7 @@ qsocket_t *NET_Connect (const char *host)
 
 	if (host)
 	{
-		if (Q_strcasecmp (host, "local") == 0)
+		if (Q_strcasecmp(host, "local") == 0)
 		{
 			numdrivers = 1;
 			goto JustDoIt;
@@ -369,7 +369,7 @@ qsocket_t *NET_Connect (const char *host)
 		if (hostCacheCount)
 		{
 			for (n = 0; n < hostCacheCount; n++)
-				if (Q_strcasecmp (host, hostcache[n].name) == 0)
+				if (Q_strcasecmp(host, hostcache[n].name) == 0)
 				{
 					host = hostcache[n].cname;
 					break;
@@ -380,9 +380,9 @@ qsocket_t *NET_Connect (const char *host)
 	}
 
 	slistSilent = host != nullptr;
-	NET_Slist_f ();
+	NET_Slist_f();
 
-	while(slistInProgress)
+	while (slistInProgress)
 		NET_Poll();
 
 	if (host == NULL)
@@ -395,18 +395,18 @@ qsocket_t *NET_Connect (const char *host)
 
 	if (hostCacheCount)
 		for (n = 0; n < hostCacheCount; n++)
-			if (Q_strcasecmp (host, hostcache[n].name) == 0)
+			if (Q_strcasecmp(host, hostcache[n].name) == 0)
 			{
 				host = hostcache[n].cname;
 				break;
 			}
 
 JustDoIt:
-	for (net_driverlevel=0 ; net_driverlevel<numdrivers; net_driverlevel++)
+	for (net_driverlevel = 0; net_driverlevel < numdrivers; net_driverlevel++)
 	{
 		if (net_drivers[net_driverlevel].initialized == false)
 			continue;
-		ret = dfunc.Connect (host);
+		ret = dfunc.Connect(host);
 		if (ret)
 			return ret;
 	}
@@ -418,7 +418,7 @@ JustDoIt:
 		PrintSlist();
 		PrintSlistTrailer();
 	}
-	
+
 	return NULL;
 }
 
@@ -436,19 +436,19 @@ struct
 	long	session;
 } vcrConnect;
 
-qsocket_t *NET_CheckNewConnections (void)
+qsocket_t* NET_CheckNewConnections(void)
 {
-	qsocket_t	*ret;
+	qsocket_t* ret;
 
 	SetNetTime();
 
-	for (net_driverlevel=0 ; net_driverlevel<net_numdrivers; net_driverlevel++)
+	for (net_driverlevel = 0; net_driverlevel < net_numdrivers; net_driverlevel++)
 	{
 		if (!net_drivers[net_driverlevel].initialized)
 			continue;
 		if (net_driverlevel && !listening)
 			continue;
-		ret = dfunc.CheckNewConnections ();
+		ret = dfunc.CheckNewConnections();
 		if (ret)
 		{
 			if (recording)
@@ -456,19 +456,19 @@ qsocket_t *NET_CheckNewConnections (void)
 				vcrConnect.time = host_time;
 				vcrConnect.op = VCR_OP_CONNECT;
 				vcrConnect.session = (long)ret;
-				Sys_FileWrite (vcrFile, &vcrConnect, sizeof(vcrConnect));
-				Sys_FileWrite (vcrFile, ret->address, NET_NAMELEN);
+				Sys_FileWrite(vcrFile, &vcrConnect, sizeof(vcrConnect));
+				Sys_FileWrite(vcrFile, ret->address, NET_NAMELEN);
 			}
 			return ret;
 		}
 	}
-	
+
 	if (recording)
 	{
 		vcrConnect.time = host_time;
 		vcrConnect.op = VCR_OP_CONNECT;
 		vcrConnect.session = 0;
-		Sys_FileWrite (vcrFile, &vcrConnect, sizeof(vcrConnect));
+		Sys_FileWrite(vcrFile, &vcrConnect, sizeof(vcrConnect));
 	}
 
 	return NULL;
@@ -479,7 +479,7 @@ qsocket_t *NET_CheckNewConnections (void)
 NET_Close
 ===================
 */
-void NET_Close (qsocket_t *sock)
+void NET_Close(qsocket_t* sock)
 {
 	if (!sock)
 		return;
@@ -490,7 +490,7 @@ void NET_Close (qsocket_t *sock)
 	SetNetTime();
 
 	// call the driver_Close function
-	sfunc.Close (sock);
+	sfunc.Close(sock);
 
 	NET_FreeQSocket(sock);
 }
@@ -517,9 +517,9 @@ struct
 	int		len;
 } vcrGetMessage;
 
-extern void PrintStats(qsocket_t *s);
+extern void PrintStats(qsocket_t* s);
 
-int	NET_GetMessage (qsocket_t *sock)
+int	NET_GetMessage(qsocket_t* sock)
 {
 	int ret;
 
@@ -565,8 +565,8 @@ int	NET_GetMessage (qsocket_t *sock)
 			vcrGetMessage.session = (long)sock;
 			vcrGetMessage.ret = ret;
 			vcrGetMessage.len = net_message.cursize;
-			Sys_FileWrite (vcrFile, &vcrGetMessage, 24);
-			Sys_FileWrite (vcrFile, net_message.data, net_message.cursize);
+			Sys_FileWrite(vcrFile, &vcrGetMessage, 24);
+			Sys_FileWrite(vcrFile, net_message.data, net_message.cursize);
 		}
 	}
 	else
@@ -577,7 +577,7 @@ int	NET_GetMessage (qsocket_t *sock)
 			vcrGetMessage.op = VCR_OP_GETMESSAGE;
 			vcrGetMessage.session = (long)sock;
 			vcrGetMessage.ret = ret;
-			Sys_FileWrite (vcrFile, &vcrGetMessage, 20);
+			Sys_FileWrite(vcrFile, &vcrGetMessage, 20);
 		}
 	}
 
@@ -604,10 +604,10 @@ struct
 	int		r;
 } vcrSendMessage;
 
-int NET_SendMessage (qsocket_t *sock, sizebuf_t *data)
+int NET_SendMessage(qsocket_t* sock, sizebuf_t* data)
 {
 	int		r;
-	
+
 	if (!sock)
 		return -1;
 
@@ -628,17 +628,17 @@ int NET_SendMessage (qsocket_t *sock, sizebuf_t *data)
 		vcrSendMessage.op = VCR_OP_SENDMESSAGE;
 		vcrSendMessage.session = (long)sock;
 		vcrSendMessage.r = r;
-		Sys_FileWrite (vcrFile, &vcrSendMessage, 20);
+		Sys_FileWrite(vcrFile, &vcrSendMessage, 20);
 	}
-	
+
 	return r;
 }
 
 
-int NET_SendUnreliableMessage (qsocket_t *sock, sizebuf_t *data)
+int NET_SendUnreliableMessage(qsocket_t* sock, sizebuf_t* data)
 {
 	int		r;
-	
+
 	if (!sock)
 		return -1;
 
@@ -659,9 +659,9 @@ int NET_SendUnreliableMessage (qsocket_t *sock, sizebuf_t *data)
 		vcrSendMessage.op = VCR_OP_SENDMESSAGE;
 		vcrSendMessage.session = (long)sock;
 		vcrSendMessage.r = r;
-		Sys_FileWrite (vcrFile, &vcrSendMessage, 20);
+		Sys_FileWrite(vcrFile, &vcrSendMessage, 20);
 	}
-	
+
 	return r;
 }
 
@@ -674,10 +674,10 @@ Returns true or false if the given qsocket can currently accept a
 message to be transmitted.
 ==================
 */
-bool NET_CanSendMessage (qsocket_t *sock)
+bool NET_CanSendMessage(qsocket_t* sock)
 {
 	bool	r;
-	
+
 	if (!sock)
 		return false;
 
@@ -687,29 +687,29 @@ bool NET_CanSendMessage (qsocket_t *sock)
 	SetNetTime();
 
 	r = sfunc.CanSendMessage(sock);
-	
+
 	if (recording)
 	{
 		vcrSendMessage.time = host_time;
 		vcrSendMessage.op = VCR_OP_CANSENDMESSAGE;
 		vcrSendMessage.session = (long)sock;
 		vcrSendMessage.r = r;
-		Sys_FileWrite (vcrFile, &vcrSendMessage, 20);
+		Sys_FileWrite(vcrFile, &vcrSendMessage, 20);
 	}
-	
+
 	return r;
 }
 
 
-int NET_SendToAll(sizebuf_t *data, int blocktime)
+int NET_SendToAll(sizebuf_t* data, int blocktime)
 {
 	double		start;
 	int			i;
 	int			count = 0;
-	bool		state1 [MAX_SCOREBOARD];
-	bool		state2 [MAX_SCOREBOARD];
+	bool		state1[MAX_SCOREBOARD];
+	bool		state2[MAX_SCOREBOARD];
 
-	for (i=0, host_client = svs.clients ; i<svs.maxclients ; i++, host_client++)
+	for (i = 0, host_client = svs.clients; i < svs.maxclients; i++, host_client++)
 	{
 		if (!host_client->netconnection)
 			continue;
@@ -737,32 +737,32 @@ int NET_SendToAll(sizebuf_t *data, int blocktime)
 	while (count)
 	{
 		count = 0;
-		for (i=0, host_client = svs.clients ; i<svs.maxclients ; i++, host_client++)
+		for (i = 0, host_client = svs.clients; i < svs.maxclients; i++, host_client++)
 		{
-			if (! state1[i])
+			if (!state1[i])
 			{
-				if (NET_CanSendMessage (host_client->netconnection))
+				if (NET_CanSendMessage(host_client->netconnection))
 				{
 					state1[i] = true;
 					NET_SendMessage(host_client->netconnection, data);
 				}
 				else
 				{
-					NET_GetMessage (host_client->netconnection);
+					NET_GetMessage(host_client->netconnection);
 				}
 				count++;
 				continue;
 			}
 
-			if (! state2[i])
+			if (!state2[i])
 			{
-				if (NET_CanSendMessage (host_client->netconnection))
+				if (NET_CanSendMessage(host_client->netconnection))
 				{
 					state2[i] = true;
 				}
 				else
 				{
-					NET_GetMessage (host_client->netconnection);
+					NET_GetMessage(host_client->netconnection);
 				}
 				count++;
 				continue;
@@ -783,11 +783,11 @@ NET_Init
 ====================
 */
 
-void NET_Init (void)
+void NET_Init(void)
 {
 	int			i;
 	int			controlSocket;
-	qsocket_t	*s;
+	qsocket_t* s;
 
 	if (COM_CheckParm("-playback"))
 	{
@@ -798,16 +798,16 @@ void NET_Init (void)
 	if (COM_CheckParm("-record"))
 		recording = true;
 
-	i = COM_CheckParm ("-port");
+	i = COM_CheckParm("-port");
 	if (!i)
-		i = COM_CheckParm ("-udpport");
+		i = COM_CheckParm("-udpport");
 
 	if (i)
 	{
-		if (i < com_argc-1)
-			DEFAULTnet_hostport = Q_atoi (com_argv[i+1]);
+		if (i < com_argc - 1)
+			DEFAULTnet_hostport = Q_atoi(com_argv[i + 1]);
 		else
-			Sys_Error ("NET_Init: you must specify a number after -port");
+			Sys_Error("NET_Init: you must specify a number after -port");
 	}
 	net_hostport = DEFAULTnet_hostport;
 
@@ -821,37 +821,37 @@ void NET_Init (void)
 
 	for (i = 0; i < net_numsockets; i++)
 	{
-		s = (qsocket_t *)Hunk_AllocName(sizeof(qsocket_t), "qsocket");
+		s = (qsocket_t*)Hunk_AllocName(sizeof(qsocket_t), "qsocket");
 		s->next = net_freeSockets;
 		net_freeSockets = s;
 		s->disconnected = true;
 	}
 
 	// allocate space for network message buffer
-	SZ_Alloc (&net_message, NET_MAXMESSAGE);
+	SZ_Alloc(&net_message, NET_MAXMESSAGE);
 
-	Cvar_RegisterVariable (&net_messagetimeout);
-	Cvar_RegisterVariable (&hostname);
+	Cvar_RegisterVariable(&net_messagetimeout);
+	Cvar_RegisterVariable(&hostname);
 #ifdef IDGODS
-	Cvar_RegisterVariable (&idgods);
+	Cvar_RegisterVariable(&idgods);
 #endif
 
-	Cmd_AddCommand ("slist", NET_Slist_f);
-	Cmd_AddCommand ("listen", NET_Listen_f);
-	Cmd_AddCommand ("maxplayers", MaxPlayers_f);
-	Cmd_AddCommand ("port", NET_Port_f);
+	Cmd_AddCommand("slist", NET_Slist_f);
+	Cmd_AddCommand("listen", NET_Listen_f);
+	Cmd_AddCommand("maxplayers", MaxPlayers_f);
+	Cmd_AddCommand("port", NET_Port_f);
 
 	// initialize all the drivers
-	for (net_driverlevel=0 ; net_driverlevel<net_numdrivers ; net_driverlevel++)
-		{
+	for (net_driverlevel = 0; net_driverlevel < net_numdrivers; net_driverlevel++)
+	{
 		controlSocket = net_drivers[net_driverlevel].Init();
 		if (controlSocket == -1)
 			continue;
 		net_drivers[net_driverlevel].initialized = true;
 		net_drivers[net_driverlevel].controlSock = controlSocket;
 		if (listening)
-			net_drivers[net_driverlevel].Listen (true);
-		}
+			net_drivers[net_driverlevel].Listen(true);
+	}
 
 	if (*my_tcpip_address)
 		Con_DPrintf("TCP/IP address %s\n", my_tcpip_address);
@@ -863,40 +863,40 @@ NET_Shutdown
 ====================
 */
 
-void		NET_Shutdown (void)
+void		NET_Shutdown(void)
 {
-	qsocket_t	*sock;
+	qsocket_t* sock;
 
 	SetNetTime();
 
 	for (sock = net_activeSockets; sock; sock = sock->next)
 		NET_Close(sock);
 
-//
-// shutdown the drivers
-//
+	//
+	// shutdown the drivers
+	//
 	for (net_driverlevel = 0; net_driverlevel < net_numdrivers; net_driverlevel++)
 	{
 		if (net_drivers[net_driverlevel].initialized == true)
 		{
-			net_drivers[net_driverlevel].Shutdown ();
+			net_drivers[net_driverlevel].Shutdown();
 			net_drivers[net_driverlevel].initialized = false;
 		}
 	}
 
 	if (vcrFile != -1)
 	{
-		Con_Printf ("Closing vcrfile.\n");
+		Con_Printf("Closing vcrfile.\n");
 		Sys_FileClose(vcrFile);
 	}
 }
 
 
-static PollProcedure *pollProcedureList = NULL;
+static PollProcedure* pollProcedureList = NULL;
 
 void NET_Poll(void)
 {
-	PollProcedure *pp;
+	PollProcedure* pp;
 
 	SetNetTime();
 
@@ -910,9 +910,9 @@ void NET_Poll(void)
 }
 
 
-void SchedulePollProcedure(PollProcedure *proc, double timeOffset)
+void SchedulePollProcedure(PollProcedure* proc, double timeOffset)
 {
-	PollProcedure *pp, *prev;
+	PollProcedure* pp, * prev;
 
 	proc->nextTime = Sys_FloatTime() + timeOffset;
 	for (pp = pollProcedureList, prev = NULL; pp; pp = pp->next)
@@ -937,7 +937,7 @@ void SchedulePollProcedure(PollProcedure *proc, double timeOffset)
 #ifdef IDGODS
 #define IDNET	0xc0f62800
 
-bool IsID(struct qsockaddr *addr)
+bool IsID(struct qsockaddr* addr)
 {
 	if (idgods.value == 0.0)
 		return false;
@@ -945,7 +945,7 @@ bool IsID(struct qsockaddr *addr)
 	if (addr->sa_family != 2)
 		return false;
 
-	if ((BigLong(*(int *)&addr->sa_data[2]) & 0xffffff00) == IDNET)
+	if ((BigLong(*(int*)&addr->sa_data[2]) & 0xffffff00) == IDNET)
 		return true;
 	return false;
 }

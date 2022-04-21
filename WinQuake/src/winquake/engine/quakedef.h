@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -62,8 +62,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define strnicmp strncasecmp
 #endif
 
-void	VID_LockBuffer (void);
-void	VID_UnlockBuffer (void);
+void	VID_LockBuffer(void);
+void	VID_UnlockBuffer(void);
 
 // set to 0 if unaligned accesses are not supported
 #define UNALIGNED_OK	0
@@ -298,11 +298,11 @@ void GL_EnableMultitexture(void);
 
 typedef struct
 {
-	const char	*basedir;
-	char	*cachedir;		// for development over ISDN lines
+	const char* basedir;
+	char* cachedir;		// for development over ISDN lines
 	int		argc;
-	const char	**argv;
-	void	*membase;
+	const char** argv;
+	void* membase;
 	int		memsize;
 } quakeparms_t;
 
@@ -325,23 +325,23 @@ extern	cvar_t		developer;
 
 extern	bool		host_initialized;		// true if into command execution
 extern	double		host_frametime;
-extern	byte		*host_basepal;
-extern	byte		*host_colormap;
+extern	byte* host_basepal;
+extern	byte* host_colormap;
 extern	int			host_framecount;	// incremented every frame, never reset
 extern	double		realtime;			// not bounded in any way, changed at
 										// start of every frame, never reset
 
-void Host_ClearMemory (void);
-void Host_ServerFrame (void);
-void Host_InitCommands (void);
-void Host_Init (quakeparms_t *parms);
+void Host_ClearMemory(void);
+void Host_ServerFrame(void);
+void Host_InitCommands(void);
+void Host_Init(quakeparms_t* parms);
 void Host_Shutdown(void);
-void Host_Error (const char *error, ...);
-void Host_EndGame (const char *message, ...);
-void Host_Frame (float time);
-void Host_Quit_f (void);
-void Host_ClientCommands (const char *fmt, ...);
-void Host_ShutdownServer (bool crash);
+void Host_Error(const char* error, ...);
+void Host_EndGame(const char* message, ...);
+void Host_Frame(float time);
+void Host_Quit_f(void);
+void Host_ClientCommands(const char* fmt, ...);
+void Host_ShutdownServer(bool crash);
 
 extern int			current_skill;		// skill level for currently loaded level (in case
 										//  the user changes the cvar while the level is
@@ -356,9 +356,9 @@ extern int			minimum_memory;
 //
 extern	cvar_t	chase_active;
 
-void Chase_Init (void);
-void Chase_Reset (void);
-void Chase_Update (void);
+void Chase_Init(void);
+void Chase_Reset(void);
+void Chase_Update(void);
 
 struct Point
 {

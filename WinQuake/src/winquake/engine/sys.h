@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -26,36 +26,36 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // returns the file size
 // return -1 if file is not present
 // the file should be in BINARY mode for stupid OSs that care
-long Sys_FileOpenRead (const char *path, int *hndl);
+long Sys_FileOpenRead(const char* path, int* hndl);
 
-int Sys_FileOpenWrite (const char *path);
-void Sys_FileClose (int handle);
-void Sys_FileSeek (int handle, int position);
-int Sys_FileRead (int handle, void *dest, int count);
-int Sys_FileWrite (int handle, const void *data, int count);
-time_t Sys_FileTime (const char *path);
-void Sys_mkdir (const char *path);
+int Sys_FileOpenWrite(const char* path);
+void Sys_FileClose(int handle);
+void Sys_FileSeek(int handle, int position);
+int Sys_FileRead(int handle, void* dest, int count);
+int Sys_FileWrite(int handle, const void* data, int count);
+time_t Sys_FileTime(const char* path);
+void Sys_mkdir(const char* path);
 
 //
 // system IO
 //
-void Sys_DebugLog(const char *file, const char *fmt, ...);
+void Sys_DebugLog(const char* file, const char* fmt, ...);
 
-[[ noreturn ]] void Sys_Error (const char *error, ...);
+[[ noreturn ]] void Sys_Error(const char* error, ...);
 // an error will cause the entire program to exit
 
-void Sys_Printf (const char *fmt, ...);
+void Sys_Printf(const char* fmt, ...);
 // send text to the console
 
-void Sys_Quit (void);
+void Sys_Quit(void);
 
-double Sys_FloatTime (void);
+double Sys_FloatTime(void);
 
-char *Sys_ConsoleInput (bool acceptEmptyInput = false);
+char* Sys_ConsoleInput(bool acceptEmptyInput = false);
 
-void Sys_Sleep (void);
+void Sys_Sleep(void);
 // called to yield for a little bit so as
 // not to hog cpu when paused or debugging
 
-void Sys_SendKeyEvents (void);
+void Sys_SendKeyEvents(void);
 // Perform Key_Event () callbacks until the input que is empty

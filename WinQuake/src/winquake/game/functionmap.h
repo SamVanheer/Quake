@@ -73,7 +73,7 @@ inline FunctionMap::Function FunctionMap::FindAddress(const char* name) const
 		return it->second;
 	}
 
-	return nullptr;
+		return nullptr;
 }
 
 inline const char* FunctionMap::FindName(Function address) const
@@ -86,7 +86,7 @@ inline const char* FunctionMap::FindName(Function address) const
 		return it->first;
 	}
 
-	return {};
+		return {};
 }
 
 struct FunctionDefinition final

@@ -31,21 +31,21 @@ constexpr int PLAT_LOW_TRIGGER = 1;
 
 void plat_spawn_inside_trigger(edict_t* self)
 {
-//
-// middle trigger
-//	
+	//
+	// middle trigger
+	//	
 	auto trigger = PF_Spawn();
 	trigger->v.touch = plat_center_touch;
 	trigger->v.movetype = MOVETYPE_NONE;
 	trigger->v.solid = SOLID_TRIGGER;
 	trigger->v.enemy = self;
-	
+
 	auto tmin = AsVector(self->v.mins) + Vector3D{25, 25, 0};
 	auto tmax = AsVector(self->v.maxs) - Vector3D{25, 25, -8};
 	tmin[2] = tmax[2] - (self->v.pos1[2] - self->v.pos2[2] + 8);
 	if (self->v.spawnflags & PLAT_LOW_TRIGGER)
 		tmax[2] = tmin[2] + 8;
-	
+
 	if (self->v.size[0] <= 50)
 	{
 		tmin[0] = (self->v.mins[0] + self->v.maxs[0]) / 2;
@@ -56,13 +56,13 @@ void plat_spawn_inside_trigger(edict_t* self)
 		tmin[1] = (self->v.mins[1] + self->v.maxs[1]) / 2;
 		tmax[1] = tmin[1] + 1;
 	}
-	
-	PF_setsize (trigger, tmin, tmax);
+
+	PF_setsize(trigger, tmin, tmax);
 }
 
 void plat_hit_top(edict_t* self)
 {
-	PF_sound (self, CHAN_VOICE, self->v.noise1, 1, ATTN_NORM);
+	PF_sound(self, CHAN_VOICE, self->v.noise1, 1, ATTN_NORM);
 	self->v.state = STATE_TOP;
 	self->v.think = plat_go_down;
 	self->v.nextthink = self->v.ltime + 3;
@@ -72,7 +72,7 @@ LINK_FUNCTION_TO_NAME(plat_hit_top);
 
 void plat_hit_bottom(edict_t* self)
 {
-	PF_sound (self, CHAN_VOICE, self->v.noise1, 1, ATTN_NORM);
+	PF_sound(self, CHAN_VOICE, self->v.noise1, 1, ATTN_NORM);
 	self->v.state = STATE_BOTTOM;
 }
 
@@ -80,31 +80,31 @@ LINK_FUNCTION_TO_NAME(plat_hit_bottom);
 
 void plat_go_down(edict_t* self)
 {
-	PF_sound (self, CHAN_VOICE, self->v.noise, 1, ATTN_NORM);
+	PF_sound(self, CHAN_VOICE, self->v.noise, 1, ATTN_NORM);
 	self->v.state = STATE_DOWN;
-	SUB_CalcMove (self, self->v.pos2, self->v.speed, plat_hit_bottom);
+	SUB_CalcMove(self, self->v.pos2, self->v.speed, plat_hit_bottom);
 }
 
 LINK_FUNCTION_TO_NAME(plat_go_down);
 
 void plat_go_up(edict_t* self)
 {
-	PF_sound (self, CHAN_VOICE, self->v.noise, 1, ATTN_NORM);
+	PF_sound(self, CHAN_VOICE, self->v.noise, 1, ATTN_NORM);
 	self->v.state = STATE_UP;
-	SUB_CalcMove (self, self->v.pos1, self->v.speed, plat_hit_top);
+	SUB_CalcMove(self, self->v.pos1, self->v.speed, plat_hit_top);
 }
 
 void plat_center_touch(edict_t* self, edict_t* other)
 {
 	if (strcmp(other->v.classname, "player"))
 		return;
-		
+
 	if (other->v.health <= 0)
 		return;
 
 	self = self->v.enemy;
 	if (self->v.state == STATE_BOTTOM)
-		plat_go_up (self);
+		plat_go_up(self);
 	else if (self->v.state == STATE_TOP)
 		self->v.nextthink = self->v.ltime + 1;	// delay going down
 }
@@ -118,11 +118,11 @@ void plat_outside_touch(edict_t* self, edict_t* other)
 
 	if (other->v.health <= 0)
 		return;
-		
-//dprint ("plat_outside_touch\n");
+
+	//dprint ("plat_outside_touch\n");
 	self = self->v.enemy;
 	if (self->v.state == STATE_TOP)
-		plat_go_down (self);
+		plat_go_down(self);
 }
 
 LINK_FUNCTION_TO_NAME(plat_outside_touch);
@@ -138,16 +138,16 @@ LINK_FUNCTION_TO_NAME(plat_trigger_use);
 
 void plat_crush(edict_t* self, edict_t* other)
 {
-//dprint ("plat_crush\n");
+	//dprint ("plat_crush\n");
 
-	T_Damage (self, other, self, self, 1);
-	
+	T_Damage(self, other, self, self, 1);
+
 	if (self->v.state == STATE_UP)
-		plat_go_down (self);
+		plat_go_down(self);
 	else if (self->v.state == STATE_DOWN)
-		plat_go_up (self);
+		plat_go_up(self);
 	else
-		PF_objerror ("plat_crush: bad self->v.state\n");
+		PF_objerror("plat_crush: bad self->v.state\n");
 }
 
 LINK_FUNCTION_TO_NAME(plat_crush);
@@ -156,7 +156,7 @@ void plat_use(edict_t* self, edict_t* other)
 {
 	self->v.use = SUB_NullUse;
 	if (self->v.state != STATE_UP)
-		PF_objerror ("plat_use: not in up state");
+		PF_objerror("plat_use: not in up state");
 	plat_go_down(self);
 }
 
@@ -186,20 +186,20 @@ void func_plat(edict_t* self)
 
 	if (self->v.sounds == 0)
 		self->v.sounds = 2;
-// FIX THIS TO LOAD A GENERIC PLAT SOUND
+	// FIX THIS TO LOAD A GENERIC PLAT SOUND
 
 	if (self->v.sounds == 1)
 	{
-		PF_precache_sound ("plats/plat1.wav");
-		PF_precache_sound ("plats/plat2.wav");
+		PF_precache_sound("plats/plat1.wav");
+		PF_precache_sound("plats/plat2.wav");
 		self->v.noise = "plats/plat1.wav";
 		self->v.noise1 = "plats/plat2.wav";
 	}
 
 	if (self->v.sounds == 2)
 	{
-		PF_precache_sound ("plats/medplat1.wav");
-		PF_precache_sound ("plats/medplat2.wav");
+		PF_precache_sound("plats/medplat1.wav");
+		PF_precache_sound("plats/medplat2.wav");
 		self->v.noise = "plats/medplat1.wav";
 		self->v.noise1 = "plats/medplat2.wav";
 	}
@@ -211,15 +211,15 @@ void func_plat(edict_t* self)
 	self->v.classname = "plat";
 	self->v.solid = SOLID_BSP;
 	self->v.movetype = MOVETYPE_PUSH;
-	PF_setorigin (self, self->v.origin);	
-	PF_setmodel (self, self->v.model);
-	PF_setsize (self, self->v.mins , self->v.maxs);
+	PF_setorigin(self, self->v.origin);
+	PF_setmodel(self, self->v.model);
+	PF_setsize(self, self->v.mins, self->v.maxs);
 
 	self->v.blocked = plat_crush;
 	if (!self->v.speed)
 		self->v.speed = 150;
 
-// pos1 is the top position, pos2 is the bottom
+	// pos1 is the top position, pos2 is the bottom
 	AsVector(self->v.pos1) = AsVector(self->v.origin);
 	AsVector(self->v.pos2) = AsVector(self->v.origin);
 	if (self->v.height)
@@ -229,7 +229,7 @@ void func_plat(edict_t* self)
 
 	self->v.use = plat_trigger_use;
 
-	plat_spawn_inside_trigger (self);	// the "start moving" trigger	
+	plat_spawn_inside_trigger(self);	// the "start moving" trigger	
 
 	if (self->v.targetname)
 	{
@@ -238,7 +238,7 @@ void func_plat(edict_t* self)
 	}
 	else
 	{
-		PF_setorigin (self, self->v.pos2);
+		PF_setorigin(self, self->v.pos2);
 		self->v.state = STATE_BOTTOM;
 	}
 }
@@ -255,7 +255,7 @@ void train_blocked(edict_t* self, edict_t* other)
 	if (pr_global_struct->time < self->v.attack_finished)
 		return;
 	self->v.attack_finished = pr_global_struct->time + 0.5;
-	T_Damage (self, other, self, self, self->v.dmg);
+	T_Damage(self, other, self, self, self->v.dmg);
 }
 
 LINK_FUNCTION_TO_NAME(train_blocked);
@@ -274,11 +274,11 @@ void train_wait(edict_t* self)
 	if (self->v.wait)
 	{
 		self->v.nextthink = self->v.ltime + self->v.wait;
-		PF_sound (self, CHAN_VOICE, self->v.noise, 1, ATTN_NORM);
+		PF_sound(self, CHAN_VOICE, self->v.noise, 1, ATTN_NORM);
 	}
 	else
 		self->v.nextthink = self->v.ltime + 0.1;
-	
+
 	self->v.think = train_next;
 }
 
@@ -286,16 +286,16 @@ LINK_FUNCTION_TO_NAME(train_wait);
 
 void train_next(edict_t* self)
 {
-	auto targ = PF_Find (pr_global_struct->world, "targetname", self->v.target);
+	auto targ = PF_Find(pr_global_struct->world, "targetname", self->v.target);
 	self->v.target = targ->v.target;
 	if (!self->v.target)
-		PF_objerror ("train_next: no next target");
+		PF_objerror("train_next: no next target");
 	if (targ->v.wait)
 		self->v.wait = targ->v.wait;
 	else
 		self->v.wait = 0;
-	PF_sound (self, CHAN_VOICE, self->v.noise1, 1, ATTN_NORM);
-	SUB_CalcMove (self, AsVector(targ->v.origin) - AsVector(self->v.mins), self->v.speed, train_wait);
+	PF_sound(self, CHAN_VOICE, self->v.noise1, 1, ATTN_NORM);
+	SUB_CalcMove(self, AsVector(targ->v.origin) - AsVector(self->v.mins), self->v.speed, train_wait);
 }
 
 LINK_FUNCTION_TO_NAME(train_next);
@@ -305,7 +305,7 @@ void func_train_find(edict_t* self)
 {
 	auto targ = PF_Find(pr_global_struct->world, "targetname", self->v.target);
 	self->v.target = targ->v.target;
-	PF_setorigin (self, AsVector(targ->v.origin) - AsVector(self->v.mins));
+	PF_setorigin(self, AsVector(targ->v.origin) - AsVector(self->v.mins));
 	if (!self->v.targetname)
 	{	// not triggered, so start immediately
 		self->v.nextthink = self->v.ltime + 0.1;
@@ -327,28 +327,28 @@ sounds
 
 */
 void func_train(edict_t* self)
-{	
+{
 	if (!self->v.speed)
 		self->v.speed = 100;
 	if (!self->v.target)
-		PF_objerror ("func_train without a target");
+		PF_objerror("func_train without a target");
 	if (!self->v.dmg)
 		self->v.dmg = 2;
 
 	if (self->v.sounds == 0)
 	{
 		self->v.noise = ("misc/null.wav");
-		PF_precache_sound ("misc/null.wav");
+		PF_precache_sound("misc/null.wav");
 		self->v.noise1 = ("misc/null.wav");
-		PF_precache_sound ("misc/null.wav");
+		PF_precache_sound("misc/null.wav");
 	}
 
 	if (self->v.sounds == 1)
 	{
 		self->v.noise = ("plats/train2.wav");
-		PF_precache_sound ("plats/train2.wav");
+		PF_precache_sound("plats/train2.wav");
 		self->v.noise1 = ("plats/train1.wav");
-		PF_precache_sound ("plats/train1.wav");
+		PF_precache_sound("plats/train1.wav");
 	}
 
 	self->v.cnt = 1;
@@ -358,12 +358,12 @@ void func_train(edict_t* self)
 	self->v.use = train_use;
 	self->v.classname = "train";
 
-	PF_setmodel (self, self->v.model);
-	PF_setsize (self, self->v.mins , self->v.maxs);
-	PF_setorigin (self, self->v.origin);
+	PF_setmodel(self, self->v.model);
+	PF_setsize(self, self->v.mins, self->v.maxs);
+	PF_setorigin(self, self->v.origin);
 
-// start trains on the second frame, to make sure their targets have had
-// a chance to spawn
+	// start trains on the second frame, to make sure their targets have had
+	// a chance to spawn
 	self->v.nextthink = self->v.ltime + 0.1;
 	self->v.think = func_train_find;
 }
@@ -374,11 +374,11 @@ LINK_ENTITY_TO_CLASS(func_train);
 This is used for the final bos
 */
 void misc_teleporttrain(edict_t* self)
-{	
+{
 	if (!self->v.speed)
 		self->v.speed = 100;
 	if (!self->v.target)
-		PF_objerror ("func_train without a target");
+		PF_objerror("func_train without a target");
 
 	self->v.cnt = 1;
 	self->v.solid = SOLID_NOT;
@@ -388,17 +388,17 @@ void misc_teleporttrain(edict_t* self)
 	AsVector(self->v.avelocity) = Vector3D{100, 200, 300};
 
 	self->v.noise = ("misc/null.wav");
-	PF_precache_sound ("misc/null.wav");
+	PF_precache_sound("misc/null.wav");
 	self->v.noise1 = ("misc/null.wav");
-	PF_precache_sound ("misc/null.wav");
+	PF_precache_sound("misc/null.wav");
 
-	PF_precache_model ("progs/teleport.mdl");
-	PF_setmodel (self, "progs/teleport.mdl");
-	PF_setsize (self, self->v.mins , self->v.maxs);
-	PF_setorigin (self, self->v.origin);
+	PF_precache_model("progs/teleport.mdl");
+	PF_setmodel(self, "progs/teleport.mdl");
+	PF_setsize(self, self->v.mins, self->v.maxs);
+	PF_setorigin(self, self->v.origin);
 
-// start trains on the second frame, to make sure their targets have had
-// a chance to spawn
+	// start trains on the second frame, to make sure their targets have had
+	// a chance to spawn
 	self->v.nextthink = self->v.ltime + 0.1;
 	self->v.think = func_train_find;
 }

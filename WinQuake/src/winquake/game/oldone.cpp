@@ -119,18 +119,18 @@ void finale_1(edict_t* self)
 	pr_global_struct->intermission_running = 1;
 
 	// find the intermission spot
-	auto pos = PF_Find (pr_global_struct->world, "classname", "info_intermission");
+	auto pos = PF_Find(pr_global_struct->world, "classname", "info_intermission");
 	if (pos == pr_global_struct->world)
-		PF_error ("no info_intermission");
+		PF_error("no info_intermission");
 	auto pl = PF_Find(pr_global_struct->world, "classname", "misc_teleporttrain");
 	if (pl == pr_global_struct->world)
-		PF_error ("no teleporttrain");
-	PF_Remove (pl);
+		PF_error("no teleporttrain");
+	PF_Remove(pl);
 
-	PF_WriteByte (MSG_ALL, SVC_FINALE);
-	PF_WriteString (MSG_ALL, "");
+	PF_WriteByte(MSG_ALL, SVC_FINALE);
+	PF_WriteString(MSG_ALL, "");
 
-	pl = PF_Find (pr_global_struct->world, "classname", "player");
+	pl = PF_Find(pr_global_struct->world, "classname", "player");
 	while (pl != pr_global_struct->world)
 	{
 		AsVector(pl->v.view_ofs) = AsVector(vec3_origin);
@@ -142,17 +142,17 @@ void finale_1(edict_t* self)
 		pl->v.solid = SOLID_NOT;
 		pl->v.movetype = MOVETYPE_NONE;
 		pl->v.modelindex = 0;
-		PF_setorigin (pl, pos->v.origin);
-		pl = PF_Find (pl, "classname", "player");
-	}	
-	
+		PF_setorigin(pl, pos->v.origin);
+		pl = PF_Find(pl, "classname", "player");
+	}
+
 	// make fake versions of all players as standins, and move the real
 	// players to the intermission spot
-	
+
 	// wait for 1 second
 	auto timer = PF_Spawn();
 	timer->v.nextthink = pr_global_struct->time + 1;
-	timer->v.think = finale_2;	
+	timer->v.think = finale_2;
 }
 
 LINK_FUNCTION_TO_NAME(finale_1);
@@ -162,14 +162,14 @@ void finale_2(edict_t* self)
 	// start a teleport splash inside shub
 
 	auto o = AsVector(pr_global_struct->shub->v.origin) - Vector3D{0, 100, 0};
-	PF_WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
-	PF_WriteByte (MSG_BROADCAST, TE_TELEPORT);
-	PF_WriteCoord (MSG_BROADCAST, o[0]);
-	PF_WriteCoord (MSG_BROADCAST, o[1]);
-	PF_WriteCoord (MSG_BROADCAST, o[2]);
+	PF_WriteByte(MSG_BROADCAST, SVC_TEMPENTITY);
+	PF_WriteByte(MSG_BROADCAST, TE_TELEPORT);
+	PF_WriteCoord(MSG_BROADCAST, o[0]);
+	PF_WriteCoord(MSG_BROADCAST, o[1]);
+	PF_WriteCoord(MSG_BROADCAST, o[2]);
 
-	PF_sound (pr_global_struct->shub, CHAN_VOICE, "misc/r_tele1.wav", 1, ATTN_NORM);
-	
+	PF_sound(pr_global_struct->shub, CHAN_VOICE, "misc/r_tele1.wav", 1, ATTN_NORM);
+
 	self->v.nextthink = pr_global_struct->time + 2;
 	self->v.think = finale_3;
 }
@@ -180,8 +180,8 @@ void finale_3(edict_t* self)
 {
 	// start shub thrashing wildly
 	pr_global_struct->shub->v.think = old_thrash1;
-	PF_sound (pr_global_struct->shub, CHAN_VOICE, "boss2/death.wav", 1, ATTN_NORM);
-	PF_lightstyle(0, "abcdefghijklmlkjihgfedcb");	
+	PF_sound(pr_global_struct->shub, CHAN_VOICE, "boss2/death.wav", 1, ATTN_NORM);
+	PF_lightstyle(0, "abcdefghijklmlkjihgfedcb");
 }
 
 LINK_FUNCTION_TO_NAME(finale_3);
@@ -189,8 +189,8 @@ LINK_FUNCTION_TO_NAME(finale_3);
 void finale_4(edict_t* self)
 {
 	// throw tons of meat chunks	
-	PF_sound (self, CHAN_VOICE, "boss2/pop2.wav", 1, ATTN_NORM);
-	
+	PF_sound(self, CHAN_VOICE, "boss2/pop2.wav", 1, ATTN_NORM);
+
 	Vector3D oldo = AsVector(self->v.origin);
 
 	float z = 16;
@@ -207,12 +207,12 @@ void finale_4(edict_t* self)
 				self->v.origin[2] = oldo[2] + z;
 
 				const float r = PF_random();
-				if (r < 0.3)				
-					ThrowGib (self, "progs/gib1.mdl", -999);
+				if (r < 0.3)
+					ThrowGib(self, "progs/gib1.mdl", -999);
 				else if (r < 0.6)
-					ThrowGib (self, "progs/gib2.mdl", -999);
+					ThrowGib(self, "progs/gib2.mdl", -999);
 				else
-					ThrowGib (self, "progs/gib3.mdl", -999);
+					ThrowGib(self, "progs/gib3.mdl", -999);
 				y = y + 32;
 			}
 			x = x + 32;
@@ -220,24 +220,24 @@ void finale_4(edict_t* self)
 		z = z + 96;
 	}
 	// start the end text
-	PF_WriteByte (MSG_ALL, SVC_FINALE);
-	PF_WriteString (MSG_ALL, "Congratulations and well done! You have\nbeaten the hideous Shub-Niggurath, and\nher hundreds of ugly changelings and\nmonsters. You have proven that your\nskill and your cunning are greater than\nall the powers of Quake. You are the\nmaster now. Id Software salutes you.");
+	PF_WriteByte(MSG_ALL, SVC_FINALE);
+	PF_WriteString(MSG_ALL, "Congratulations and well done! You have\nbeaten the hideous Shub-Niggurath, and\nher hundreds of ugly changelings and\nmonsters. You have proven that your\nskill and your cunning are greater than\nall the powers of Quake. You are the\nmaster now. Id Software salutes you.");
 
-// put a player model down
+	// put a player model down
 	auto n = PF_Spawn();
-	PF_setmodel (n, "progs/player.mdl");
+	PF_setmodel(n, "progs/player.mdl");
 	oldo = oldo - Vector3D{32, 264, 0};
-	PF_setorigin (n, oldo);
+	PF_setorigin(n, oldo);
 	AsVector(n->v.angles) = Vector3D{0, 290, 0};
 	n->v.frame = 1;
 
-	PF_Remove (self);
+	PF_Remove(self);
 
-// switch cd track
-	PF_WriteByte (MSG_ALL, SVC_CDTRACK);
-	PF_WriteByte (MSG_ALL, 3);
-	PF_WriteByte (MSG_ALL, 3);
-	PF_lightstyle(0, "m");	
+	// switch cd track
+	PF_WriteByte(MSG_ALL, SVC_CDTRACK);
+	PF_WriteByte(MSG_ALL, 3);
+	PF_WriteByte(MSG_ALL, 3);
+	PF_lightstyle(0, "m");
 }
 
 LINK_FUNCTION_TO_NAME(finale_4);
@@ -255,18 +255,18 @@ void monster_oldone(edict_t* self)
 		return;
 	}
 
-	PF_precache_model ("progs/oldone.mdl");
+	PF_precache_model("progs/oldone.mdl");
 
-	PF_precache_sound ("boss2/death.wav");
-	PF_precache_sound ("boss2/idle.wav");
-	PF_precache_sound ("boss2/sight.wav");
-	PF_precache_sound ("boss2/pop2.wav");
+	PF_precache_sound("boss2/death.wav");
+	PF_precache_sound("boss2/idle.wav");
+	PF_precache_sound("boss2/sight.wav");
+	PF_precache_sound("boss2/pop2.wav");
 
 	self->v.solid = SOLID_SLIDEBOX;
 	self->v.movetype = MOVETYPE_STEP;
-	
-	PF_setmodel (self, "progs/oldone.mdl");
-	PF_setsize (self, Vector3D{-160, -128, -24}, Vector3D{160, 128, 256});
+
+	PF_setmodel(self, "progs/oldone.mdl");
+	PF_setsize(self, Vector3D{-160, -128, -24}, Vector3D{160, 128, 256});
 
 	self->v.health = 40000;		// kill by telefrag
 	self->v.think = old_idle1;
@@ -275,7 +275,7 @@ void monster_oldone(edict_t* self)
 	self->v.th_die = finale_1;
 	self->v.animations_get = &old_animations_get;
 	pr_global_struct->shub = self;
-	
+
 	pr_global_struct->total_monsters = pr_global_struct->total_monsters + 1;
 }
 

@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -23,7 +23,7 @@ typedef struct
 {
 	vec3_t	viewangles;
 
-// intended velocities
+	// intended velocities
 	float	forwardmove;
 	float	sidemove;
 	float	upmove;
@@ -44,7 +44,7 @@ typedef struct
 	float	entertime;
 	int		frags;
 	int		colors;			// two 4 bit fields
-	byte	translations[VID_GRADES*256];
+	byte	translations[VID_GRADES * 256];
 } scoreboard_t;
 
 typedef struct
@@ -87,7 +87,7 @@ typedef struct
 typedef struct
 {
 	int		entity;
-	struct model_s	*model;
+	struct model_s* model;
 	float	endtime;
 	vec3_t	start, end;
 } beam_t;
@@ -99,9 +99,9 @@ typedef struct
 #define	MAX_DEMONAME	16
 
 typedef enum {
-ca_dedicated, 		// a dedicated server with no ability to start a client
-ca_disconnected, 	// full screen console with no connection
-ca_connected		// valid netcon, talking to a server
+	ca_dedicated, 		// a dedicated server with no ability to start a client
+	ca_disconnected, 	// full screen console with no connection
+	ca_connected		// valid netcon, talking to a server
 } cactive_t;
 
 //
@@ -112,7 +112,7 @@ typedef struct
 {
 	cactive_t	state;
 
-// personalization data sent to server	
+	// personalization data sent to server	
 	char		mapstring[MAX_QPATH];
 	char		spawnparms[MAX_MAPSTRING];	// to restart a level
 
@@ -126,7 +126,7 @@ typedef struct
 	bool		demoplayback;
 	bool		timedemo;
 	int			forcetrack;			// -1 = use normal cd track
-	FILE		*demofile;
+	FILE* demofile;
 	int			td_lastframe;		// to meter out one message a frame
 	int			td_startframe;		// host_framecount at start
 	float		td_starttime;		// realtime at second frame of timedemo
@@ -134,9 +134,9 @@ typedef struct
 
 // connection information
 	int			signon;			// 0 to SIGNONS
-	struct qsocket_s	*netcon;
+	struct qsocket_s* netcon;
 	sizebuf_t	message;		// writing buffer to send to server
-	
+
 } client_static_t;
 
 extern client_static_t	cls;
@@ -169,13 +169,13 @@ typedef struct
 	vec3_t		mviewangles[2];	// during demo playback viewangles is lerped
 								// between these
 	vec3_t		viewangles;
-	
+
 	vec3_t		mvelocity[2];	// update by server, used for lean+bob
 								// (0 is newest)
 	vec3_t		velocity;		// lerped between mvelocity[0] and [1]
 
 	vec3_t		punchangle;		// temporary offset
-	
+
 // pitch drifting vars
 	float		idealpitch;
 	float		pitchvel;
@@ -189,34 +189,34 @@ typedef struct
 	bool		paused;			// send over by server
 	bool		onground;
 	bool		inwater;
-	
+
 	int			intermission;	// don't change view angle, full screen, etc
 	int			completed_time;	// latched at intermission start
-	
+
 	double		mtime[2];		// the timestamp of last two messages	
 	double		time;			// clients view of time, should be between
 								// servertime and oldservertime to generate
 								// a lerp point for other data
 	double		oldtime;		// previous cl.time, time-oldtime is used
 								// to decay light values and smooth step ups
-	
+
 
 	float		last_received_message;	// (realtime) for net trouble icon
 
 //
 // information that is static for the entire time connected to a server
 //
-	struct model_s		*model_precache[MAX_MODELS];
-	struct sfx_s		*sound_precache[MAX_SOUNDS];
+	struct model_s* model_precache[MAX_MODELS];
+	struct sfx_s* sound_precache[MAX_SOUNDS];
 
 	char		levelname[40];	// for display on solo scoreboard
 	int			viewentity;		// cl_entitites[cl.viewentity] = player
 	int			maxclients;
 	int			gametype;
 
-// refresh related state
-	struct model_s	*worldmodel;	// cl_entitites[0].model
-	struct efrag_s	*free_efrags;
+	// refresh related state
+	struct model_s* worldmodel;	// cl_entitites[0].model
+	struct efrag_s* free_efrags;
 	int			num_entities;	// held in cl_entities array
 	int			num_statics;	// held in cl_staticentities array
 	entity_t	viewent;			// the gun model
@@ -224,7 +224,7 @@ typedef struct
 	int			cdtrack, looptrack;	// cd audio
 
 // frag scoreboard
-	scoreboard_t	*scores;		// [cl.maxclients]
+	scoreboard_t* scores;		// [cl.maxclients]
 
 #ifdef QUAKE2
 // light level at player's position including dlights
@@ -288,24 +288,24 @@ extern	beam_t			cl_beams[MAX_BEAMS];
 //
 // cl_main
 //
-dlight_t *CL_AllocDlight (int key);
-void	CL_DecayLights (void);
+dlight_t* CL_AllocDlight(int key);
+void	CL_DecayLights(void);
 
-void CL_Init (void);
+void CL_Init(void);
 
-void CL_EstablishConnection (const char *host);
-void CL_Signon1 (void);
-void CL_Signon2 (void);
-void CL_Signon3 (void);
-void CL_Signon4 (void);
+void CL_EstablishConnection(const char* host);
+void CL_Signon1(void);
+void CL_Signon2(void);
+void CL_Signon3(void);
+void CL_Signon4(void);
 
-void CL_Disconnect (void);
-void CL_Disconnect_f (void);
-void CL_NextDemo (void);
+void CL_Disconnect(void);
+void CL_Disconnect_f(void);
+void CL_NextDemo(void);
 
 #define			MAX_VISEDICTS	256
 extern	int				cl_numvisedicts;
-extern	entity_t		*cl_visedicts[MAX_VISEDICTS];
+extern	entity_t* cl_visedicts[MAX_VISEDICTS];
 
 //
 // cl_input
@@ -320,56 +320,56 @@ extern	kbutton_t	in_mlook, in_klook;
 extern 	kbutton_t 	in_strafe;
 extern 	kbutton_t 	in_speed;
 
-void CL_InitInput (void);
-void CL_SendCmd (void);
-void CL_SendMove (usercmd_t *cmd);
+void CL_InitInput(void);
+void CL_SendCmd(void);
+void CL_SendMove(usercmd_t* cmd);
 
-void CL_ParseTEnt (void);
-void CL_UpdateTEnts (void);
+void CL_ParseTEnt(void);
+void CL_UpdateTEnts(void);
 
-void CL_ClearState (void);
-
-
-int  CL_ReadFromServer (void);
-void CL_WriteToServer (usercmd_t *cmd);
-void CL_BaseMove (usercmd_t *cmd);
+void CL_ClearState(void);
 
 
-float CL_KeyState (kbutton_t *key);
-const char *Key_KeynumToString (int keynum);
+int  CL_ReadFromServer(void);
+void CL_WriteToServer(usercmd_t* cmd);
+void CL_BaseMove(usercmd_t* cmd);
+
+
+float CL_KeyState(kbutton_t* key);
+const char* Key_KeynumToString(int keynum);
 
 //
 // cl_demo.c
 //
-void CL_StopPlayback (void);
-int CL_GetMessage (void);
+void CL_StopPlayback(void);
+int CL_GetMessage(void);
 
-void CL_Stop_f (void);
-void CL_Record_f (void);
-void CL_PlayDemo_f (void);
-void CL_TimeDemo_f (void);
+void CL_Stop_f(void);
+void CL_Record_f(void);
+void CL_PlayDemo_f(void);
+void CL_TimeDemo_f(void);
 
 //
 // cl_parse.c
 //
-void CL_ParseServerMessage (void);
-void CL_NewTranslation (int slot);
+void CL_ParseServerMessage(void);
+void CL_NewTranslation(int slot);
 
 //
 // view
 //
-void V_StartPitchDrift (void);
-void V_StopPitchDrift (void);
+void V_StartPitchDrift(void);
+void V_StopPitchDrift(void);
 
-void V_RenderView (void);
-void V_UpdatePalette (void);
-void V_Register (void);
-void V_ParseDamage (void);
-void V_SetContentsColor (int contents);
+void V_RenderView(void);
+void V_UpdatePalette(void);
+void V_Register(void);
+void V_ParseDamage(void);
+void V_SetContentsColor(int contents);
 
 
 //
 // cl_tent
 //
-void CL_InitTEnts (void);
-void CL_SignonReply (void);
+void CL_InitTEnts(void);
+void CL_SignonReply(void);

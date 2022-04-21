@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "game/IGame.h"
 
 globalvars_t globalVars;
-globalvars_t	*pr_global_struct = &globalVars;
+globalvars_t* pr_global_struct = &globalVars;
 
 /**
 *	@brief Size of game variable types, as multiples of 4.
@@ -39,9 +39,9 @@ ED_ClearEdict
 Sets everything to NULL
 =================
 */
-void ED_ClearEdict (edict_t *e)
+void ED_ClearEdict(edict_t* e)
 {
-	memset (&e->v, 0, sizeof(entvars_t));
+	memset(&e->v, 0, sizeof(entvars_t));
 	e->free = false;
 }
 
@@ -56,29 +56,29 @@ instead of being removed and recreated, which can cause interpolated
 angles and bad trails.
 =================
 */
-edict_t *ED_Alloc (void)
+edict_t* ED_Alloc(void)
 {
 	int			i;
-	edict_t		*e;
+	edict_t* e;
 
-	for ( i=svs.maxclients+1 ; i<sv.num_edicts ; i++)
+	for (i = svs.maxclients + 1; i < sv.num_edicts; i++)
 	{
 		e = EDICT_NUM(i);
 		// the first couple seconds of server time can involve a lot of
 		// freeing and allocating, so relax the replacement policy
-		if (e->free && ( e->freetime < 2 || sv.time - e->freetime > 0.5 ) )
+		if (e->free && (e->freetime < 2 || sv.time - e->freetime > 0.5))
 		{
-			ED_ClearEdict (e);
+			ED_ClearEdict(e);
 			return e;
 		}
 	}
-	
+
 	if (i == MAX_EDICTS)
-		Sys_Error ("ED_Alloc: no free edicts");
-		
+		Sys_Error("ED_Alloc: no free edicts");
+
 	sv.num_edicts++;
 	e = EDICT_NUM(i);
-	ED_ClearEdict (e);
+	ED_ClearEdict(e);
 
 	return e;
 }
@@ -91,9 +91,9 @@ Marks the edict as free
 FIXME: walk all entities and NULL out references to this entity
 =================
 */
-void ED_Free (edict_t *ed)
+void ED_Free(edict_t* ed)
 {
-	SV_UnlinkEdict (ed);		// unlink from world bsp
+	SV_UnlinkEdict(ed);		// unlink from world bsp
 
 	ed->free = true;
 	ed->v.model = 0;
@@ -102,11 +102,11 @@ void ED_Free (edict_t *ed)
 	ed->v.colormap = 0;
 	ed->v.skin = 0;
 	ed->v.frame = 0;
-	VectorCopy (vec3_origin, ed->v.origin);
-	VectorCopy (vec3_origin, ed->v.angles);
+	VectorCopy(vec3_origin, ed->v.origin);
+	VectorCopy(vec3_origin, ed->v.angles);
 	ed->v.nextthink = -1;
 	ed->v.solid = 0;
-	
+
 	ed->freetime = sv.time;
 }
 
@@ -441,7 +441,7 @@ const fielddescription EntvarsFields[] =
 #undef OBJ_FIELD
 
 template<size_t Size>
-const fielddescription* ED_FindFieldInTable(const char* name, const fielddescription (&fields)[Size])
+const fielddescription* ED_FindFieldInTable(const char* name, const fielddescription(&fields)[Size])
 {
 	for (const auto& field : fields)
 	{
@@ -469,7 +469,7 @@ const fielddescription* ED_FindGlobal(const char* name)
 ED_FindField
 ============
 */
-const fielddescription* ED_FindField (const char *name)
+const fielddescription* ED_FindField(const char* name)
 {
 	return ED_FindFieldInTable(name, EntvarsFields);
 }
@@ -638,7 +638,7 @@ ED_Write
 For savegames
 =============
 */
-void ED_Write (FILE *f, edict_t *ed)
+void ED_Write(FILE* f, edict_t* ed)
 {
 	int* v;
 	int		j;
@@ -717,11 +717,11 @@ ED_Count
 For debugging
 =============
 */
-void ED_Count ()
+void ED_Count()
 {
 	int active = 0, models = 0, solid = 0, step = 0;
 
-	for (int i=0 ; i<sv.num_edicts ; i++)
+	for (int i = 0; i < sv.num_edicts; i++)
 	{
 		auto ent = EDICT_NUM(i);
 		if (ent->free)
@@ -735,11 +735,11 @@ void ED_Count ()
 			step++;
 	}
 
-	Con_Printf ("num_edicts:%3i\n", sv.num_edicts);
-	Con_Printf ("active    :%3i\n", active);
-	Con_Printf ("view      :%3i\n", models);
-	Con_Printf ("touch     :%3i\n", solid);
-	Con_Printf ("step      :%3i\n", step);
+	Con_Printf("num_edicts:%3i\n", sv.num_edicts);
+	Con_Printf("active    :%3i\n", active);
+	Con_Printf("view      :%3i\n", models);
+	Con_Printf("touch     :%3i\n", solid);
+	Con_Printf("step      :%3i\n", step);
 
 }
 
@@ -757,7 +757,7 @@ FIXME: need to tag constants, doesn't really work
 ED_WriteGlobals
 =============
 */
-void ED_WriteGlobals (FILE *f)
+void ED_WriteGlobals(FILE* f)
 {
 	fprintf(f, "{\n");
 	for (const auto& field : GlobalvarsFields)
@@ -789,7 +789,7 @@ void ED_WriteGlobals (FILE *f)
 ED_ParseGlobals
 =============
 */
-void ED_ParseGlobals (char *data)
+void ED_ParseGlobals(char* data)
 {
 	char	keyname[64];
 
@@ -832,15 +832,15 @@ void ED_ParseGlobals (char *data)
 ED_NewString
 =============
 */
-char *ED_NewString (const char *string)
-{	
+char* ED_NewString(const char* string)
+{
 	const int l = strlen(string) + 1;
-	auto pszNew = reinterpret_cast<char*>( Hunk_Alloc (l) );
+	auto pszNew = reinterpret_cast<char*>(Hunk_Alloc(l));
 	auto new_p = pszNew;
 
-	for (int i=0 ; i< l ; i++)
+	for (int i = 0; i < l; i++)
 	{
-		if (string[i] == '\\' && i < l-1)
+		if (string[i] == '\\' && i < l - 1)
 		{
 			i++;
 			if (string[i] == 'n')
@@ -851,7 +851,7 @@ char *ED_NewString (const char *string)
 		else
 			*new_p++ = string[i];
 	}
-	
+
 	return pszNew;
 }
 
@@ -863,22 +863,22 @@ Can parse either fields or globals
 returns false if error
 =============
 */
-bool ED_ParseEpair (void *base, const fielddescription& key, const char *s)
+bool ED_ParseEpair(void* base, const fielddescription& key, const char* s)
 {
 	switch (key.Type)
 	{
 	case ev_string:
 		ED_SetValue(base, key, ED_NewString(s));
 		break;
-		
+
 	case ev_float:
-		ED_SetValue(base, key, static_cast<float>(atof (s)));
+		ED_SetValue(base, key, static_cast<float>(atof(s)));
 		break;
 
 	case ev_int:
 		ED_SetValue(base, key, atoi(s));
 		break;
-		
+
 	case ev_vector:
 	{
 		float* vec = ED_GetValueAddress<float>(base, key);
@@ -897,9 +897,9 @@ bool ED_ParseEpair (void *base, const fielddescription& key, const char *s)
 		}
 		break;
 	}
-		
+
 	case ev_entity:
-		ED_SetValue(base, key, EDICT_NUM(atoi (s)));
+		ED_SetValue(base, key, EDICT_NUM(atoi(s)));
 		break;
 
 	case ev_function:
@@ -915,7 +915,7 @@ bool ED_ParseEpair (void *base, const fielddescription& key, const char *s)
 		ED_SetValue(base, key, address);
 		break;
 	}
-		
+
 	default:
 		break;
 	}
@@ -931,80 +931,80 @@ ed should be a properly initialized empty edict.
 Used for initial level load and for savegames.
 ====================
 */
-char *ED_ParseEdict (char *data, edict_t *ent)
+char* ED_ParseEdict(char* data, edict_t* ent)
 {
 	char keyname[256];
 
 	bool init = false;
 
-// clear it
+	// clear it
 	if (ent != sv.edicts)	// hack
-		memset (&ent->v, 0, sizeof(entvars_t));
+		memset(&ent->v, 0, sizeof(entvars_t));
 
-// go through all the dictionary pairs
+	// go through all the dictionary pairs
 	while (1)
-	{	
-	// parse key
-		data = COM_Parse (data);
+	{
+		// parse key
+		data = COM_Parse(data);
 		if (com_token[0] == '}')
 			break;
 		if (!data)
-			Sys_Error ("ED_ParseEntity: EOF without closing brace");
-		
+			Sys_Error("ED_ParseEntity: EOF without closing brace");
+
 		// anglehack is to allow QuakeEd to write single scalar angles
 		// and allow them to be turned into vectors. (FIXME...)
 		const bool anglehack = !strcmp(com_token, "angle");
 
 		if (anglehack)
 		{
-			strcpy (com_token, "angles");
+			strcpy(com_token, "angles");
 		}
 
 		// FIXME: change light to _light to get rid of this hack
 		if (!strcmp(com_token, "light"))
-			strcpy (com_token, "light_lev");	// hack for single light def
+			strcpy(com_token, "light_lev");	// hack for single light def
 
-		strcpy (keyname, com_token);
+		strcpy(keyname, com_token);
 
 		// another hack to fix heynames with trailing spaces
 		int n = strlen(keyname);
-		while (n && keyname[n-1] == ' ')
+		while (n && keyname[n - 1] == ' ')
 		{
-			keyname[n-1] = 0;
+			keyname[n - 1] = 0;
 			n--;
 		}
 
-	// parse value	
-		data = COM_Parse (data);
+		// parse value	
+		data = COM_Parse(data);
 		if (!data)
-			Sys_Error ("ED_ParseEntity: EOF without closing brace");
+			Sys_Error("ED_ParseEntity: EOF without closing brace");
 
 		if (com_token[0] == '}')
-			Sys_Error ("ED_ParseEntity: closing brace without data");
+			Sys_Error("ED_ParseEntity: closing brace without data");
 
-		init = true;	
+		init = true;
 
-// keynames with a leading underscore are used for utility comments,
-// and are immediately discarded by quake
+		// keynames with a leading underscore are used for utility comments,
+		// and are immediately discarded by quake
 		if (keyname[0] == '_')
 			continue;
-		
-		auto key = ED_FindField (keyname);
+
+		auto key = ED_FindField(keyname);
 		if (!key)
 		{
-			Con_Printf ("'%s' is not a field\n", keyname);
+			Con_Printf("'%s' is not a field\n", keyname);
 			continue;
 		}
 
 		if (anglehack)
 		{
 			char	temp[32];
-			strcpy (temp, com_token);
-			sprintf (com_token, "0 %s 0", temp);
+			strcpy(temp, com_token);
+			sprintf(com_token, "0 %s 0", temp);
 		}
 
-		if (!ED_ParseEpair (&ent->v, *key, com_token))
-			Host_Error ("ED_ParseEdict: parse error");
+		if (!ED_ParseEpair(&ent->v, *key, com_token))
+			Host_Error("ED_ParseEdict: parse error");
 	}
 
 	if (!init)
@@ -1028,21 +1028,21 @@ Used for both fresh maps and savegame loads.  A fresh map would also need
 to call ED_CallSpawnFunctions () to let the objects initialize themselves.
 ================
 */
-void ED_LoadFromFile (char *data)
-{	
+void ED_LoadFromFile(char* data)
+{
 	edict_t* ent = NULL;
 	int inhibit = 0;
 	pr_global_struct->time = sv.time;
-	
-// parse ents
+
+	// parse ents
 	while (1)
 	{
-// parse the opening brace	
-		data = COM_Parse (data);
+		// parse the opening brace	
+		data = COM_Parse(data);
 		if (!data)
 			break;
 		if (com_token[0] != '{')
-			Sys_Error ("ED_LoadFromFile: found %s when expecting {",com_token);
+			Sys_Error("ED_LoadFromFile: found %s when expecting {", com_token);
 
 		if (!ent)
 		{
@@ -1051,48 +1051,48 @@ void ED_LoadFromFile (char *data)
 			pr_global_struct->world = ent;
 		}
 		else
-			ent = ED_Alloc ();
-		data = ED_ParseEdict (data, ent);
+			ent = ED_Alloc();
+		data = ED_ParseEdict(data, ent);
 
-// remove things from different skill levels or deathmatch
+		// remove things from different skill levels or deathmatch
 		if (deathmatch.value)
 		{
 			if (((int)ent->v.spawnflags & SPAWNFLAG_NOT_DEATHMATCH))
 			{
-				ED_Free (ent);	
+				ED_Free(ent);
 				inhibit++;
 				continue;
 			}
 		}
 		else if ((current_skill == 0 && ((int)ent->v.spawnflags & SPAWNFLAG_NOT_EASY))
-				|| (current_skill == 1 && ((int)ent->v.spawnflags & SPAWNFLAG_NOT_MEDIUM))
-				|| (current_skill >= 2 && ((int)ent->v.spawnflags & SPAWNFLAG_NOT_HARD)) )
+			|| (current_skill == 1 && ((int)ent->v.spawnflags & SPAWNFLAG_NOT_MEDIUM))
+			|| (current_skill >= 2 && ((int)ent->v.spawnflags & SPAWNFLAG_NOT_HARD)))
 		{
-			ED_Free (ent);	
+			ED_Free(ent);
 			inhibit++;
 			continue;
 		}
 
-//
-// immediately call spawn function
-//
+		//
+		// immediately call spawn function
+		//
 		if (!ent->v.classname || !strcmp(ent->v.classname, ""))
 		{
-			Con_Printf ("No classname for entity\n");
-			ED_Free (ent);
+			Con_Printf("No classname for entity\n");
+			ED_Free(ent);
 			continue;
 		}
 
-	// look for the spawn function
+		// look for the spawn function
 		if (!g_Game->SpawnEntity(ent, ent->v.classname))
 		{
 			Con_Printf("No spawn function for: %s\n", ent->v.classname);
 			ED_Free(ent);
 			continue;
 		}
-	}	
+	}
 
-	Con_DPrintf ("%i entities inhibited\n", inhibit);
+	Con_DPrintf("%i entities inhibited\n", inhibit);
 }
 
 void PR_LoadProgs()
@@ -1138,28 +1138,28 @@ void PR_VerifyFunctionsLinked()
 PR_Init
 ===============
 */
-void PR_Init (void)
+void PR_Init(void)
 {
 	Cmd_AddCommand("edict", ED_PrintEdict_f);
 	Cmd_AddCommand("edicts", ED_PrintEdicts);
-	Cmd_AddCommand ("edictcount", ED_Count);
+	Cmd_AddCommand("edictcount", ED_Count);
 #ifdef _DEBUG
 	Cmd_AddCommand("edicts_verifyfunctionslinked", PR_VerifyFunctionsLinked);
 #endif
 }
 
-edict_t *EDICT_NUM(int n)
+edict_t* EDICT_NUM(int n)
 {
 	if (n < 0 || n >= sv.max_edicts)
-		Sys_Error ("EDICT_NUM: bad number %i", n);
+		Sys_Error("EDICT_NUM: bad number %i", n);
 	return sv.edicts + n;
 }
 
-int NUM_FOR_EDICT(edict_t *e)
+int NUM_FOR_EDICT(edict_t* e)
 {
 	const int b = e - sv.edicts;
-	
+
 	if (b < 0 || b >= sv.num_edicts)
-		Sys_Error ("NUM_FOR_EDICT: bad pointer");
+		Sys_Error("NUM_FOR_EDICT: bad pointer");
 	return b;
 }

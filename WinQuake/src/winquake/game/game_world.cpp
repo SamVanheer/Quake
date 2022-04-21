@@ -195,7 +195,7 @@ void worldspawn(edict_t* self)
 	PF_lightstyle(4, "mamamamamama");
 
 	// 5 GENTLE PULSE 1
-	PF_lightstyle(5,"jklmnopqrstuvwxyzyxwvutsrqponmlkj");
+	PF_lightstyle(5, "jklmnopqrstuvwxyzyxwvutsrqponmlkj");
 
 	// 6 FLICKER (second variety)
 	PF_lightstyle(6, "nmonqnmomnmomomno");

@@ -303,38 +303,38 @@ void demon1_pain(edict_t* self, edict_t* attacker, float damage)
 		return;
 
 	self->v.pain_finished = pr_global_struct->time + 1;
-	PF_sound (self, CHAN_VOICE, "demon/dpain1.wav", 1, ATTN_NORM);
+	PF_sound(self, CHAN_VOICE, "demon/dpain1.wav", 1, ATTN_NORM);
 
-	if (PF_random()*200 > damage)
+	if (PF_random() * 200 > damage)
 		return;		// didn't flinch
-		
-	demon1_pain1 (self);
+
+	demon1_pain1(self);
 }
 
 LINK_FUNCTION_TO_NAME(demon1_pain);
 
 void demon_die(edict_t* self)
 {
-// check for gib
+	// check for gib
 	if (self->v.health < -80)
 	{
-		PF_sound (self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
-		ThrowHead (self, "progs/h_demon.mdl", self->v.health);
-		ThrowGib (self, "progs/gib1.mdl", self->v.health);
-		ThrowGib (self, "progs/gib1.mdl", self->v.health);
-		ThrowGib (self, "progs/gib1.mdl", self->v.health);
+		PF_sound(self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
+		ThrowHead(self, "progs/h_demon.mdl", self->v.health);
+		ThrowGib(self, "progs/gib1.mdl", self->v.health);
+		ThrowGib(self, "progs/gib1.mdl", self->v.health);
+		ThrowGib(self, "progs/gib1.mdl", self->v.health);
 		return;
 	}
 
-// regular death
-	demon1_die1 (self);
+	// regular death
+	demon1_die1(self);
 }
 
 LINK_FUNCTION_TO_NAME(demon_die);
 
 void Demon_MeleeAttack(edict_t* self)
 {
-	demon1_atta1 (self);
+	demon1_atta1(self);
 }
 
 LINK_FUNCTION_TO_NAME(Demon_MeleeAttack);
@@ -349,22 +349,22 @@ void monster_demon1(edict_t* self)
 		PF_Remove(self);
 		return;
 	}
-	PF_precache_model ("progs/demon.mdl");
+	PF_precache_model("progs/demon.mdl");
 	PF_precache_model("progs/h_demon.mdl");
 
-	PF_precache_sound ("demon/ddeath.wav");
-	PF_precache_sound ("demon/dhit2.wav");
-	PF_precache_sound ("demon/djump.wav");
-	PF_precache_sound ("demon/dpain1.wav");
-	PF_precache_sound ("demon/idle1.wav");
-	PF_precache_sound ("demon/sight2.wav");
+	PF_precache_sound("demon/ddeath.wav");
+	PF_precache_sound("demon/dhit2.wav");
+	PF_precache_sound("demon/djump.wav");
+	PF_precache_sound("demon/dpain1.wav");
+	PF_precache_sound("demon/idle1.wav");
+	PF_precache_sound("demon/sight2.wav");
 
 	self->v.solid = SOLID_SLIDEBOX;
 	self->v.movetype = MOVETYPE_STEP;
 
-	PF_setmodel (self, "progs/demon.mdl");
+	PF_setmodel(self, "progs/demon.mdl");
 
-	PF_setsize (self, VEC_HULL2_MIN, VEC_HULL2_MAX);
+	PF_setsize(self, VEC_HULL2_MIN, VEC_HULL2_MAX);
 	self->v.health = 300;
 
 	self->v.th_stand = demon1_stand1;
@@ -375,7 +375,7 @@ void monster_demon1(edict_t* self)
 	self->v.th_missile = demon1_jump1;			// jump attack
 	self->v.th_pain = demon1_pain;
 	self->v.animations_get = &demon_animations_get;
-		
+
 	walkmonster_start(self);
 }
 
@@ -415,46 +415,46 @@ CheckDemonJump
 bool CheckDemonJump(edict_t* self)
 {
 	if (self->v.origin[2] + self->v.mins[2] > self->v.enemy->v.origin[2] + self->v.enemy->v.mins[2]
-	+ 0.75 * self->v.enemy->v.size[2])
+		+ 0.75 * self->v.enemy->v.size[2])
 		return false;
-		
+
 	if (self->v.origin[2] + self->v.maxs[2] < self->v.enemy->v.origin[2] + self->v.enemy->v.mins[2]
-	+ 0.25 * self->v.enemy->v.size[2])
+		+ 0.25 * self->v.enemy->v.size[2])
 		return false;
-		
+
 	auto dist = AsVector(self->v.enemy->v.origin) - AsVector(self->v.origin);
 	dist[2] = 0;
-	
+
 	const float d = PF_vlen(dist);
-	
+
 	if (d < 100)
 		return false;
-		
+
 	if (d > 200)
 	{
 		if (PF_random() < 0.9)
 			return false;
 	}
-		
+
 	return true;
 }
 
 bool DemonCheckAttack(edict_t* self)
 {
-// if close enough for slashing, go for it
-	if (CheckDemonMelee (self))
+	// if close enough for slashing, go for it
+	if (CheckDemonMelee(self))
 	{
 		self->v.attack_state = AS_MELEE;
 		return true;
 	}
-	
-	if (CheckDemonJump (self))
+
+	if (CheckDemonJump(self))
 	{
 		self->v.attack_state = AS_MISSILE;
-		PF_sound (self, CHAN_VOICE, "demon/djump.wav", 1, ATTN_NORM);
+		PF_sound(self, CHAN_VOICE, "demon/djump.wav", 1, ATTN_NORM);
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -462,35 +462,35 @@ bool DemonCheckAttack(edict_t* self)
 
 void Demon_Melee(edict_t* self, float side)
 {
-	ai_face (self);
-	PF_walkmove (self, self->v.ideal_yaw, 12);	// allow a little closing
+	ai_face(self);
+	PF_walkmove(self, self->v.ideal_yaw, 12);	// allow a little closing
 
 	auto delta = AsVector(self->v.enemy->v.origin) - AsVector(self->v.origin);
 
 	if (PF_vlen(delta) > 100)
 		return;
-	if (!CanDamage (self, self->v.enemy, self))
+	if (!CanDamage(self, self->v.enemy, self))
 		return;
-		
-	PF_sound (self, CHAN_WEAPON, "demon/dhit2.wav", 1, ATTN_NORM);
-	const float ldmg = 10 + 5*PF_random();
-	T_Damage (self, self->v.enemy, self, self, ldmg);	
 
-	PF_makevectors (self->v.angles);
-	SpawnMeatSpray (self, AsVector(self->v.origin) + AsVector(pr_global_struct->v_forward)*16, side * AsVector(pr_global_struct->v_right));
+	PF_sound(self, CHAN_WEAPON, "demon/dhit2.wav", 1, ATTN_NORM);
+	const float ldmg = 10 + 5 * PF_random();
+	T_Damage(self, self->v.enemy, self, self, ldmg);
+
+	PF_makevectors(self->v.angles);
+	SpawnMeatSpray(self, AsVector(self->v.origin) + AsVector(pr_global_struct->v_forward) * 16, side * AsVector(pr_global_struct->v_right));
 }
 
 void Demon_JumpTouch(edict_t* self, edict_t* other)
 {
 	if (self->v.health <= 0)
 		return;
-		
+
 	if (other->v.takedamage)
 	{
-		if ( PF_vlen(self->v.velocity) > 400 )
+		if (PF_vlen(self->v.velocity) > 400)
 		{
-			const float ldmg = 40 + 10*PF_random();
-			T_Damage (self, other, self, self, ldmg);	
+			const float ldmg = 40 + 10 * PF_random();
+			T_Damage(self, other, self, self, ldmg);
 		}
 	}
 
@@ -499,14 +499,14 @@ void Demon_JumpTouch(edict_t* self, edict_t* other)
 		if (self->v.flags & FL_ONGROUND)
 		{	// jump randomly to not get hung up
 //dprint ("popjump\n");
-	self->v.touch = SUB_NullTouch;
-	self->v.think = demon1_jump1;
-	self->v.nextthink = pr_global_struct->time + 0.1;
+			self->v.touch = SUB_NullTouch;
+			self->v.think = demon1_jump1;
+			self->v.nextthink = pr_global_struct->time + 0.1;
 
-//			self->v.velocity[0] = (PF_random() - 0.5) * 600;
-//			self->v.velocity[1] = (PF_random() - 0.5) * 600;
-//			self->v.velocity[2] = 200;
-//			self->v.flags &= ~FL_ONGROUND;
+			//			self->v.velocity[0] = (PF_random() - 0.5) * 600;
+			//			self->v.velocity[1] = (PF_random() - 0.5) * 600;
+			//			self->v.velocity[2] = 200;
+			//			self->v.flags &= ~FL_ONGROUND;
 		}
 		return;	// not on ground yet
 	}

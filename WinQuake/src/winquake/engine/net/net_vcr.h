@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -25,13 +25,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define VCR_OP_CANSENDMESSAGE			4
 #define VCR_MAX_MESSAGE					4
 
-int			VCR_Init (void);
-void		VCR_Listen (bool state);
-void		VCR_SearchForHosts (bool xmit);
-qsocket_t 	*VCR_Connect (const char *host);
-qsocket_t 	*VCR_CheckNewConnections (void);
-int			VCR_GetMessage (qsocket_t *sock);
-int			VCR_SendMessage (qsocket_t *sock, sizebuf_t *data);
-bool		VCR_CanSendMessage (qsocket_t *sock);
-void		VCR_Close (qsocket_t *sock);
-void		VCR_Shutdown (void);
+int			VCR_Init(void);
+void		VCR_Listen(bool state);
+void		VCR_SearchForHosts(bool xmit);
+qsocket_t* VCR_Connect(const char* host);
+qsocket_t* VCR_CheckNewConnections(void);
+int			VCR_GetMessage(qsocket_t* sock);
+int			VCR_SendMessage(qsocket_t* sock, sizebuf_t* data);
+bool		VCR_CanSendMessage(qsocket_t* sock);
+void		VCR_Close(qsocket_t* sock);
+void		VCR_Shutdown(void);

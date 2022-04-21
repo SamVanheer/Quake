@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -25,22 +25,22 @@ extern int con_totallines;
 extern int con_backscroll;
 extern bool con_forcedup;	// because no entities to refresh
 extern bool con_initialized;
-extern byte *con_chars;
+extern byte* con_chars;
 extern	int	con_notifylines;		// scan lines to clear for notify lines
 
-void Con_DrawCharacter (int cx, int line, int num);
+void Con_DrawCharacter(int cx, int line, int num);
 
-void Con_CheckResize (void);
-void Con_Init (void);
-void Con_DrawConsole (int lines, bool drawinput);
-void Con_Print (const char *txt);
-void Con_Printf (const char *fmt, ...);
-void Con_DPrintf (const char *fmt, ...);
-void Con_SafePrintf (const char *fmt, ...);
-void Con_Clear_f (void);
-void Con_DrawNotify (void);
-void Con_ClearNotify (void);
-void Con_ToggleConsole_f (void);
+void Con_CheckResize(void);
+void Con_Init(void);
+void Con_DrawConsole(int lines, bool drawinput);
+void Con_Print(const char* txt);
+void Con_Printf(const char* fmt, ...);
+void Con_DPrintf(const char* fmt, ...);
+void Con_SafePrintf(const char* fmt, ...);
+void Con_Clear_f(void);
+void Con_DrawNotify(void);
+void Con_ClearNotify(void);
+void Con_ToggleConsole_f(void);
 
-void Con_NotifyBox (const char *text);	// during startup for sound / cd warnings
+void Con_NotifyBox(const char* text);	// during startup for sound / cd warnings
 

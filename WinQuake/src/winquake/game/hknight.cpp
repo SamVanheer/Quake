@@ -515,41 +515,41 @@ void hknight_shot(edict_t* self, float offset)
 {
 	Vector3D offang;
 	Vector3D vec;
-	
-	PF_vectoangles (AsVector(self->v.enemy->v.origin) - AsVector(self->v.origin), offang);
+
+	PF_vectoangles(AsVector(self->v.enemy->v.origin) - AsVector(self->v.origin), offang);
 	offang[1] += offset * 6;
-	
-	PF_makevectors (offang);
 
-	auto org = AsVector(self->v.origin) + AsVector(self->v.mins) + AsVector(self->v.size)*0.5f + AsVector(pr_global_struct->v_forward) * 20;
+	PF_makevectors(offang);
 
-// set missile speed
-	PF_normalize (pr_global_struct->v_forward, vec);
+	auto org = AsVector(self->v.origin) + AsVector(self->v.mins) + AsVector(self->v.size) * 0.5f + AsVector(pr_global_struct->v_forward) * 20;
+
+	// set missile speed
+	PF_normalize(pr_global_struct->v_forward, vec);
 	vec[2] = 0 - vec[2] + (PF_random() - 0.5) * 0.1;
-	
-	auto newmis = launch_spike (self, org, vec);
+
+	auto newmis = launch_spike(self, org, vec);
 	newmis->v.classname = "knightspike";
-	PF_setmodel (newmis, "progs/k_spike.mdl");
-	PF_setsize (newmis, VEC_ORIGIN, VEC_ORIGIN);		
-	AsVector(newmis->v.velocity) = vec*300;
-	PF_sound (self, CHAN_WEAPON, "hknight/attack1.wav", 1, ATTN_NORM);
+	PF_setmodel(newmis, "progs/k_spike.mdl");
+	PF_setsize(newmis, VEC_ORIGIN, VEC_ORIGIN);
+	AsVector(newmis->v.velocity) = vec * 300;
+	PF_sound(self, CHAN_WEAPON, "hknight/attack1.wav", 1, ATTN_NORM);
 }
 
 void CheckForCharge(edict_t* self)
 {
-// check for mad charge
-if (!enemy_vis)
-	return;
-if (pr_global_struct->time < self->v.attack_finished)
-	return;	
-if ( fabs(self->v.origin[2] - self->v.enemy->v.origin[2]) > 20)
-	return;		// too much height change
-if ( PF_vlen (AsVector(self->v.origin) - AsVector(self->v.enemy->v.origin)) < 80)
-	return;		// use regular attack
+	// check for mad charge
+	if (!enemy_vis)
+		return;
+	if (pr_global_struct->time < self->v.attack_finished)
+		return;
+	if (fabs(self->v.origin[2] - self->v.enemy->v.origin[2]) > 20)
+		return;		// too much height change
+	if (PF_vlen(AsVector(self->v.origin) - AsVector(self->v.enemy->v.origin)) < 80)
+		return;		// use regular attack
 
-// charge		
-	SUB_AttackFinished (self, 2);
-	hknight_char_a1 (self);
+	// charge		
+	SUB_AttackFinished(self, 2);
+	hknight_char_a1(self);
 
 }
 
@@ -557,14 +557,14 @@ void CheckContinueCharge(edict_t* self)
 {
 	if (pr_global_struct->time > self->v.attack_finished)
 	{
-		SUB_AttackFinished (self, 3);
-		hknight_run1 (self);
+		SUB_AttackFinished(self, 3);
+		hknight_run1(self);
 		return;		// done charging
 	}
 	if (PF_random() > 0.5)
-		PF_sound (self, CHAN_WEAPON, "knight/sword2.wav", 1, ATTN_NORM);
+		PF_sound(self, CHAN_WEAPON, "knight/sword2.wav", 1, ATTN_NORM);
 	else
-		PF_sound (self, CHAN_WEAPON, "knight/sword1.wav", 1, ATTN_NORM);
+		PF_sound(self, CHAN_WEAPON, "knight/sword1.wav", 1, ATTN_NORM);
 }
 
 //===========================================================================
@@ -615,23 +615,23 @@ void hknight_dieb1(edict_t* self)
 
 void hknight_die(edict_t* self)
 {
-// check for gib
+	// check for gib
 	if (self->v.health < -40)
 	{
-		PF_sound (self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
-		ThrowHead (self, "progs/h_hellkn.mdl", self->v.health);
-		ThrowGib (self, "progs/gib1.mdl", self->v.health);
-		ThrowGib (self, "progs/gib2.mdl", self->v.health);
-		ThrowGib (self, "progs/gib3.mdl", self->v.health);
+		PF_sound(self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
+		ThrowHead(self, "progs/h_hellkn.mdl", self->v.health);
+		ThrowGib(self, "progs/gib1.mdl", self->v.health);
+		ThrowGib(self, "progs/gib2.mdl", self->v.health);
+		ThrowGib(self, "progs/gib3.mdl", self->v.health);
 		return;
 	}
 
-// regular death
-	PF_sound (self, CHAN_VOICE, "hknight/death1.wav", 1, ATTN_NORM);
+	// regular death
+	PF_sound(self, CHAN_VOICE, "hknight/death1.wav", 1, ATTN_NORM);
 	if (PF_random() > 0.5)
-		hknight_die1 (self);
+		hknight_die1(self);
 	else
-		hknight_dieb1 (self);
+		hknight_dieb1(self);
 }
 
 LINK_FUNCTION_TO_NAME(hknight_die);
@@ -699,7 +699,7 @@ void hknight_watk1(edict_t* self)
 void hk_idle_sound(edict_t* self)
 {
 	if (PF_random() < 0.2)
-		PF_sound (self, CHAN_VOICE, "hknight/idle.wav", 1, ATTN_NORM);
+		PF_sound(self, CHAN_VOICE, "hknight/idle.wav", 1, ATTN_NORM);
 }
 
 void hknight_pain(edict_t* self, edict_t* attacker, float damage)
@@ -707,20 +707,20 @@ void hknight_pain(edict_t* self, edict_t* attacker, float damage)
 	if (self->v.pain_finished > pr_global_struct->time)
 		return;
 
-	PF_sound (self, CHAN_VOICE, "hknight/pain1.wav", 1, ATTN_NORM);
+	PF_sound(self, CHAN_VOICE, "hknight/pain1.wav", 1, ATTN_NORM);
 
 	if (pr_global_struct->time - self->v.pain_finished > 5)
 	{	// allways go into pain frame if it has been a while
-		hknight_pain1 (self);
+		hknight_pain1(self);
 		self->v.pain_finished = pr_global_struct->time + 1;
 		return;
 	}
-	
-	if ((PF_random()*30 > damage) )
+
+	if ((PF_random() * 30 > damage))
 		return;		// didn't flinch
 
 	self->v.pain_finished = pr_global_struct->time + 1;
-	hknight_pain1 (self);
+	hknight_pain1(self);
 }
 
 LINK_FUNCTION_TO_NAME(hknight_pain);
@@ -729,14 +729,14 @@ void hknight_melee(edict_t* self)
 {
 	++pr_global_struct->hknight_type;
 
-	PF_sound (self, CHAN_WEAPON, "hknight/slash1.wav", 1, ATTN_NORM);
+	PF_sound(self, CHAN_WEAPON, "hknight/slash1.wav", 1, ATTN_NORM);
 	if (pr_global_struct->hknight_type == 1)
-		hknight_slice1 (self);
+		hknight_slice1(self);
 	else if (pr_global_struct->hknight_type == 2)
-		hknight_smash1 (self);
+		hknight_smash1(self);
 	else if (pr_global_struct->hknight_type == 3)
 	{
-		hknight_watk1 (self);
+		hknight_watk1(self);
 		pr_global_struct->hknight_type = 0;
 	}
 }
@@ -752,29 +752,29 @@ void monster_hell_knight(edict_t* self)
 		PF_Remove(self);
 		return;
 	}
-	PF_precache_model ("progs/hknight.mdl");
-	PF_precache_model ("progs/k_spike.mdl");
-	PF_precache_model ("progs/h_hellkn.mdl");
+	PF_precache_model("progs/hknight.mdl");
+	PF_precache_model("progs/k_spike.mdl");
+	PF_precache_model("progs/h_hellkn.mdl");
 
-	
-	PF_precache_sound ("hknight/attack1.wav");
-	PF_precache_sound ("hknight/death1.wav");
-	PF_precache_sound ("hknight/pain1.wav");
-	PF_precache_sound ("hknight/sight1.wav");
+
+	PF_precache_sound("hknight/attack1.wav");
+	PF_precache_sound("hknight/death1.wav");
+	PF_precache_sound("hknight/pain1.wav");
+	PF_precache_sound("hknight/sight1.wav");
 	PF_precache_sound("hknight/hit.wav");		// used by C code, so don't sound2
-	PF_precache_sound ("hknight/slash1.wav");
-	PF_precache_sound ("hknight/idle.wav");
-	PF_precache_sound ("hknight/grunt.wav");
+	PF_precache_sound("hknight/slash1.wav");
+	PF_precache_sound("hknight/idle.wav");
+	PF_precache_sound("hknight/grunt.wav");
 
-	PF_precache_sound ("knight/sword1.wav");
-	PF_precache_sound ("knight/sword2.wav");
-	
+	PF_precache_sound("knight/sword1.wav");
+	PF_precache_sound("knight/sword2.wav");
+
 	self->v.solid = SOLID_SLIDEBOX;
 	self->v.movetype = MOVETYPE_STEP;
 
-	PF_setmodel (self, "progs/hknight.mdl");
+	PF_setmodel(self, "progs/hknight.mdl");
 
-	PF_setsize (self, Vector3D{-16, -16, -24}, Vector3D{16, 16, 40});
+	PF_setsize(self, Vector3D{-16, -16, -24}, Vector3D{16, 16, 40});
 	self->v.health = 250;
 
 	self->v.th_stand = hknight_stand1;
@@ -785,8 +785,8 @@ void monster_hell_knight(edict_t* self)
 	self->v.th_pain = hknight_pain;
 	self->v.th_die = hknight_die;
 	self->v.animations_get = &hknight_animations_get;
-	
-	walkmonster_start (self);
+
+	walkmonster_start(self);
 }
 
 LINK_ENTITY_TO_CLASS(monster_hell_knight);

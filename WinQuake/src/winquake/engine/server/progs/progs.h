@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -36,12 +36,12 @@ typedef struct edict_s
 {
 	bool		free;
 	link_t		area;				// linked to a division node or leaf
-	
+
 	int			num_leafs;
 	short		leafnums[MAX_ENT_LEAFS];
 
 	entity_state_t	baseline;
-	
+
 	float		freetime;			// sv.time when the object was freed
 	entvars_t	v;					// C exported fields from progs
 // other fields from progs come immediately after
@@ -50,21 +50,21 @@ typedef struct edict_s
 
 //============================================================================
 
-extern	globalvars_t	*pr_global_struct;
+extern	globalvars_t* pr_global_struct;
 
 //============================================================================
 
-void PR_Init (void);
+void PR_Init(void);
 
 void PR_LoadProgs(void);
 
-edict_t *ED_Alloc (void);
-void ED_Free (edict_t *ed);
+edict_t* ED_Alloc(void);
+void ED_Free(edict_t* ed);
 
-char	*ED_NewString (const char *string);
+char* ED_NewString(const char* string);
 // returns a copy of the string allocated from the server's string heap
 
-void ED_Write (FILE *f, edict_t *ed);
+void ED_Write(FILE* f, edict_t* ed);
 
 template<typename T>
 T* ED_GetValueAddress(void* base, const fielddescription& field)
@@ -85,20 +85,20 @@ void ED_SetValue(void* base, const fielddescription& field, T value)
 	*address = value;
 }
 
-char *ED_ParseEdict (char *data, edict_t *ent);
+char* ED_ParseEdict(char* data, edict_t* ent);
 
-void ED_WriteGlobals (FILE *f);
-void ED_ParseGlobals (char *data);
+void ED_WriteGlobals(FILE* f);
+void ED_ParseGlobals(char* data);
 
-void ED_LoadFromFile (char *data);
+void ED_LoadFromFile(char* data);
 
-edict_t *EDICT_NUM(int n);
-int NUM_FOR_EDICT(edict_t *e);
+edict_t* EDICT_NUM(int n);
+int NUM_FOR_EDICT(edict_t* e);
 
 //============================================================================
 
-void ED_PrintEdicts (void);
-void ED_PrintNum (int ent);
+void ED_PrintEdicts(void);
+void ED_PrintNum(int ent);
 
 const fielddescription* ED_FindField(const char* name);
 

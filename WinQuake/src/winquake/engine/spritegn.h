@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -63,7 +63,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // must match definition in modelgen.h
 #ifndef SYNCTYPE_T
 #define SYNCTYPE_T
-typedef enum {ST_SYNC=0, ST_RAND } synctype_t;
+typedef enum { ST_SYNC = 0, ST_RAND } synctype_t;
 #endif
 
 // TODO: shorten these?
@@ -99,12 +99,12 @@ typedef struct {
 	float	interval;
 } dspriteinterval_t;
 
-typedef enum { SPR_SINGLE=0, SPR_GROUP } spriteframetype_t;
+typedef enum { SPR_SINGLE = 0, SPR_GROUP } spriteframetype_t;
 
 typedef struct {
 	spriteframetype_t	type;
 } dspriteframetype_t;
 
 #define IDSPRITEHEADER	(('P'<<24)+('S'<<16)+('D'<<8)+'I')
-														// little-endian "IDSP"
+// little-endian "IDSP"
 

@@ -379,20 +379,20 @@ LINK_FUNCTION_TO_NAME(ogre_animations_get);
 
 void OgreGrenadeExplode(edict_t* self)
 {
-	T_RadiusDamage (self, self, self->v.owner, 40, pr_global_struct->world);
-	PF_sound (self, CHAN_VOICE, "weapons/r_exp3.wav", 1, ATTN_NORM);
+	T_RadiusDamage(self, self, self->v.owner, 40, pr_global_struct->world);
+	PF_sound(self, CHAN_VOICE, "weapons/r_exp3.wav", 1, ATTN_NORM);
 
-	PF_WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
-	PF_WriteByte (MSG_BROADCAST, TE_EXPLOSION);
-	PF_WriteCoord (MSG_BROADCAST, self->v.origin[0]);
-	PF_WriteCoord (MSG_BROADCAST, self->v.origin[1]);
-	PF_WriteCoord (MSG_BROADCAST, self->v.origin[2]);
+	PF_WriteByte(MSG_BROADCAST, SVC_TEMPENTITY);
+	PF_WriteByte(MSG_BROADCAST, TE_EXPLOSION);
+	PF_WriteCoord(MSG_BROADCAST, self->v.origin[0]);
+	PF_WriteCoord(MSG_BROADCAST, self->v.origin[1]);
+	PF_WriteCoord(MSG_BROADCAST, self->v.origin[2]);
 
 	AsVector(self->v.velocity) = AsVector(vec3_origin);
 	self->v.touch = SUB_NullTouch;
-	PF_setmodel (self, "progs/s_explod.spr");
+	PF_setmodel(self, "progs/s_explod.spr");
 	self->v.solid = SOLID_NOT;
-	s_explode1 (self);
+	s_explode1(self);
 }
 
 LINK_FUNCTION_TO_NAME(OgreGrenadeExplode);
@@ -406,7 +406,7 @@ void OgreGrenadeTouch(edict_t* self, edict_t* other)
 		OgreGrenadeExplode(self);
 		return;
 	}
-	PF_sound (self, CHAN_VOICE, "weapons/bounce.wav", 1, ATTN_NORM);	// bounce sound
+	PF_sound(self, CHAN_VOICE, "weapons/bounce.wav", 1, ATTN_NORM);	// bounce sound
 	if (AsVector(self->v.velocity) == AsVector(vec3_origin))
 		AsVector(self->v.avelocity) = AsVector(vec3_origin);
 }
@@ -422,16 +422,16 @@ void OgreFireGrenade(edict_t* self)
 {
 	self->v.effects = self->v.effects | EF_MUZZLEFLASH;
 
-	PF_sound (self, CHAN_WEAPON, "weapons/grenade.wav", 1, ATTN_NORM);
+	PF_sound(self, CHAN_WEAPON, "weapons/grenade.wav", 1, ATTN_NORM);
 
-	auto missile = PF_Spawn ();
+	auto missile = PF_Spawn();
 	missile->v.owner = self;
 	missile->v.movetype = MOVETYPE_BOUNCE;
 	missile->v.solid = SOLID_BBOX;
-		
-// set missile speed	
 
-	PF_makevectors (self->v.angles);
+	// set missile speed	
+
+	PF_makevectors(self->v.angles);
 
 	PF_normalize(AsVector(self->v.enemy->v.origin) - AsVector(self->v.origin), missile->v.velocity);
 	AsVector(missile->v.velocity) = AsVector(missile->v.velocity) * 600;
@@ -440,16 +440,16 @@ void OgreFireGrenade(edict_t* self)
 	AsVector(missile->v.avelocity) = Vector3D{300, 300, 300};
 
 	PF_vectoangles(missile->v.velocity, missile->v.angles);
-	
+
 	missile->v.touch = OgreGrenadeTouch;
-	
-// set missile duration
+
+	// set missile duration
 	missile->v.nextthink = pr_global_struct->time + 2.5;
 	missile->v.think = OgreGrenadeExplode;
 
-	PF_setmodel (missile, "progs/grenade.mdl");
-	PF_setsize (missile, vec3_origin, vec3_origin);
-	PF_setorigin (missile, self->v.origin);
+	PF_setmodel(missile, "progs/grenade.mdl");
+	PF_setsize(missile, vec3_origin, vec3_origin);
+	PF_setorigin(missile, self->v.origin);
 }
 
 
@@ -466,7 +466,7 @@ void chainsaw(edict_t* self, float side)
 {
 	if (!self->v.enemy)
 		return;
-	if (!CanDamage (self, self->v.enemy, self))
+	if (!CanDamage(self, self->v.enemy, self))
 		return;
 
 	ai_charge(self, 10);
@@ -475,17 +475,17 @@ void chainsaw(edict_t* self, float side)
 
 	if (PF_vlen(delta) > 100)
 		return;
-		
+
 	const float ldmg = (PF_random() + PF_random() + PF_random()) * 4;
-	T_Damage (self, self->v.enemy, self, self, ldmg);
-	
+	T_Damage(self, self->v.enemy, self, self, ldmg);
+
 	if (side)
 	{
-		PF_makevectors (self->v.angles);
+		PF_makevectors(self->v.angles);
 		if (side == 1)
-			SpawnMeatSpray (self, AsVector(self->v.origin) + AsVector(pr_global_struct->v_forward)*16, crandom() * 100 * AsVector(pr_global_struct->v_right));
+			SpawnMeatSpray(self, AsVector(self->v.origin) + AsVector(pr_global_struct->v_forward) * 16, crandom() * 100 * AsVector(pr_global_struct->v_right));
 		else
-			SpawnMeatSpray (self, AsVector(self->v.origin) + AsVector(pr_global_struct->v_forward)*16, side * AsVector(pr_global_struct->v_right));
+			SpawnMeatSpray(self, AsVector(self->v.origin) + AsVector(pr_global_struct->v_forward) * 16, side * AsVector(pr_global_struct->v_right));
 	}
 }
 
@@ -564,37 +564,37 @@ void ogre_bdie1(edict_t* self)
 
 void ogre_pain(edict_t* self, edict_t* attacker, float damage)
 {
-// don't make multiple pain sounds right after each other
+	// don't make multiple pain sounds right after each other
 	if (self->v.pain_finished > pr_global_struct->time)
 		return;
 
-	PF_sound (self, CHAN_VOICE, "ogre/ogpain1.wav", 1, ATTN_NORM);		
+	PF_sound(self, CHAN_VOICE, "ogre/ogpain1.wav", 1, ATTN_NORM);
 
 	const float r = PF_random();
-	
+
 	if (r < 0.25)
 	{
-		ogre_pain1 (self);
+		ogre_pain1(self);
 		self->v.pain_finished = pr_global_struct->time + 1;
 	}
 	else if (r < 0.5)
 	{
-		ogre_painb1 (self);
+		ogre_painb1(self);
 		self->v.pain_finished = pr_global_struct->time + 1;
 	}
 	else if (r < 0.75)
 	{
-		ogre_painc1 (self);
+		ogre_painc1(self);
 		self->v.pain_finished = pr_global_struct->time + 1;
 	}
 	else if (r < 0.88)
 	{
-		ogre_paind1 (self);
+		ogre_paind1(self);
 		self->v.pain_finished = pr_global_struct->time + 2;
 	}
 	else
 	{
-		ogre_paine1 (self);
+		ogre_paine1(self);
 		self->v.pain_finished = pr_global_struct->time + 2;
 	}
 }
@@ -603,23 +603,23 @@ LINK_FUNCTION_TO_NAME(ogre_pain);
 
 void ogre_die(edict_t* self)
 {
-// check for gib
+	// check for gib
 	if (self->v.health < -80)
 	{
-		PF_sound (self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
-		ThrowHead (self, "progs/h_ogre.mdl", self->v.health);
-		ThrowGib (self, "progs/gib3.mdl", self->v.health);
-		ThrowGib (self, "progs/gib3.mdl", self->v.health);
-		ThrowGib (self, "progs/gib3.mdl", self->v.health);
+		PF_sound(self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
+		ThrowHead(self, "progs/h_ogre.mdl", self->v.health);
+		ThrowGib(self, "progs/gib3.mdl", self->v.health);
+		ThrowGib(self, "progs/gib3.mdl", self->v.health);
+		ThrowGib(self, "progs/gib3.mdl", self->v.health);
 		return;
 	}
 
-	PF_sound (self, CHAN_VOICE, "ogre/ogdth.wav", 1, ATTN_NORM);
-	
+	PF_sound(self, CHAN_VOICE, "ogre/ogdth.wav", 1, ATTN_NORM);
+
 	if (PF_random() < 0.5)
-		ogre_die1 (self);
+		ogre_die1(self);
 	else
-		ogre_bdie1 (self);
+		ogre_bdie1(self);
 }
 
 LINK_FUNCTION_TO_NAME(ogre_die);
@@ -627,9 +627,9 @@ LINK_FUNCTION_TO_NAME(ogre_die);
 void ogre_melee(edict_t* self)
 {
 	if (PF_random() > 0.5)
-		ogre_smash1 (self);
+		ogre_smash1(self);
 	else
-		ogre_swing1 (self);
+		ogre_swing1(self);
 }
 
 LINK_FUNCTION_TO_NAME(ogre_melee);
@@ -644,24 +644,24 @@ void monster_ogre(edict_t* self)
 		PF_Remove(self);
 		return;
 	}
-	PF_precache_model ("progs/ogre.mdl");
+	PF_precache_model("progs/ogre.mdl");
 	PF_precache_model("progs/h_ogre.mdl");
 	PF_precache_model("progs/grenade.mdl");
 
-	PF_precache_sound ("ogre/ogdrag.wav");
-	PF_precache_sound ("ogre/ogdth.wav");
-	PF_precache_sound ("ogre/ogidle.wav");
-	PF_precache_sound ("ogre/ogidle2.wav");
-	PF_precache_sound ("ogre/ogpain1.wav");
-	PF_precache_sound ("ogre/ogsawatk.wav");
-	PF_precache_sound ("ogre/ogwake.wav");
+	PF_precache_sound("ogre/ogdrag.wav");
+	PF_precache_sound("ogre/ogdth.wav");
+	PF_precache_sound("ogre/ogidle.wav");
+	PF_precache_sound("ogre/ogidle2.wav");
+	PF_precache_sound("ogre/ogpain1.wav");
+	PF_precache_sound("ogre/ogsawatk.wav");
+	PF_precache_sound("ogre/ogwake.wav");
 
 	self->v.solid = SOLID_SLIDEBOX;
 	self->v.movetype = MOVETYPE_STEP;
 
-	PF_setmodel (self, "progs/ogre.mdl");
+	PF_setmodel(self, "progs/ogre.mdl");
 
-	PF_setsize (self, VEC_HULL2_MIN, VEC_HULL2_MAX);
+	PF_setsize(self, VEC_HULL2_MIN, VEC_HULL2_MAX);
 	self->v.health = 200;
 
 	self->v.th_stand = ogre_stand1;
@@ -672,13 +672,13 @@ void monster_ogre(edict_t* self)
 	self->v.th_missile = ogre_nail1;
 	self->v.th_pain = ogre_pain;
 	self->v.animations_get = &ogre_animations_get;
-	
+
 	walkmonster_start(self);
 }
 
 void monster_ogre_marksman(edict_t* self)
 {
-	monster_ogre (self);
+	monster_ogre(self);
 }
 
 LINK_ENTITY_TO_CLASS(monster_ogre);

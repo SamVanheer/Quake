@@ -83,7 +83,7 @@ struct Animations
 			return &(*it);
 		}
 
-		return nullptr;
+			return nullptr;
 	}
 
 	int FindAnimationStart(std::string_view name) const

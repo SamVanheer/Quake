@@ -467,7 +467,7 @@ void Game::PutClientInServer(edict_t* self)
 	self->v.animations_get = &player_animations_get;
 
 	DecodeLevelParms(self);
-	
+
 	W_SetCurrentAmmo(self);
 
 	self->v.attack_finished = pr_global_struct->time;
@@ -887,7 +887,7 @@ void WaterMove(edict_t* self)
 
 void CheckWaterJump(edict_t* self)
 {
-// check for a jump-out-of-water
+	// check for a jump-out-of-water
 	PF_makevectors(self->v.angles);
 	Vector3D start = AsVector(self->v.origin);
 	start[2] += 8;

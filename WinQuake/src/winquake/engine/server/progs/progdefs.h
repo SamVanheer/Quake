@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -29,7 +29,7 @@ typedef struct
 	float	time;
 	float	frametime;
 	float	force_retouch;
-	const char*	mapname;
+	const char* mapname;
 	float	deathmatch;
 	float	coop;
 	float	teamplay;
@@ -123,8 +123,8 @@ struct entvars_t
 	vec3_t	angles;
 	vec3_t	avelocity;
 	vec3_t	punchangle;
-	const char*	classname;
-	const char*	model;
+	const char* classname;
+	const char* model;
 	float	frame;
 	float	skin;
 	int	effects;
@@ -175,8 +175,8 @@ struct entvars_t
 	edict_s* aiment;
 	edict_s* goalentity;
 	int	spawnflags;
-	const char*	target;
-	const char*	targetname;
+	const char* target;
+	const char* targetname;
 	float	dmg_take;
 	float	dmg_save;
 	edict_s* dmg_inflictor;
@@ -184,17 +184,17 @@ struct entvars_t
 	vec3_t	movedir;
 	const char* message;
 	float	sounds;
-	const char*	noise;
-	const char*	noise1;
-	const char*	noise2;
-	const char*	noise3;
+	const char* noise;
+	const char* noise1;
+	const char* noise2;
+	const char* noise3;
 
 	//QuakeC only variables.
 	//
 	// world fields (FIXME: make globals)
 	//
-	const char*	wad;
-	const char* 	map;
+	const char* wad;
+	const char* map;
 	float		worldtype;	// 0=medieval 1=metal 2=base
 
 	//================================================
@@ -219,7 +219,7 @@ struct entvars_t
 	void (*th_pain)(edict_s*, edict_s* attacker, float damage);
 	void (*th_die)(edict_s*);
 
-	edict_s*	oldenemy;		// mad at this player before taking damage
+	edict_s* oldenemy;		// mad at this player before taking damage
 
 	float	speed;
 
@@ -275,14 +275,14 @@ struct entvars_t
 	vec3_t		dest, dest1, dest2;
 	float		wait;			// time from firing to restarting
 	float		delay;			// time from activation to firing
-	edict_s*	trigger_field;	// door's trigger entity
+	edict_s* trigger_field;	// door's trigger entity
 	const char* noise4;
 
 	//
 	// monsters
 	//
 	float 		pausetime;
-	edict_s*	movetarget;
+	edict_s* movetarget;
 
 
 	//

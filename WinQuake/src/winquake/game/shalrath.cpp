@@ -241,7 +241,7 @@ void shalrath_pain(edict_t* self, edict_t* attacker, float damage)
 	if (self->v.pain_finished > pr_global_struct->time)
 		return;
 
-	PF_sound (self, CHAN_VOICE, "shalrath/pain.wav", 1, ATTN_NORM);
+	PF_sound(self, CHAN_VOICE, "shalrath/pain.wav", 1, ATTN_NORM);
 	shal_pain1(self);
 	self->v.pain_finished = pr_global_struct->time + 3;
 }
@@ -250,18 +250,18 @@ LINK_FUNCTION_TO_NAME(shalrath_pain);
 
 void shalrath_die(edict_t* self)
 {
-// check for gib
+	// check for gib
 	if (self->v.health < -90)
 	{
-		PF_sound (self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
-		ThrowHead (self, "progs/h_shal.mdl", self->v.health);
-		ThrowGib (self, "progs/gib1.mdl", self->v.health);
-		ThrowGib (self, "progs/gib2.mdl", self->v.health);
-		ThrowGib (self, "progs/gib3.mdl", self->v.health);
+		PF_sound(self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
+		ThrowHead(self, "progs/h_shal.mdl", self->v.health);
+		ThrowGib(self, "progs/gib1.mdl", self->v.health);
+		ThrowGib(self, "progs/gib2.mdl", self->v.health);
+		ThrowGib(self, "progs/gib3.mdl", self->v.health);
 		return;
 	}
 
-	PF_sound (self, CHAN_VOICE, "shalrath/death.wav", 1, ATTN_NORM);
+	PF_sound(self, CHAN_VOICE, "shalrath/death.wav", 1, ATTN_NORM);
 	shal_death1(self);
 	self->v.solid = SOLID_NOT;
 	// insert death sounds here
@@ -281,22 +281,22 @@ void ShalMissile(edict_t* self)
 	Vector3D dir;
 
 	PF_normalize((AsVector(self->v.enemy->v.origin) + Vector3D{0, 0, 10}) - AsVector(self->v.origin), dir);
-	const float dist = PF_vlen (AsVector(self->v.enemy->v.origin) - AsVector(self->v.origin));
+	const float dist = PF_vlen(AsVector(self->v.enemy->v.origin) - AsVector(self->v.origin));
 	float flytime = dist * 0.002;
 	if (flytime < 0.1)
 		flytime = 0.1f;
 
 	self->v.effects = self->v.effects | EF_MUZZLEFLASH;
-	PF_sound (self, CHAN_WEAPON, "shalrath/attack2.wav", 1, ATTN_NORM);
+	PF_sound(self, CHAN_WEAPON, "shalrath/attack2.wav", 1, ATTN_NORM);
 
-	auto missile = PF_Spawn ();
+	auto missile = PF_Spawn();
 	missile->v.owner = self;
 
 	missile->v.solid = SOLID_BBOX;
 	missile->v.movetype = MOVETYPE_FLYMISSILE;
-	PF_setmodel (missile, "progs/v_spike.mdl");
+	PF_setmodel(missile, "progs/v_spike.mdl");
 
-	PF_setsize (missile, vec3_origin, vec3_origin);		
+	PF_setsize(missile, vec3_origin, vec3_origin);
 
 	AsVector(missile->v.origin) = AsVector(self->v.origin) + Vector3D{0, 0, 10};
 	AsVector(missile->v.velocity) = dir * 400;
@@ -323,7 +323,7 @@ void ShalHome(edict_t* self)
 	else
 		AsVector(self->v.velocity) = dir * 250;
 	self->v.nextthink = pr_global_struct->time + 0.2;
-	self->v.think = ShalHome;	
+	self->v.think = ShalHome;
 }
 
 LINK_FUNCTION_TO_NAME(ShalHome);
@@ -334,21 +334,21 @@ void ShalMissileTouch(edict_t* self, edict_t* other)
 		return;		// don't explode on owner
 
 	if (!strcmp(other->v.classname, "monster_zombie"))
-		T_Damage (self, other, self, self, 110);	
-	T_RadiusDamage (self, self, self->v.owner, 40, pr_global_struct->world);
-	PF_sound (self, CHAN_WEAPON, "weapons/r_exp3.wav", 1, ATTN_NORM);
+		T_Damage(self, other, self, self, 110);
+	T_RadiusDamage(self, self, self->v.owner, 40, pr_global_struct->world);
+	PF_sound(self, CHAN_WEAPON, "weapons/r_exp3.wav", 1, ATTN_NORM);
 
-	PF_WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
-	PF_WriteByte (MSG_BROADCAST, TE_EXPLOSION);
-	PF_WriteCoord (MSG_BROADCAST, self->v.origin[0]);
-	PF_WriteCoord (MSG_BROADCAST, self->v.origin[1]);
-	PF_WriteCoord (MSG_BROADCAST, self->v.origin[2]);
+	PF_WriteByte(MSG_BROADCAST, SVC_TEMPENTITY);
+	PF_WriteByte(MSG_BROADCAST, TE_EXPLOSION);
+	PF_WriteCoord(MSG_BROADCAST, self->v.origin[0]);
+	PF_WriteCoord(MSG_BROADCAST, self->v.origin[1]);
+	PF_WriteCoord(MSG_BROADCAST, self->v.origin[2]);
 
 	AsVector(self->v.velocity) = AsVector(vec3_origin);
 	self->v.touch = SUB_NullTouch;
-	PF_setmodel (self, "progs/s_explod.spr");
+	PF_setmodel(self, "progs/s_explod.spr");
 	self->v.solid = SOLID_NOT;
-	s_explode1 (self);
+	s_explode1(self);
 }
 
 LINK_FUNCTION_TO_NAME(ShalMissileTouch);
@@ -364,22 +364,22 @@ void monster_shalrath(edict_t* self)
 		PF_Remove(self);
 		return;
 	}
-	PF_precache_model ("progs/shalrath.mdl");
-	PF_precache_model ("progs/h_shal.mdl");
-	PF_precache_model ("progs/v_spike.mdl");
-	
-	PF_precache_sound ("shalrath/attack.wav");
-	PF_precache_sound ("shalrath/attack2.wav");
-	PF_precache_sound ("shalrath/death.wav");
-	PF_precache_sound ("shalrath/idle.wav");
-	PF_precache_sound ("shalrath/pain.wav");
-	PF_precache_sound ("shalrath/sight.wav");
-	
+	PF_precache_model("progs/shalrath.mdl");
+	PF_precache_model("progs/h_shal.mdl");
+	PF_precache_model("progs/v_spike.mdl");
+
+	PF_precache_sound("shalrath/attack.wav");
+	PF_precache_sound("shalrath/attack2.wav");
+	PF_precache_sound("shalrath/death.wav");
+	PF_precache_sound("shalrath/idle.wav");
+	PF_precache_sound("shalrath/pain.wav");
+	PF_precache_sound("shalrath/sight.wav");
+
 	self->v.solid = SOLID_SLIDEBOX;
 	self->v.movetype = MOVETYPE_STEP;
-	
-	PF_setmodel (self, "progs/shalrath.mdl");
-	PF_setsize (self, VEC_HULL2_MIN, VEC_HULL2_MAX);
+
+	PF_setmodel(self, "progs/shalrath.mdl");
+	PF_setsize(self, VEC_HULL2_MIN, VEC_HULL2_MAX);
 	self->v.health = 400;
 
 	self->v.th_stand = shal_stand;
@@ -391,7 +391,7 @@ void monster_shalrath(edict_t* self)
 	self->v.animations_get = &shal_animations_get;
 
 	self->v.think = walkmonster_start;
-	self->v.nextthink = pr_global_struct->time + 0.1 + PF_random ()*0.1;
+	self->v.nextthink = pr_global_struct->time + 0.1 + PF_random() * 0.1;
 
 }
 

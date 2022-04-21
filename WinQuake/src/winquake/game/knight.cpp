@@ -337,16 +337,16 @@ void knight_pain(edict_t* self, edict_t* attacker, float damage)
 		return;
 
 	const float r = PF_random();
-	
-	PF_sound (self, CHAN_VOICE, "knight/khurt.wav", 1, ATTN_NORM);
+
+	PF_sound(self, CHAN_VOICE, "knight/khurt.wav", 1, ATTN_NORM);
 	if (r < 0.85)
 	{
-		knight_pain1 (self);
+		knight_pain1(self);
 		self->v.pain_finished = pr_global_struct->time + 1;
 	}
 	else
 	{
-		knight_painb1 (self);
+		knight_painb1(self);
 		self->v.pain_finished = pr_global_struct->time + 1;
 	}
 }
@@ -371,23 +371,23 @@ void knight_dieb1(edict_t* self)
 
 void knight_die(edict_t* self)
 {
-// check for gib
+	// check for gib
 	if (self->v.health < -40)
 	{
 		PF_sound(self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
-		ThrowHead (self, "progs/h_knight.mdl", self->v.health);
-		ThrowGib (self, "progs/gib1.mdl", self->v.health);
-		ThrowGib (self, "progs/gib2.mdl", self->v.health);
-		ThrowGib (self, "progs/gib3.mdl", self->v.health);
+		ThrowHead(self, "progs/h_knight.mdl", self->v.health);
+		ThrowGib(self, "progs/gib1.mdl", self->v.health);
+		ThrowGib(self, "progs/gib2.mdl", self->v.health);
+		ThrowGib(self, "progs/gib3.mdl", self->v.health);
 		return;
 	}
 
-// regular death
+	// regular death
 	PF_sound(self, CHAN_VOICE, "knight/kdeath.wav", 1, ATTN_NORM);
 	if (PF_random() < 0.5)
-		knight_die1 (self);
+		knight_die1(self);
 	else
-		knight_dieb1 (self);
+		knight_dieb1(self);
 }
 
 LINK_FUNCTION_TO_NAME(knight_die);
@@ -414,9 +414,9 @@ void monster_knight(edict_t* self)
 	self->v.solid = SOLID_SLIDEBOX;
 	self->v.movetype = MOVETYPE_STEP;
 
-	PF_setmodel (self, "progs/knight.mdl");
+	PF_setmodel(self, "progs/knight.mdl");
 
-	PF_setsize (self, Vector3D{-16, -16, -24}, Vector3D{16, 16, 40});
+	PF_setsize(self, Vector3D{-16, -16, -24}, Vector3D{16, 16, 40});
 	self->v.health = 75;
 
 	self->v.th_stand = knight_stand1;
@@ -426,8 +426,8 @@ void monster_knight(edict_t* self)
 	self->v.th_pain = knight_pain;
 	self->v.th_die = knight_die;
 	self->v.animations_get = &knight_animations_get;
-	
-	walkmonster_start (self);
+
+	walkmonster_start(self);
 }
 
 LINK_ENTITY_TO_CLASS(monster_knight);

@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -76,11 +76,11 @@ typedef struct texture_s
 	char		name[16];
 	unsigned	width, height;
 	int			gl_texturenum;
-	struct msurface_s	*texturechain;	// for gl_texsort drawing
+	struct msurface_s* texturechain;	// for gl_texsort drawing
 	int			anim_total;				// total tenths in sequence ( 0 = no)
 	int			anim_min, anim_max;		// time for this frame min <=time< max
-	struct texture_s *anim_next;		// in the animation sequence
-	struct texture_s *alternate_anims;	// bmodels in frmae 1 use these
+	struct texture_s* anim_next;		// in the animation sequence
+	struct texture_s* alternate_anims;	// bmodels in frmae 1 use these
 	unsigned	offsets[MIPLEVELS];		// four mip maps stored
 } texture_t;
 
@@ -103,7 +103,7 @@ typedef struct
 {
 	float		vecs[2][4];
 	float		mipadjust;
-	texture_t	*texture;
+	texture_t* texture;
 	int			flags;
 } mtexinfo_t;
 
@@ -111,8 +111,8 @@ typedef struct
 
 typedef struct glpoly_s
 {
-	struct	glpoly_s	*next;
-	struct	glpoly_s	*chain;
+	struct	glpoly_s* next;
+	struct	glpoly_s* chain;
 	int		numverts;
 	int		flags;			// for SURF_UNDERWATER
 	float	verts[4][VERTEXSIZE];	// variable sized (xyz s1t1 s2t2)
@@ -122,23 +122,23 @@ typedef struct msurface_s
 {
 	int			visframe;		// should be drawn when node is crossed
 
-	mplane_t	*plane;
+	mplane_t* plane;
 	int			flags;
 
 	int			firstedge;	// look up in model->surfedges[], negative numbers
 	int			numedges;	// are backwards edges
-	
+
 	short		texturemins[2];
 	short		extents[2];
 
 	int			light_s, light_t;	// gl lightmap coordinates
 
-	glpoly_t	*polys;				// multiple if warped
-	struct	msurface_s	*texturechain;
+	glpoly_t* polys;				// multiple if warped
+	struct	msurface_s* texturechain;
 
-	mtexinfo_t	*texinfo;
-	
-// lighting info
+	mtexinfo_t* texinfo;
+
+	// lighting info
 	int			dlightframe;
 	int			dlightbits;
 
@@ -146,22 +146,22 @@ typedef struct msurface_s
 	byte		styles[MAXLIGHTMAPS];
 	int			cached_light[MAXLIGHTMAPS];	// values currently used in lightmap
 	bool		cached_dlight;				// true if dynamic light in cache
-	byte		*samples;		// [numstyles*surfsize]
+	byte* samples;		// [numstyles*surfsize]
 } msurface_t;
 
 typedef struct mnode_s
 {
-// common with leaf
+	// common with leaf
 	int			contents;		// 0, to differentiate from leafs
 	int			visframe;		// node needs to be traversed if current
-	
+
 	float		minmaxs[6];		// for bounding box culling
 
-	struct mnode_s	*parent;
+	struct mnode_s* parent;
 
-// node specific
-	mplane_t	*plane;
-	struct mnode_s	*children[2];	
+	// node specific
+	mplane_t* plane;
+	struct mnode_s* children[2];
 
 	unsigned short		firstsurface;
 	unsigned short		numsurfaces;
@@ -171,19 +171,19 @@ typedef struct mnode_s
 
 typedef struct mleaf_s
 {
-// common with node
+	// common with node
 	int			contents;		// wil be a negative contents number
 	int			visframe;		// node needs to be traversed if current
 
 	float		minmaxs[6];		// for bounding box culling
 
-	struct mnode_s	*parent;
+	struct mnode_s* parent;
 
-// leaf specific
-	byte		*compressed_vis;
-	efrag_t		*efrags;
+	// leaf specific
+	byte* compressed_vis;
+	efrag_t* efrags;
 
-	msurface_t	**firstmarksurface;
+	msurface_t** firstmarksurface;
 	int			nummarksurfaces;
 	int			key;			// BSP sequence number for leaf's contents
 	byte		ambient_sound_level[NUM_AMBIENTS];
@@ -191,8 +191,8 @@ typedef struct mleaf_s
 
 typedef struct
 {
-	dclipnode_t	*clipnodes;
-	mplane_t	*planes;
+	dclipnode_t* clipnodes;
+	mplane_t* planes;
 	int			firstclipnode;
 	int			lastclipnode;
 	vec3_t		clip_mins;
@@ -220,14 +220,14 @@ typedef struct mspriteframe_s
 typedef struct
 {
 	int				numframes;
-	float			*intervals;
-	mspriteframe_t	*frames[1];
+	float* intervals;
+	mspriteframe_t* frames[1];
 } mspritegroup_t;
 
 typedef struct
 {
 	spriteframetype_t	type;
-	mspriteframe_t		*frameptr;
+	mspriteframe_t* frameptr;
 } mspriteframedesc_t;
 
 typedef struct
@@ -237,7 +237,7 @@ typedef struct
 	int					maxheight;
 	int					numframes;
 	float				beamlength;		// remove?
-	void				*cachespot;		// remove?
+	void* cachespot;		// remove?
 	mspriteframedesc_t	frames[1];
 } msprite_t;
 
@@ -312,10 +312,10 @@ typedef struct {
 #define	MAXALIASVERTS	1024
 #define	MAXALIASFRAMES	256
 #define	MAXALIASTRIS	2048
-extern	aliashdr_t	*pheader;
+extern	aliashdr_t* pheader;
 extern	stvert_t	stverts[MAXALIASVERTS];
 extern	mtriangle_t	triangles[MAXALIASTRIS];
-extern	trivertx_t	*poseverts[MAXALIASFRAMES];
+extern	trivertx_t* poseverts[MAXALIASFRAMES];
 
 //===================================================================
 
@@ -323,7 +323,7 @@ extern	trivertx_t	*poseverts[MAXALIASFRAMES];
 // Whole model
 //
 
-typedef enum {mod_brush, mod_sprite, mod_alias} modtype_t;
+typedef enum { mod_brush, mod_sprite, mod_alias } modtype_t;
 
 #define	EF_ROCKET	1			// leave a trail
 #define	EF_GRENADE	2			// leave a trail
@@ -342,84 +342,84 @@ typedef struct model_s
 	modtype_t	type;
 	int			numframes;
 	synctype_t	synctype;
-	
+
 	int			flags;
 
-//
-// volume occupied by the model graphics
-//		
+	//
+	// volume occupied by the model graphics
+	//		
 	vec3_t		mins, maxs;
 	float		radius;
 
-//
-// solid volume for clipping 
-//
+	//
+	// solid volume for clipping 
+	//
 	bool		clipbox;
 	vec3_t		clipmins, clipmaxs;
 
-//
-// brush model
-//
+	//
+	// brush model
+	//
 	int			firstmodelsurface, nummodelsurfaces;
 
 	int			numsubmodels;
-	dmodel_t	*submodels;
+	dmodel_t* submodels;
 
 	int			numplanes;
-	mplane_t	*planes;
+	mplane_t* planes;
 
 	int			numleafs;		// number of visible leafs, not counting 0
-	mleaf_t		*leafs;
+	mleaf_t* leafs;
 
 	int			numvertexes;
-	mvertex_t	*vertexes;
+	mvertex_t* vertexes;
 
 	int			numedges;
-	medge_t		*edges;
+	medge_t* edges;
 
 	int			numnodes;
-	mnode_t		*nodes;
+	mnode_t* nodes;
 
 	int			numtexinfo;
-	mtexinfo_t	*texinfo;
+	mtexinfo_t* texinfo;
 
 	int			numsurfaces;
-	msurface_t	*surfaces;
+	msurface_t* surfaces;
 
 	int			numsurfedges;
-	int			*surfedges;
+	int* surfedges;
 
 	int			numclipnodes;
-	dclipnode_t	*clipnodes;
+	dclipnode_t* clipnodes;
 
 	int			nummarksurfaces;
-	msurface_t	**marksurfaces;
+	msurface_t** marksurfaces;
 
 	hull_t		hulls[MAX_MAP_HULLS];
 
 	int			numtextures;
-	texture_t	**textures;
+	texture_t** textures;
 
-	byte		*visdata;
-	byte		*lightdata;
-	char		*entities;
+	byte* visdata;
+	byte* lightdata;
+	char* entities;
 
-//
-// additional model data
-//
+	//
+	// additional model data
+	//
 	cache_user_t	cache;		// only access through Mod_Extradata
 
 } model_t;
 
 //============================================================================
 
-void	Mod_Init (void);
-void	Mod_ClearAll (void);
-model_t *Mod_ForName (const char *name, bool crash);
-void	*Mod_Extradata (model_t *mod);	// handles caching
-void	Mod_TouchModel (const char *name);
+void	Mod_Init(void);
+void	Mod_ClearAll(void);
+model_t* Mod_ForName(const char* name, bool crash);
+void* Mod_Extradata(model_t* mod);	// handles caching
+void	Mod_TouchModel(const char* name);
 
-mleaf_t *Mod_PointInLeaf (float *p, model_t *model);
-byte	*Mod_LeafPVS (mleaf_t *leaf, model_t *model);
+mleaf_t* Mod_PointInLeaf(float* p, model_t* model);
+byte* Mod_LeafPVS(mleaf_t* leaf, model_t* model);
 
 #endif	// __MODEL__

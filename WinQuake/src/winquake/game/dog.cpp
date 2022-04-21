@@ -202,29 +202,29 @@ void dog_bite(edict_t* self)
 
 	ai_charge(self, 10);
 
-	if (!CanDamage (self, self->v.enemy, self))
+	if (!CanDamage(self, self->v.enemy, self))
 		return;
 
 	auto delta = AsVector(self->v.enemy->v.origin) - AsVector(self->v.origin);
 
 	if (PF_vlen(delta) > 100)
 		return;
-		
+
 	const float ldmg = (PF_random() + PF_random() + PF_random()) * 8;
-	T_Damage (self, self->v.enemy, self, self, ldmg);
+	T_Damage(self, self->v.enemy, self, self, ldmg);
 }
 
 void Dog_JumpTouch(edict_t* self, edict_t* other)
 {
 	if (self->v.health <= 0)
 		return;
-		
+
 	if (other->v.takedamage)
 	{
-		if ( PF_vlen(self->v.velocity) > 300 )
+		if (PF_vlen(self->v.velocity) > 300)
 		{
-			const float ldmg = 10 + 10*PF_random();
-			T_Damage (self, other, self, self, ldmg);
+			const float ldmg = 10 + 10 * PF_random();
+			T_Damage(self, other, self, self, ldmg);
 		}
 	}
 
@@ -233,14 +233,14 @@ void Dog_JumpTouch(edict_t* self, edict_t* other)
 		if (self->v.flags & FL_ONGROUND)
 		{	// jump randomly to not get hung up
 //dprint ("popjump\n");
-	self->v.touch = SUB_NullTouch;
-	self->v.think = dog_leap1;
-	self->v.nextthink = pr_global_struct->time + 0.1;
+			self->v.touch = SUB_NullTouch;
+			self->v.think = dog_leap1;
+			self->v.nextthink = pr_global_struct->time + 0.1;
 
-//			self->v.velocity[0] = (PF_random() - 0.5) * 600;
-//			self->v.velocity[1] = (PF_random() - 0.5) * 600;
-//			self->v.velocity[2] = 200;
-//			self->v.flags &= ~FL_ONGROUND;
+			//			self->v.velocity[0] = (PF_random() - 0.5) * 600;
+			//			self->v.velocity[1] = (PF_random() - 0.5) * 600;
+			//			self->v.velocity[2] = 200;
+			//			self->v.flags &= ~FL_ONGROUND;
 		}
 		return;	// not on ground yet
 	}
@@ -309,37 +309,37 @@ void dog_dieb1(edict_t* self)
 
 void dog_pain(edict_t* self, edict_t* attacker, float damage)
 {
-	PF_sound (self, CHAN_VOICE, "dog/dpain1.wav", 1, ATTN_NORM);
+	PF_sound(self, CHAN_VOICE, "dog/dpain1.wav", 1, ATTN_NORM);
 
 	if (PF_random() > 0.5)
-		dog_pain1 (self);
+		dog_pain1(self);
 	else
-		dog_painb1 (self);
+		dog_painb1(self);
 }
 
 LINK_FUNCTION_TO_NAME(dog_pain);
 
 void dog_die(edict_t* self)
 {
-// check for gib
+	// check for gib
 	if (self->v.health < -35)
 	{
 		PF_sound(self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
-		ThrowGib (self, "progs/gib3.mdl", self->v.health);
-		ThrowGib (self, "progs/gib3.mdl", self->v.health);
-		ThrowGib (self, "progs/gib3.mdl", self->v.health);
-		ThrowHead (self, "progs/h_dog.mdl", self->v.health);
+		ThrowGib(self, "progs/gib3.mdl", self->v.health);
+		ThrowGib(self, "progs/gib3.mdl", self->v.health);
+		ThrowGib(self, "progs/gib3.mdl", self->v.health);
+		ThrowHead(self, "progs/h_dog.mdl", self->v.health);
 		return;
 	}
 
-// regular death
+	// regular death
 	PF_sound(self, CHAN_VOICE, "dog/ddeath.wav", 1, ATTN_NORM);
 	self->v.solid = SOLID_NOT;
 
 	if (PF_random() > 0.5)
-		dog_die1 (self);
+		dog_die1(self);
 	else
-		dog_dieb1 (self);
+		dog_dieb1(self);
 }
 
 LINK_FUNCTION_TO_NAME(dog_die);
@@ -372,42 +372,42 @@ CheckDogJump
 bool CheckDogJump(edict_t* self)
 {
 	if (self->v.origin[2] + self->v.mins[2] > self->v.enemy->v.origin[2] + self->v.enemy->v.mins[2]
-	+ 0.75 * self->v.enemy->v.size[2])
+		+ 0.75 * self->v.enemy->v.size[2])
 		return false;
-		
+
 	if (self->v.origin[2] + self->v.maxs[2] < self->v.enemy->v.origin[2] + self->v.enemy->v.mins[2]
-	+ 0.25 * self->v.enemy->v.size[2])
+		+ 0.25 * self->v.enemy->v.size[2])
 		return false;
-		
+
 	auto dist = AsVector(self->v.enemy->v.origin) - AsVector(self->v.origin);
 	dist[2] = 0;
-	
+
 	const float d = PF_vlen(dist);
-	
+
 	if (d < 80)
 		return false;
-		
+
 	if (d > 150)
 		return false;
-		
+
 	return true;
 }
 
 bool DogCheckAttack(edict_t* self)
 {
-// if close enough for slashing, go for it
-	if (CheckDogMelee (self))
+	// if close enough for slashing, go for it
+	if (CheckDogMelee(self))
 	{
 		self->v.attack_state = AS_MELEE;
 		return true;
 	}
-	
-	if (CheckDogJump (self))
+
+	if (CheckDogJump(self))
 	{
 		self->v.attack_state = AS_MISSILE;
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -424,21 +424,21 @@ void monster_dog(edict_t* self)
 		PF_Remove(self);
 		return;
 	}
-	PF_precache_model ("progs/h_dog.mdl");
+	PF_precache_model("progs/h_dog.mdl");
 	PF_precache_model("progs/dog.mdl");
 
-	PF_precache_sound ("dog/dattack1.wav");
-	PF_precache_sound ("dog/ddeath.wav");
-	PF_precache_sound ("dog/dpain1.wav");
-	PF_precache_sound ("dog/dsight.wav");
-	PF_precache_sound ("dog/idle.wav");
+	PF_precache_sound("dog/dattack1.wav");
+	PF_precache_sound("dog/ddeath.wav");
+	PF_precache_sound("dog/dpain1.wav");
+	PF_precache_sound("dog/dsight.wav");
+	PF_precache_sound("dog/idle.wav");
 
 	self->v.solid = SOLID_SLIDEBOX;
 	self->v.movetype = MOVETYPE_STEP;
 
-	PF_setmodel (self, "progs/dog.mdl");
+	PF_setmodel(self, "progs/dog.mdl");
 
-	PF_setsize (self, Vector3D{-32, -32, -24}, Vector3D{32, 32, 40});
+	PF_setsize(self, Vector3D{-32, -32, -24}, Vector3D{32, 32, 40});
 	self->v.health = 25;
 
 	self->v.th_stand = dog_stand1;

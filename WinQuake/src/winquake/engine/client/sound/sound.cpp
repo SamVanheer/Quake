@@ -152,8 +152,7 @@ static void CheckALErrors()
 		{
 			Con_SafePrintf("OpenAL Error: %u\n", error);
 		}
-	}
-	while (error != AL_NO_ERROR);
+	} while (error != AL_NO_ERROR);
 }
 
 class OpenALAudio final : public ISoundSystem

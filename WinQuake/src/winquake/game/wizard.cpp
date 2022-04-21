@@ -184,32 +184,32 @@ if self->v.enemy maintains it's current velocity
 */
 void LaunchMissile(edict_t* self, edict_t* missile, float mspeed, float accuracy)
 {
-	PF_makevectors (self->v.angles);
-		
-// set missile speed
+	PF_makevectors(self->v.angles);
+
+	// set missile speed
 	auto vec = AsVector(self->v.enemy->v.origin) + AsVector(self->v.enemy->v.mins) + AsVector(self->v.enemy->v.size) * 0.7f - AsVector(missile->v.origin);
 
-// calc aproximate time for missile to reach vec
-	const float fly = PF_vlen (vec) / mspeed;
-	
-// get the entities xy velocity
+	// calc aproximate time for missile to reach vec
+	const float fly = PF_vlen(vec) / mspeed;
+
+	// get the entities xy velocity
 	Vector3D move = AsVector(self->v.enemy->v.velocity);
 	move[2] = 0;
 
-// project the target forward in time
+	// project the target forward in time
 	vec = vec + move * fly;
-	
+
 	PF_normalize(vec, vec);
-	vec = vec + accuracy* AsVector(pr_global_struct->v_up)*(PF_random()- 0.5) + accuracy* AsVector(pr_global_struct->v_right)*(PF_random()- 0.5);
-	
+	vec = vec + accuracy * AsVector(pr_global_struct->v_up) * (PF_random() - 0.5) + accuracy * AsVector(pr_global_struct->v_right) * (PF_random() - 0.5);
+
 	AsVector(missile->v.velocity) = vec * mspeed;
 
 	AsVector(missile->v.angles) = AsVector(vec3_origin);
 	missile->v.angles[1] = PF_vectoyaw(missile->v.velocity);
 
-// set missile duration
+	// set missile duration
 	missile->v.nextthink = pr_global_struct->time + 5;
-	missile->v.think = SUB_Remove;	
+	missile->v.think = SUB_Remove;
 }
 
 /*
@@ -229,31 +229,31 @@ bool WizardCheckAttack(edict_t* self)
 		if (self->v.attack_state != AS_STRAIGHT)
 		{
 			self->v.attack_state = AS_STRAIGHT;
-			wiz_run1 (self);
+			wiz_run1(self);
 		}
 		return false;
 	}
-		
+
 	auto targ = self->v.enemy;
-	
-// see if any entities are in the way of the shot
+
+	// see if any entities are in the way of the shot
 	auto spot1 = AsVector(self->v.origin) + AsVector(self->v.view_ofs);
 	auto spot2 = AsVector(targ->v.origin) + AsVector(targ->v.view_ofs);
 
-	PF_traceline (spot1, spot2, MOVE_NORMAL, self);
+	PF_traceline(spot1, spot2, MOVE_NORMAL, self);
 
 	if (pr_global_struct->trace_ent != targ)
 	{	// don't have a clear shot, so move to a side
 		if (self->v.attack_state != AS_STRAIGHT)
 		{
 			self->v.attack_state = AS_STRAIGHT;
-			wiz_run1 (self);
+			wiz_run1(self);
 		}
 		return false;
 	}
 
 	float chance;
-			
+
 	if (enemy_range == RANGE_MELEE)
 		chance = 0.9f;
 	else if (enemy_range == RANGE_NEAR)
@@ -263,7 +263,7 @@ bool WizardCheckAttack(edict_t* self)
 	else
 		chance = 0;
 
-	if (PF_random () < chance)
+	if (PF_random() < chance)
 	{
 		self->v.attack_state = AS_MISSILE;
 		return true;
@@ -274,7 +274,7 @@ bool WizardCheckAttack(edict_t* self)
 		if (self->v.attack_state != AS_STRAIGHT)
 		{
 			self->v.attack_state = AS_STRAIGHT;
-			wiz_run1 (self);
+			wiz_run1(self);
 		}
 	}
 	else
@@ -282,10 +282,10 @@ bool WizardCheckAttack(edict_t* self)
 		if (self->v.attack_state != AS_SLIDING)
 		{
 			self->v.attack_state = AS_SLIDING;
-			wiz_side1 (self);
+			wiz_side1(self);
 		}
 	}
-	
+
 	return false;
 }
 
@@ -322,36 +322,36 @@ void Wiz_FastFire(edict_t* self)
 	{
 		self->v.owner->v.effects |= EF_MUZZLEFLASH;
 
-		PF_makevectors (self->v.enemy->v.angles);	
-		auto dst = AsVector(self->v.enemy->v.origin) - 13* AsVector(self->v.movedir);
-	
+		PF_makevectors(self->v.enemy->v.angles);
+		auto dst = AsVector(self->v.enemy->v.origin) - 13 * AsVector(self->v.movedir);
+
 		Vector3D vec;
 		PF_normalize(dst - AsVector(self->v.origin), vec);
-		PF_sound (self, CHAN_WEAPON, "wizard/wattack.wav", 1, ATTN_NORM);
-		auto newmis = launch_spike (self, self->v.origin, vec);
-		AsVector(newmis->v.velocity) = vec*600;
+		PF_sound(self, CHAN_WEAPON, "wizard/wattack.wav", 1, ATTN_NORM);
+		auto newmis = launch_spike(self, self->v.origin, vec);
+		AsVector(newmis->v.velocity) = vec * 600;
 		newmis->v.owner = self->v.owner;
 		newmis->v.classname = "wizspike";
-		PF_setmodel (newmis, "progs/w_spike.mdl");
-		PF_setsize (newmis, VEC_ORIGIN, VEC_ORIGIN);		
+		PF_setmodel(newmis, "progs/w_spike.mdl");
+		PF_setsize(newmis, VEC_ORIGIN, VEC_ORIGIN);
 	}
 
-	PF_Remove (self);
+	PF_Remove(self);
 }
 
 LINK_FUNCTION_TO_NAME(Wiz_FastFire);
 
 void Wiz_StartFast(edict_t* self)
 {
-	PF_sound (self, CHAN_WEAPON, "wizard/wattack.wav", 1, ATTN_NORM);
+	PF_sound(self, CHAN_WEAPON, "wizard/wattack.wav", 1, ATTN_NORM);
 	AsVector(self->v.v_angle) = AsVector(self->v.angles);
-	PF_makevectors (self->v.angles);
+	PF_makevectors(self->v.angles);
 
-	auto missile = PF_Spawn ();
+	auto missile = PF_Spawn();
 	missile->v.owner = self;
 	missile->v.nextthink = pr_global_struct->time + 0.6;
-	PF_setsize (missile, Vector3D{0, 0, 0}, Vector3D{0, 0, 0});		
-	PF_setorigin (missile, AsVector(self->v.origin) + Vector3D{0, 0, 30} + AsVector(pr_global_struct->v_forward)*14 + AsVector(pr_global_struct->v_right)*14);
+	PF_setsize(missile, Vector3D{0, 0, 0}, Vector3D{0, 0, 0});
+	PF_setorigin(missile, AsVector(self->v.origin) + Vector3D{0, 0, 30} + AsVector(pr_global_struct->v_forward) * 14 + AsVector(pr_global_struct->v_right) * 14);
 	missile->v.enemy = self->v.enemy;
 	missile->v.nextthink = pr_global_struct->time + 0.8;
 	missile->v.think = Wiz_FastFire;
@@ -360,12 +360,12 @@ void Wiz_StartFast(edict_t* self)
 	missile = PF_Spawn();
 	missile->v.owner = self;
 	missile->v.nextthink = pr_global_struct->time + 1;
-	PF_setsize (missile, Vector3D{0, 0, 0}, Vector3D{0, 0, 0});		
-	PF_setorigin (missile, AsVector(self->v.origin) + Vector3D{0, 0, 30} + AsVector(pr_global_struct->v_forward)*14 + AsVector(pr_global_struct->v_right)* -14);
+	PF_setsize(missile, Vector3D{0, 0, 0}, Vector3D{0, 0, 0});
+	PF_setorigin(missile, AsVector(self->v.origin) + Vector3D{0, 0, 30} + AsVector(pr_global_struct->v_forward) * 14 + AsVector(pr_global_struct->v_right) * -14);
 	missile->v.enemy = self->v.enemy;
 	missile->v.nextthink = pr_global_struct->time + 0.3;
 	missile->v.think = Wiz_FastFire;
-	AsVector(missile->v.movedir) = AsVector(vec3_origin) -AsVector(pr_global_struct->v_right);
+	AsVector(missile->v.movedir) = AsVector(vec3_origin) - AsVector(pr_global_struct->v_right);
 }
 
 void Wiz_idlesound(edict_t* self)
@@ -375,10 +375,10 @@ void Wiz_idlesound(edict_t* self)
 	if (self->v.waitmin < pr_global_struct->time)
 	{
 		self->v.waitmin = pr_global_struct->time + 2;
-		if (wr > 4.5) 
-			PF_sound (self, CHAN_VOICE, "wizard/widle1.wav", 1,  ATTN_IDLE);
+		if (wr > 4.5)
+			PF_sound(self, CHAN_VOICE, "wizard/widle1.wav", 1, ATTN_IDLE);
 		if (wr < 1.5)
-			PF_sound (self, CHAN_VOICE, "wizard/widle2.wav", 1, ATTN_IDLE);
+			PF_sound(self, CHAN_VOICE, "wizard/widle2.wav", 1, ATTN_IDLE);
 	}
 	return;
 }
@@ -431,29 +431,29 @@ void wiz_death1(edict_t* self)
 
 void wiz_die(edict_t* self)
 {
-// check for gib
+	// check for gib
 	if (self->v.health < -40)
 	{
-		PF_sound (self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
-		ThrowHead (self, "progs/h_wizard.mdl", self->v.health);
-		ThrowGib (self, "progs/gib2.mdl", self->v.health);
-		ThrowGib (self, "progs/gib2.mdl", self->v.health);
-		ThrowGib (self, "progs/gib2.mdl", self->v.health);
+		PF_sound(self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
+		ThrowHead(self, "progs/h_wizard.mdl", self->v.health);
+		ThrowGib(self, "progs/gib2.mdl", self->v.health);
+		ThrowGib(self, "progs/gib2.mdl", self->v.health);
+		ThrowGib(self, "progs/gib2.mdl", self->v.health);
 		return;
 	}
 
-	wiz_death1 (self);
+	wiz_death1(self);
 }
 
 LINK_FUNCTION_TO_NAME(wiz_die);
 
 void Wiz_Pain(edict_t* self, edict_t* attacker, float damage)
 {
-	PF_sound (self, CHAN_VOICE, "wizard/wpain.wav", 1, ATTN_NORM);
-	if (PF_random()*70 > damage)
+	PF_sound(self, CHAN_VOICE, "wizard/wpain.wav", 1, ATTN_NORM);
+	if (PF_random() * 70 > damage)
 		return;		// didn't flinch
 
-	wiz_pain1 (self);
+	wiz_pain1(self);
 }
 
 LINK_FUNCTION_TO_NAME(Wiz_Pain);
@@ -474,24 +474,24 @@ void monster_wizard(edict_t* self)
 		PF_Remove(self);
 		return;
 	}
-	PF_precache_model ("progs/wizard.mdl");
-	PF_precache_model ("progs/h_wizard.mdl");
-	PF_precache_model ("progs/w_spike.mdl");
+	PF_precache_model("progs/wizard.mdl");
+	PF_precache_model("progs/h_wizard.mdl");
+	PF_precache_model("progs/w_spike.mdl");
 
-	PF_precache_sound ("wizard/hit.wav");		// used by c code
-	PF_precache_sound ("wizard/wattack.wav");
-	PF_precache_sound ("wizard/wdeath.wav");
-	PF_precache_sound ("wizard/widle1.wav");
-	PF_precache_sound ("wizard/widle2.wav");
-	PF_precache_sound ("wizard/wpain.wav");
-	PF_precache_sound ("wizard/wsight.wav");
+	PF_precache_sound("wizard/hit.wav");		// used by c code
+	PF_precache_sound("wizard/wattack.wav");
+	PF_precache_sound("wizard/wdeath.wav");
+	PF_precache_sound("wizard/widle1.wav");
+	PF_precache_sound("wizard/widle2.wav");
+	PF_precache_sound("wizard/wpain.wav");
+	PF_precache_sound("wizard/wsight.wav");
 
 	self->v.solid = SOLID_SLIDEBOX;
 	self->v.movetype = MOVETYPE_STEP;
 
-	PF_setmodel (self, "progs/wizard.mdl");
+	PF_setmodel(self, "progs/wizard.mdl");
 
-	PF_setsize (self, Vector3D{-16, -16, -24}, Vector3D{16, 16, 40});
+	PF_setsize(self, Vector3D{-16, -16, -24}, Vector3D{16, 16, 40});
 	self->v.health = 80;
 
 	self->v.th_stand = wiz_stand1;
@@ -501,8 +501,8 @@ void monster_wizard(edict_t* self)
 	self->v.th_pain = Wiz_Pain;
 	self->v.th_die = wiz_die;
 	self->v.animations_get = &wizard_animations_get;
-		
-	flymonster_start (self);
+
+	flymonster_start(self);
 }
 
 LINK_ENTITY_TO_CLASS(monster_wizard);

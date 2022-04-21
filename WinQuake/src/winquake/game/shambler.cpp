@@ -430,15 +430,15 @@ void ShamClaw(edict_t* self, float side)
 
 	if (PF_vlen(delta) > 100)
 		return;
-		
+
 	const float ldmg = (PF_random() + PF_random() + PF_random()) * 20;
-	T_Damage (self, self->v.enemy, self, self, ldmg);
-	PF_sound (self, CHAN_VOICE, "shambler/smack.wav", 1, ATTN_NORM);
+	T_Damage(self, self->v.enemy, self, self, ldmg);
+	PF_sound(self, CHAN_VOICE, "shambler/smack.wav", 1, ATTN_NORM);
 
 	if (side)
 	{
-		PF_makevectors (self->v.angles);
-		SpawnMeatSpray (self, AsVector(self->v.origin) + AsVector(pr_global_struct->v_forward)*16, side * AsVector(pr_global_struct->v_right));
+		PF_makevectors(self->v.angles);
+		SpawnMeatSpray(self, AsVector(self->v.origin) + AsVector(pr_global_struct->v_forward) * 16, side * AsVector(pr_global_struct->v_right));
 	}
 }
 
@@ -460,11 +460,11 @@ void sham_melee(edict_t* self)
 {
 	const float chance = PF_random();
 	if (chance > 0.6 || self->v.health == 600)
-		sham_smash1 (self);
+		sham_smash1(self);
 	else if (chance > 0.3)
-		sham_swingr1 (self);
+		sham_swingr1(self);
 	else
-		sham_swingl1 (self);
+		sham_swingl1(self);
 }
 
 LINK_FUNCTION_TO_NAME(sham_melee);
@@ -475,26 +475,26 @@ void CastLightning(edict_t* self)
 {
 	self->v.effects |= EF_MUZZLEFLASH;
 
-	ai_face (self);
+	ai_face(self);
 
 	auto org = AsVector(self->v.origin) + Vector3D{0, 0, 40};
 
 	auto dir = AsVector(self->v.enemy->v.origin) + Vector3D{0, 0, 16} - org;
-	PF_normalize (dir, dir);
+	PF_normalize(dir, dir);
 
-	PF_traceline (org, AsVector(self->v.origin) + AsVector(dir)*600, MOVE_NOMONSTERS, self);
+	PF_traceline(org, AsVector(self->v.origin) + AsVector(dir) * 600, MOVE_NOMONSTERS, self);
 
-	PF_WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
-	PF_WriteByte (MSG_BROADCAST, TE_LIGHTNING1);
-	PF_WriteEntity (MSG_BROADCAST, self);
-	PF_WriteCoord (MSG_BROADCAST, org[0]);
-	PF_WriteCoord (MSG_BROADCAST, org[1]);
-	PF_WriteCoord (MSG_BROADCAST, org[2]);
-	PF_WriteCoord (MSG_BROADCAST, pr_global_struct->trace_endpos[0]);
-	PF_WriteCoord (MSG_BROADCAST, pr_global_struct->trace_endpos[1]);
-	PF_WriteCoord (MSG_BROADCAST, pr_global_struct->trace_endpos[2]);
+	PF_WriteByte(MSG_BROADCAST, SVC_TEMPENTITY);
+	PF_WriteByte(MSG_BROADCAST, TE_LIGHTNING1);
+	PF_WriteEntity(MSG_BROADCAST, self);
+	PF_WriteCoord(MSG_BROADCAST, org[0]);
+	PF_WriteCoord(MSG_BROADCAST, org[1]);
+	PF_WriteCoord(MSG_BROADCAST, org[2]);
+	PF_WriteCoord(MSG_BROADCAST, pr_global_struct->trace_endpos[0]);
+	PF_WriteCoord(MSG_BROADCAST, pr_global_struct->trace_endpos[1]);
+	PF_WriteCoord(MSG_BROADCAST, pr_global_struct->trace_endpos[2]);
 
-	LightningDamage (self, org, pr_global_struct->trace_endpos, self, 10);
+	LightningDamage(self, org, pr_global_struct->trace_endpos, self, 10);
 }
 
 void sham_magic1(edict_t* self)
@@ -511,19 +511,19 @@ void sham_pain1(edict_t* self)
 
 void sham_pain(edict_t* self, edict_t* attacker, float damage)
 {
-	PF_sound (self, CHAN_VOICE, "shambler/shurt2.wav", 1, ATTN_NORM);
+	PF_sound(self, CHAN_VOICE, "shambler/shurt2.wav", 1, ATTN_NORM);
 
 	if (self->v.health <= 0)
 		return;		// allready dying, don't go into pain frame
 
-	if (PF_random()*400 > damage)
+	if (PF_random() * 400 > damage)
 		return;		// didn't flinch
 
 	if (self->v.pain_finished > pr_global_struct->time)
 		return;
 	self->v.pain_finished = pr_global_struct->time + 2;
-		
-	sham_pain1 (self);
+
+	sham_pain1(self);
 }
 
 LINK_FUNCTION_TO_NAME(sham_pain);
@@ -537,20 +537,20 @@ void sham_death1(edict_t* self)
 
 void sham_die(edict_t* self)
 {
-// check for gib
+	// check for gib
 	if (self->v.health < -60)
 	{
-		PF_sound (self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
-		ThrowHead (self, "progs/h_shams.mdl", self->v.health);
-		ThrowGib (self, "progs/gib1.mdl", self->v.health);
-		ThrowGib (self, "progs/gib2.mdl", self->v.health);
-		ThrowGib (self, "progs/gib3.mdl", self->v.health);
+		PF_sound(self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
+		ThrowHead(self, "progs/h_shams.mdl", self->v.health);
+		ThrowGib(self, "progs/gib1.mdl", self->v.health);
+		ThrowGib(self, "progs/gib2.mdl", self->v.health);
+		ThrowGib(self, "progs/gib3.mdl", self->v.health);
 		return;
 	}
 
-// regular death
-	PF_sound (self, CHAN_VOICE, "shambler/sdeath.wav", 1, ATTN_NORM);
-	sham_death1 (self);
+	// regular death
+	PF_sound(self, CHAN_VOICE, "shambler/sdeath.wav", 1, ATTN_NORM);
+	sham_death1(self);
 }
 
 LINK_FUNCTION_TO_NAME(sham_die);
@@ -567,26 +567,26 @@ void monster_shambler(edict_t* self)
 		PF_Remove(self);
 		return;
 	}
-	PF_precache_model ("progs/shambler.mdl");
-	PF_precache_model ("progs/s_light.mdl");
-	PF_precache_model ("progs/h_shams.mdl");
-	PF_precache_model ("progs/bolt.mdl");
-	
-	PF_precache_sound ("shambler/sattck1.wav");
-	PF_precache_sound ("shambler/sboom.wav");
-	PF_precache_sound ("shambler/sdeath.wav");
-	PF_precache_sound ("shambler/shurt2.wav");
-	PF_precache_sound ("shambler/sidle.wav");
-	PF_precache_sound ("shambler/ssight.wav");
-	PF_precache_sound ("shambler/melee1.wav");
-	PF_precache_sound ("shambler/melee2.wav");
-	PF_precache_sound ("shambler/smack.wav");
+	PF_precache_model("progs/shambler.mdl");
+	PF_precache_model("progs/s_light.mdl");
+	PF_precache_model("progs/h_shams.mdl");
+	PF_precache_model("progs/bolt.mdl");
+
+	PF_precache_sound("shambler/sattck1.wav");
+	PF_precache_sound("shambler/sboom.wav");
+	PF_precache_sound("shambler/sdeath.wav");
+	PF_precache_sound("shambler/shurt2.wav");
+	PF_precache_sound("shambler/sidle.wav");
+	PF_precache_sound("shambler/ssight.wav");
+	PF_precache_sound("shambler/melee1.wav");
+	PF_precache_sound("shambler/melee2.wav");
+	PF_precache_sound("shambler/smack.wav");
 
 	self->v.solid = SOLID_SLIDEBOX;
 	self->v.movetype = MOVETYPE_STEP;
-	PF_setmodel (self, "progs/shambler.mdl");
+	PF_setmodel(self, "progs/shambler.mdl");
 
-	PF_setsize (self, VEC_HULL2_MIN, VEC_HULL2_MAX);
+	PF_setsize(self, VEC_HULL2_MIN, VEC_HULL2_MAX);
 	self->v.health = 600;
 
 	self->v.th_stand = sham_stand1;
@@ -597,7 +597,7 @@ void monster_shambler(edict_t* self)
 	self->v.th_missile = sham_magic1;
 	self->v.th_pain = sham_pain;
 	self->v.animations_get = &shambler_animations_get;
-	
+
 	walkmonster_start(self);
 }
 

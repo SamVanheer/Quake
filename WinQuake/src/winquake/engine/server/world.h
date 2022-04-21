@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -33,7 +33,7 @@ typedef struct
 	float	fraction;		// time completed, 1.0 = didn't hit anything
 	vec3_t	endpos;			// final position
 	plane_t	plane;			// surface normal at impact
-	edict_t	*ent;			// entity the surface is on
+	edict_t* ent;			// entity the surface is on
 } trace_t;
 
 
@@ -42,31 +42,31 @@ typedef struct
 #define	MOVE_MISSILE	2
 
 
-void SV_ClearWorld (void);
+void SV_ClearWorld(void);
 // called after the world model has been loaded, before linking any entities
 
-void SV_UnlinkEdict (edict_t *ent);
+void SV_UnlinkEdict(edict_t* ent);
 // call before removing an entity, and before trying to move one,
 // so it doesn't clip against itself
 // flags ent->v.modified
 
-void SV_LinkEdict (edict_t *ent, bool touch_triggers);
+void SV_LinkEdict(edict_t* ent, bool touch_triggers);
 // Needs to be called any time an entity changes origin, mins, maxs, or solid
 // flags ent->v.modified
 // sets ent->v.absmin and ent->v.absmax
 // if touchtriggers, calls prog functions for the intersected triggers
 
-int SV_PointContents (const vec3_t p);
-int SV_TruePointContents (const vec3_t p);
+int SV_PointContents(const vec3_t p);
+int SV_TruePointContents(const vec3_t p);
 // returns the CONTENTS_* value from the world at the given point.
 // does not check any entities at all
 // the non-true version remaps the water current contents to content_water
 
-edict_t	*SV_TestEntityPosition (edict_t *ent);
+edict_t* SV_TestEntityPosition(edict_t* ent);
 
-bool SV_RecursiveHullCheck( hull_t *hull, int num, float p1f, float p2f, vec3_t p1, vec3_t p2, trace_t *trace );
+bool SV_RecursiveHullCheck(hull_t* hull, int num, float p1f, float p2f, vec3_t p1, vec3_t p2, trace_t* trace);
 
-trace_t SV_Move (const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int type, edict_t *passedict);
+trace_t SV_Move(const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int type, edict_t* passedict);
 // mins and maxs are reletive
 
 // if the entire move stays in a solid volume, trace.allsolid will be set

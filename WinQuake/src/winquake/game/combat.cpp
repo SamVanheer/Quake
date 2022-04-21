@@ -202,7 +202,7 @@ void T_Damage(edict_t* self, edict_t* targ, edict_t* inflictor, edict_t* attacke
 		if (self != attacker && attacker != self->v.enemy)
 		{
 			if ((self->v.classname != attacker->v.classname)
-			|| (!strcmp(self->v.classname, "monster_army")))
+				|| (!strcmp(self->v.classname, "monster_army")))
 			{
 				if (self->v.enemy && !strcmp(self->v.enemy->v.classname, "player"))
 					self->v.oldenemy = self->v.enemy;

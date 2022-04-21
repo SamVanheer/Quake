@@ -191,8 +191,8 @@ LINK_FUNCTION_TO_NAME(boss_animations_get);
 
 void boss_face(edict_t* self)
 {
-	
-// go for another player if multi player
+
+	// go for another player if multi player
 	if (self->v.enemy->v.health <= 0 || PF_random() < 0.02)
 	{
 		self->v.enemy = PF_Find(self->v.enemy, "classname", "player");
@@ -246,12 +246,12 @@ void boss_missile(edict_t* self, vec3_t p)
 	Vector3D offang;
 	Vector3D vec, d;
 
-	PF_vectoangles (AsVector(self->v.enemy->v.origin) - AsVector(self->v.origin), offang);
-	PF_makevectors (offang);
+	PF_vectoangles(AsVector(self->v.enemy->v.origin) - AsVector(self->v.origin), offang);
+	PF_makevectors(offang);
 
-	auto org = AsVector(self->v.origin) + p[0]* AsVector(pr_global_struct->v_forward) + p[1]* AsVector(pr_global_struct->v_right) + p[2] * Vector3D{0, 0, 1};
-	
-// lead the player on hard mode
+	auto org = AsVector(self->v.origin) + p[0] * AsVector(pr_global_struct->v_forward) + p[1] * AsVector(pr_global_struct->v_right) + p[2] * Vector3D{0, 0, 1};
+
+	// lead the player on hard mode
 	if (pr_global_struct->skill > 1)
 	{
 		const float t = PF_vlen(AsVector(self->v.enemy->v.origin) - org) / 300;
@@ -263,20 +263,20 @@ void boss_missile(edict_t* self, vec3_t p)
 	{
 		d = AsVector(self->v.enemy->v.origin);
 	}
-	
-	PF_normalize (d - org, vec);
 
-	auto newmis = launch_spike (self, org, vec);
-	PF_setmodel (newmis, "progs/lavaball.mdl");
+	PF_normalize(d - org, vec);
+
+	auto newmis = launch_spike(self, org, vec);
+	PF_setmodel(newmis, "progs/lavaball.mdl");
 	AsVector(newmis->v.avelocity) = Vector3D{200, 100, 300};
-	PF_setsize (newmis, VEC_ORIGIN, VEC_ORIGIN);		
-	AsVector(newmis->v.velocity) = vec*300;
+	PF_setsize(newmis, VEC_ORIGIN, VEC_ORIGIN);
+	AsVector(newmis->v.velocity) = vec * 300;
 	newmis->v.touch = T_MissileTouch; // rocket explosion
-	PF_sound (self, CHAN_WEAPON, "boss1/throw.wav", 1, ATTN_NORM);
+	PF_sound(self, CHAN_WEAPON, "boss1/throw.wav", 1, ATTN_NORM);
 
-// check for dead enemy
+	// check for dead enemy
 	if (self->v.enemy->v.health <= 0)
-		boss_idle1 (self);
+		boss_idle1(self);
 }
 
 
@@ -285,10 +285,10 @@ void boss_awake(edict_t* self, edict_t* other)
 	self->v.solid = SOLID_SLIDEBOX;
 	self->v.movetype = MOVETYPE_STEP;
 	self->v.takedamage = DAMAGE_NO;
-	
-	PF_setmodel (self, "progs/boss.mdl");
-	PF_setsize (self, Vector3D{-128, -128, -24}, Vector3D{128, 128, 256});
-	
+
+	PF_setmodel(self, "progs/boss.mdl");
+	PF_setsize(self, Vector3D{-128, -128, -24}, Vector3D{128, 128, 256});
+
 	if (pr_global_struct->skill == 0)
 		self->v.health = 1;
 	else
@@ -296,14 +296,14 @@ void boss_awake(edict_t* self, edict_t* other)
 
 	self->v.enemy = pr_global_struct->activator;
 
-	PF_WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
-	PF_WriteByte (MSG_BROADCAST, TE_LAVASPLASH);
-	PF_WriteCoord (MSG_BROADCAST, self->v.origin[0]);
-	PF_WriteCoord (MSG_BROADCAST, self->v.origin[1]);
-	PF_WriteCoord (MSG_BROADCAST, self->v.origin[2]);
+	PF_WriteByte(MSG_BROADCAST, SVC_TEMPENTITY);
+	PF_WriteByte(MSG_BROADCAST, TE_LAVASPLASH);
+	PF_WriteCoord(MSG_BROADCAST, self->v.origin[0]);
+	PF_WriteCoord(MSG_BROADCAST, self->v.origin[1]);
+	PF_WriteCoord(MSG_BROADCAST, self->v.origin[2]);
 
 	self->v.yaw_speed = 20;
-	boss_rise1 (self);
+	boss_rise1(self);
 }
 
 LINK_FUNCTION_TO_NAME(boss_awake);
@@ -317,16 +317,16 @@ void monster_boss(edict_t* self)
 		PF_Remove(self);
 		return;
 	}
-	PF_precache_model ("progs/boss.mdl");
+	PF_precache_model("progs/boss.mdl");
 	PF_precache_model("progs/lavaball.mdl");
 
-	PF_precache_sound ("weapons/rocket1i.wav");
-	PF_precache_sound ("boss1/out1.wav");
-	PF_precache_sound ("boss1/sight1.wav");
-	PF_precache_sound ("misc/power.wav");
-	PF_precache_sound ("boss1/throw.wav");
-	PF_precache_sound ("boss1/pain.wav");
-	PF_precache_sound ("boss1/death.wav");
+	PF_precache_sound("weapons/rocket1i.wav");
+	PF_precache_sound("boss1/out1.wav");
+	PF_precache_sound("boss1/sight1.wav");
+	PF_precache_sound("misc/power.wav");
+	PF_precache_sound("boss1/throw.wav");
+	PF_precache_sound("boss1/pain.wav");
+	PF_precache_sound("boss1/death.wav");
 
 	pr_global_struct->total_monsters = pr_global_struct->total_monsters + 1;
 
@@ -342,35 +342,35 @@ void lightning_fire(edict_t* self)
 {
 	if (pr_global_struct->time >= pr_global_struct->lightning_end)
 	{	// done here, put the terminals back up
-		door_go_down (pr_global_struct->le1);
-		door_go_down (pr_global_struct->le2);
+		door_go_down(pr_global_struct->le1);
+		door_go_down(pr_global_struct->le2);
 		return;
 	}
-	
+
 	auto p1 = (AsVector(pr_global_struct->le1->v.mins) + AsVector(pr_global_struct->le1->v.maxs)) * 0.5f;
 	p1[2] = pr_global_struct->le1->v.absmin[2] - 16;
-	
+
 	auto p2 = (AsVector(pr_global_struct->le2->v.mins) + AsVector(pr_global_struct->le2->v.maxs)) * 0.5f;
 	p2[2] = pr_global_struct->le2->v.absmin[2] - 16;
-	
+
 	// compensate for length of bolt
 	Vector3D offset;
 	PF_normalize(p2 - p1, offset);
 
-	p2 = p2 - offset*100;
+	p2 = p2 - offset * 100;
 
 	self->v.nextthink = pr_global_struct->time + 0.1;
 	self->v.think = lightning_fire;
 
-	PF_WriteByte (MSG_ALL, SVC_TEMPENTITY);
-	PF_WriteByte (MSG_ALL, TE_LIGHTNING3);
-	PF_WriteEntity (MSG_ALL, pr_global_struct->world);
-	PF_WriteCoord (MSG_ALL, p1[0]);
-	PF_WriteCoord (MSG_ALL, p1[1]);
-	PF_WriteCoord (MSG_ALL, p1[2]);
-	PF_WriteCoord (MSG_ALL, p2[0]);
-	PF_WriteCoord (MSG_ALL, p2[1]);
-	PF_WriteCoord (MSG_ALL, p2[2]);
+	PF_WriteByte(MSG_ALL, SVC_TEMPENTITY);
+	PF_WriteByte(MSG_ALL, TE_LIGHTNING3);
+	PF_WriteEntity(MSG_ALL, pr_global_struct->world);
+	PF_WriteCoord(MSG_ALL, p1[0]);
+	PF_WriteCoord(MSG_ALL, p1[1]);
+	PF_WriteCoord(MSG_ALL, p1[2]);
+	PF_WriteCoord(MSG_ALL, p2[0]);
+	PF_WriteCoord(MSG_ALL, p2[1]);
+	PF_WriteCoord(MSG_ALL, p2[2]);
 }
 
 LINK_FUNCTION_TO_NAME(lightning_fire);
@@ -384,35 +384,35 @@ void lightning_use(edict_t* self, edict_t* other)
 	pr_global_struct->le2 = PF_Find(pr_global_struct->le1, "target", "lightning");
 	if (pr_global_struct->le1 == pr_global_struct->world || pr_global_struct->le2 == pr_global_struct->world)
 	{
-		dprint ("missing lightning targets\n");
-		return;
-	}
-	
-	if (
-	 (pr_global_struct->le1->v.state != STATE_TOP && pr_global_struct->le1->v.state != STATE_BOTTOM)
-	|| (pr_global_struct->le2->v.state != STATE_TOP && pr_global_struct->le2->v.state != STATE_BOTTOM)
-	|| (pr_global_struct->le1->v.state != pr_global_struct->le2->v.state) )
-	{
-//		dprint ("not aligned\n");
+		dprint("missing lightning targets\n");
 		return;
 	}
 
-// don't let the electrodes go back up until the bolt is done
+	if (
+		(pr_global_struct->le1->v.state != STATE_TOP && pr_global_struct->le1->v.state != STATE_BOTTOM)
+		|| (pr_global_struct->le2->v.state != STATE_TOP && pr_global_struct->le2->v.state != STATE_BOTTOM)
+		|| (pr_global_struct->le1->v.state != pr_global_struct->le2->v.state))
+	{
+		//		dprint ("not aligned\n");
+		return;
+	}
+
+	// don't let the electrodes go back up until the bolt is done
 	pr_global_struct->le1->v.nextthink = -1;
 	pr_global_struct->le2->v.nextthink = -1;
 	pr_global_struct->lightning_end = pr_global_struct->time + 1;
 
-	PF_sound (self, CHAN_VOICE, "misc/power.wav", 1, ATTN_NORM);
-	lightning_fire (self);		
+	PF_sound(self, CHAN_VOICE, "misc/power.wav", 1, ATTN_NORM);
+	lightning_fire(self);
 
-// advance the boss pain if down
+	// advance the boss pain if down
 	self = PF_Find(pr_global_struct->world, "classname", "monster_boss");
 	if (self == pr_global_struct->world)
 		return;
 	self->v.enemy = pr_global_struct->activator;
 	if (pr_global_struct->le1->v.state == STATE_TOP && self->v.health > 0)
 	{
-		PF_sound (self, CHAN_VOICE, "boss1/pain.wav", 1, ATTN_NORM);
+		PF_sound(self, CHAN_VOICE, "boss1/pain.wav", 1, ATTN_NORM);
 		self->v.health = self->v.health - 1;
 		if (self->v.health >= 2)
 			boss_shocka1(self);
@@ -420,7 +420,7 @@ void lightning_use(edict_t* self, edict_t* other)
 			boss_shockb1(self);
 		else if (self->v.health == 0)
 			boss_shockc1(self);
-	}	
+	}
 }
 
 LINK_FUNCTION_TO_NAME(lightning_use);

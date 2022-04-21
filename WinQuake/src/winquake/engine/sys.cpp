@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -58,7 +58,7 @@ static double lastcurtime = 0.0;
 
 bool isDedicated;
 
-static const char			*tracking_tag = "Clams & Mooses";
+static const char* tracking_tag = "Clams & Mooses";
 
 #ifdef WIN32
 static HANDLE hFile;
@@ -66,7 +66,7 @@ static HANDLE heventParent;
 static HANDLE heventChild;
 #endif
 
-void Sys_InitFloatTime (void);
+void Sys_InitFloatTime(void);
 
 volatile int					sys_checksum;
 
@@ -79,16 +79,16 @@ FILE IO
 */
 
 #define	MAX_HANDLES		10
-FILE	*sys_handles[MAX_HANDLES];
+FILE* sys_handles[MAX_HANDLES];
 
-int		findhandle (void)
+int		findhandle(void)
 {
 	int		i;
-	
-	for (i=1 ; i<MAX_HANDLES ; i++)
+
+	for (i = 1; i < MAX_HANDLES; i++)
 		if (!sys_handles[i])
 			return i;
-	Sys_Error ("out of handles");
+	Sys_Error("out of handles");
 }
 
 /*
@@ -96,19 +96,19 @@ int		findhandle (void)
 filelength
 ================
 */
-long filelength (FILE *f)
+long filelength(FILE* f)
 {
-	const long pos = ftell (f);
-	fseek (f, 0, SEEK_END);
-	const long end = ftell (f);
-	fseek (f, pos, SEEK_SET);
+	const long pos = ftell(f);
+	fseek(f, 0, SEEK_END);
+	const long end = ftell(f);
+	fseek(f, pos, SEEK_SET);
 
 	return end;
 }
 
-long Sys_FileOpenRead (const char *path, int *hndl)
+long Sys_FileOpenRead(const char* path, int* hndl)
 {
-	const int i = findhandle ();
+	const int i = findhandle();
 
 	if (auto f = fopen(path, "rb"); f)
 	{
@@ -121,40 +121,40 @@ long Sys_FileOpenRead (const char *path, int *hndl)
 	return -1;
 }
 
-int Sys_FileOpenWrite (const char *path)
+int Sys_FileOpenWrite(const char* path)
 {
-	const int i = findhandle ();
+	const int i = findhandle();
 
 	auto f = fopen(path, "wb");
 	if (!f)
-		Sys_Error ("Error opening %s: %s", path,strerror(errno));
+		Sys_Error("Error opening %s: %s", path, strerror(errno));
 	sys_handles[i] = f;
 
 	return i;
 }
 
-void Sys_FileClose (int handle)
+void Sys_FileClose(int handle)
 {
-	fclose (sys_handles[handle]);
+	fclose(sys_handles[handle]);
 	sys_handles[handle] = NULL;
 }
 
-void Sys_FileSeek (int handle, int position)
+void Sys_FileSeek(int handle, int position)
 {
-	fseek (sys_handles[handle], position, SEEK_SET);
+	fseek(sys_handles[handle], position, SEEK_SET);
 }
 
-int Sys_FileRead (int handle, void *dest, int count)
+int Sys_FileRead(int handle, void* dest, int count)
 {
-	return fread (dest, 1, count, sys_handles[handle]);
+	return fread(dest, 1, count, sys_handles[handle]);
 }
 
-int Sys_FileWrite (int handle, const void *data, int count)
+int Sys_FileWrite(int handle, const void* data, int count)
 {
-	return fwrite (data, 1, count, sys_handles[handle]);
+	return fwrite(data, 1, count, sys_handles[handle]);
 }
 
-time_t Sys_FileTime (const char *path)
+time_t Sys_FileTime(const char* path)
 {
 	struct stat buf;
 
@@ -166,7 +166,7 @@ time_t Sys_FileTime (const char *path)
 	return buf.st_mtime;
 }
 
-void Sys_mkdir (const char *path)
+void Sys_mkdir(const char* path)
 {
 #ifdef WIN32
 	_mkdir(path);
@@ -189,9 +189,9 @@ SYSTEM IO
 Sys_Init
 ================
 */
-void Sys_Init (void)
+void Sys_Init(void)
 {
-	Sys_InitFloatTime ();
+	Sys_InitFloatTime();
 
 #ifdef WIN32
 	//Raised OS requirement to Windows 7 or newer because GetVersionEx is deprecated,
@@ -206,7 +206,7 @@ void Sys_Init (void)
 }
 
 
-void Sys_Error (const char *error, ...)
+void Sys_Error(const char* error, ...)
 {
 	static bool in_sys_error0 = false;
 	static bool in_sys_error1 = false;
@@ -219,10 +219,10 @@ void Sys_Error (const char *error, ...)
 	}
 
 	va_list argptr;
-	va_start (argptr, error);
+	va_start(argptr, error);
 	char text[1024];
-	vsprintf (text, error, argptr);
-	va_end (argptr);
+	vsprintf(text, error, argptr);
+	va_end(argptr);
 
 	if (isDedicated)
 	{
@@ -231,28 +231,28 @@ void Sys_Error (const char *error, ...)
 		const char* text5 = "\n";
 
 		char text2[1024];
-		sprintf (text2, "ERROR: %s\n", text);
+		sprintf(text2, "ERROR: %s\n", text);
 
-		fwrite(text5, sizeof(char), strlen (text5), stdout);
-		fwrite(text4, sizeof(char), strlen (text4), stdout);
-		fwrite(text2, sizeof(char), strlen (text2), stdout);
-		fwrite(text3, sizeof(char), strlen (text3), stdout);
-		fwrite(text4, sizeof(char), strlen (text4), stdout);
+		fwrite(text5, sizeof(char), strlen(text5), stdout);
+		fwrite(text4, sizeof(char), strlen(text4), stdout);
+		fwrite(text2, sizeof(char), strlen(text2), stdout);
+		fwrite(text3, sizeof(char), strlen(text3), stdout);
+		fwrite(text4, sizeof(char), strlen(text4), stdout);
 
 		fflush(stdout);
 
-		const double starttime = Sys_FloatTime ();
+		const double starttime = Sys_FloatTime();
 
 		// accept empty input so Enter will get us out of here
-		while (!Sys_ConsoleInput (true) &&
-				((Sys_FloatTime () - starttime) < CONSOLE_ERROR_TIMEOUT))
+		while (!Sys_ConsoleInput(true) &&
+			((Sys_FloatTime() - starttime) < CONSOLE_ERROR_TIMEOUT))
 		{
 		}
 	}
 	else
 	{
-	// switch to windowed so the message box is visible, unless we already
-	// tried that and failed
+		// switch to windowed so the message box is visible, unless we already
+		// tried that and failed
 		if (!in_sys_error0)
 		{
 			in_sys_error0 = true;
@@ -268,33 +268,33 @@ void Sys_Error (const char *error, ...)
 	if (!in_sys_error1)
 	{
 		in_sys_error1 = true;
-		Host_Shutdown ();
+		Host_Shutdown();
 	}
 
 #ifdef WIN32
-// shut down QHOST hooks if necessary
+	// shut down QHOST hooks if necessary
 	if (!in_sys_error2)
 	{
 		in_sys_error2 = true;
-		DeinitConProc ();
+		DeinitConProc();
 	}
 #endif
 
 	exit(1);
 }
 
-void Sys_Printf (const char *fmt, ...)
+void Sys_Printf(const char* fmt, ...)
 {
 	if (isDedicated)
 	{
 		va_list argptr;
-		va_start (argptr,fmt);
+		va_start(argptr, fmt);
 		vfprintf(stdout, fmt, argptr);
-		va_end (argptr);
+		va_end(argptr);
 	}
 }
 
-void Sys_Quit (void)
+void Sys_Quit(void)
 {
 	Host_Shutdown();
 
@@ -302,12 +302,12 @@ void Sys_Quit (void)
 	if (isDedicated)
 		FreeConsole();
 
-// shut down QHOST hooks if necessary
-	DeinitConProc ();
+	// shut down QHOST hooks if necessary
+	DeinitConProc();
 #endif
 
 	fflush(stdout);
-	exit (0);
+	exit(0);
 }
 
 
@@ -316,7 +316,7 @@ void Sys_Quit (void)
 Sys_FloatTime
 ================
 */
-double Sys_FloatTime (void)
+double Sys_FloatTime(void)
 {
 	static bool first = true;
 
@@ -355,7 +355,7 @@ double Sys_FloatTime (void)
 
 	lastcurtime = curtime;
 
-    return curtime;
+	return curtime;
 }
 
 
@@ -364,7 +364,7 @@ double Sys_FloatTime (void)
 Sys_InitFloatTime
 ================
 */
-void Sys_InitFloatTime (void)
+void Sys_InitFloatTime(void)
 {
 	if (const int j = COM_CheckParm("-starttime"); j)
 	{
@@ -375,7 +375,7 @@ void Sys_InitFloatTime (void)
 		starttime = 0.0;
 	}
 
-	Sys_FloatTime ();
+	Sys_FloatTime();
 
 	lastcurtime = curtime;
 }
@@ -433,13 +433,13 @@ char* Sys_ConsoleInput(bool acceptEmptyInput)
 	return nullptr;
 }
 
-void Sys_Sleep (void)
+void Sys_Sleep(void)
 {
 	std::this_thread::sleep_for(std::chrono::milliseconds{1});
 }
 
 
-void Sys_SendKeyEvents (void)
+void Sys_SendKeyEvents(void)
 {
 	SDL_PumpEvents();
 
@@ -469,7 +469,7 @@ void Sys_SendKeyEvents (void)
 WinMain
 ==================
 */
-void SleepUntilInput (int time)
+void SleepUntilInput(int time)
 {
 	SDL_WaitEventTimeout(nullptr, time);
 }
@@ -481,7 +481,7 @@ WinMain
 ==================
 */
 
-int EngineMain (int argc, const char* argv[])
+int EngineMain(int argc, const char* argv[])
 {
 	//TODO: need to rework this so SDL2's setup code is used instead.
 	SDL_SetMainReady();
@@ -489,7 +489,7 @@ int EngineMain (int argc, const char* argv[])
 	std::string cwd = std::filesystem::current_path().string();
 
 	if (cwd.empty())
-		Sys_Error ("Couldn't determine current directory");
+		Sys_Error("Couldn't determine current directory");
 
 	if (cwd.back() == '/')
 	{
@@ -500,36 +500,36 @@ int EngineMain (int argc, const char* argv[])
 	parms.basedir = cwd.c_str();
 	parms.cachedir = NULL;
 
-	COM_InitArgv (argc, argv);
+	COM_InitArgv(argc, argv);
 
 	parms.argc = com_argc;
 	parms.argv = com_argv;
 
-	isDedicated = (COM_CheckParm ("-dedicated") != 0);
+	isDedicated = (COM_CheckParm("-dedicated") != 0);
 
-// take 16 Mb, unless they explicitly
-// request otherwise
+	// take 16 Mb, unless they explicitly
+	// request otherwise
 	parms.memsize = MAXIMUM_WIN_MEMORY;
 
-	if (int t = COM_CheckParm ("-heapsize"); t != 0)
+	if (int t = COM_CheckParm("-heapsize"); t != 0)
 	{
 		t = COM_CheckParm("-heapsize") + 1;
 
 		if (t < com_argc)
-			parms.memsize = Q_atoi (com_argv[t]) * 1024;
+			parms.memsize = Q_atoi(com_argv[t]) * 1024;
 	}
 
-	parms.membase = malloc (parms.memsize);
+	parms.membase = malloc(parms.memsize);
 
 	if (!parms.membase)
-		Sys_Error ("Not enough memory free; check disk space\n");
+		Sys_Error("Not enough memory free; check disk space\n");
 
 	if (isDedicated)
 	{
 #ifdef WIN32
-		if (!AllocConsole ())
+		if (!AllocConsole())
 		{
-			Sys_Error ("Couldn't create dedicated server console");
+			Sys_Error("Couldn't create dedicated server console");
 		}
 
 		//Since we're allocating the console ourselves in a GUI program
@@ -540,44 +540,44 @@ int EngineMain (int argc, const char* argv[])
 			freopen_s(&stream, "CONIN$", "r", stdin);
 		}
 
-	// give QHOST a chance to hook into the console
+		// give QHOST a chance to hook into the console
 		if (int t = COM_CheckParm("-HFILE"); t > 0)
 		{
 			if (t < com_argc)
-				hFile = (HANDLE)Q_atoi (com_argv[t+1]);
-		}
-			
-		if (int t = COM_CheckParm ("-HPARENT"); t > 0)
-		{
-			if (t < com_argc)
-				heventParent = (HANDLE)Q_atoi (com_argv[t+1]);
-		}
-			
-		if (int t = COM_CheckParm ("-HCHILD"); t > 0)
-		{
-			if (t < com_argc)
-				heventChild = (HANDLE)Q_atoi (com_argv[t+1]);
+				hFile = (HANDLE)Q_atoi(com_argv[t + 1]);
 		}
 
-		InitConProc (hFile, heventParent, heventChild);
+		if (int t = COM_CheckParm("-HPARENT"); t > 0)
+		{
+			if (t < com_argc)
+				heventParent = (HANDLE)Q_atoi(com_argv[t + 1]);
+		}
+
+		if (int t = COM_CheckParm("-HCHILD"); t > 0)
+		{
+			if (t < com_argc)
+				heventChild = (HANDLE)Q_atoi(com_argv[t + 1]);
+		}
+
+		InitConProc(hFile, heventParent, heventChild);
 #endif
 	}
 
-	Sys_Init ();
+	Sys_Init();
 
-	Sys_Printf ("Host_Init\n");
-	Host_Init (&parms);
+	Sys_Printf("Host_Init\n");
+	Host_Init(&parms);
 
-	double oldtime = Sys_FloatTime ();
+	double oldtime = Sys_FloatTime();
 
 	double time, newtime;
 
-    /* main window message loop */
+	/* main window message loop */
 	while (1)
 	{
 		if (isDedicated)
 		{
-			newtime = Sys_FloatTime ();
+			newtime = Sys_FloatTime();
 			time = newtime - oldtime;
 
 			extern int vcrFile;
@@ -586,35 +586,35 @@ int EngineMain (int argc, const char* argv[])
 			while (time < sys_ticrate.value && (vcrFile == -1 || recording))
 			{
 				Sys_Sleep();
-				newtime = Sys_FloatTime ();
+				newtime = Sys_FloatTime();
 				time = newtime - oldtime;
 			}
 		}
 		else
 		{
-		// yield the CPU for a little while when paused, minimized, or not the focus
+			// yield the CPU for a little while when paused, minimized, or not the focus
 			if ((cl.paused && !ActiveApp) || Minimized || block_drawing)
 			{
-				SleepUntilInput (PAUSE_SLEEP);
+				SleepUntilInput(PAUSE_SLEEP);
 				scr_skipupdate = true;		// no point in bothering to draw
 			}
 			else if (!ActiveApp)
 			{
-				SleepUntilInput (NOT_FOCUS_SLEEP);
+				SleepUntilInput(NOT_FOCUS_SLEEP);
 			}
 
-			newtime = Sys_FloatTime ();
+			newtime = Sys_FloatTime();
 			time = newtime - oldtime;
 		}
 
-		Host_Frame (time);
+		Host_Frame(time);
 		oldtime = newtime;
 	}
 
 	SDL_Quit();
 
-    /* return success of application */
-    return 0;
+	/* return success of application */
+	return 0;
 }
 
 #ifdef WIN32

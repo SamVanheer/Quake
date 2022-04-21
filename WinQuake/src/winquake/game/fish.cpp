@@ -165,15 +165,15 @@ void fish_melee(edict_t* self)
 {
 	if (!self->v.enemy)
 		return;		// removed before stroke
-		
+
 	auto delta = AsVector(self->v.enemy->v.origin) - AsVector(self->v.origin);
 
 	if (PF_vlen(delta) > 60)
 		return;
-		
-	PF_sound (self, CHAN_VOICE, "fish/bite.wav", 1, ATTN_NORM);
+
+	PF_sound(self, CHAN_VOICE, "fish/bite.wav", 1, ATTN_NORM);
 	const float ldmg = (PF_random() + PF_random()) * 3;
-	T_Damage (self, self->v.enemy, self, self, ldmg);
+	T_Damage(self, self->v.enemy, self, self, ldmg);
 }
 
 void f_attack1(edict_t* self)
@@ -198,8 +198,8 @@ void f_pain1(edict_t* self)
 void fish_pain(edict_t* self, edict_t* attacker, float damage)
 {
 
-// fish allways do pain frames
-	f_pain1 (self);
+	// fish allways do pain frames
+	f_pain1(self);
 }
 
 LINK_FUNCTION_TO_NAME(fish_pain);
@@ -213,20 +213,20 @@ void monster_fish(edict_t* self)
 		PF_Remove(self);
 		return;
 	}
-	PF_precache_model ("progs/fish.mdl");
+	PF_precache_model("progs/fish.mdl");
 
-	PF_precache_sound ("fish/death.wav");
-	PF_precache_sound ("fish/bite.wav");
-	PF_precache_sound ("fish/idle.wav");
+	PF_precache_sound("fish/death.wav");
+	PF_precache_sound("fish/bite.wav");
+	PF_precache_sound("fish/idle.wav");
 
 	self->v.solid = SOLID_SLIDEBOX;
 	self->v.movetype = MOVETYPE_STEP;
 
-	PF_setmodel (self, "progs/fish.mdl");
+	PF_setmodel(self, "progs/fish.mdl");
 
-	PF_setsize (self, Vector3D{-16, -16, -24}, Vector3D{16, 16, 24});
+	PF_setsize(self, Vector3D{-16, -16, -24}, Vector3D{16, 16, 24});
 	self->v.health = 25;
-	
+
 	self->v.th_stand = f_stand1;
 	self->v.th_walk = f_walk1;
 	self->v.th_run = f_run1;
@@ -234,8 +234,8 @@ void monster_fish(edict_t* self)
 	self->v.th_pain = fish_pain;
 	self->v.th_melee = f_attack1;
 	self->v.animations_get = &fish_animations_get;
-	
-	swimmonster_start (self);
+
+	swimmonster_start(self);
 }
 
 LINK_ENTITY_TO_CLASS(monster_fish);

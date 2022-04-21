@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -55,13 +55,13 @@ interface from being ambiguous.
 
 typedef struct cvar_s
 {
-	const char	*name;
-	char	*string;
+	const char* name;
+	char* string;
 	bool archive;		// set to true to cause it to be saved to vars.rc
 	bool server;		// notifies players when changed
 	float	value;
-	struct cvar_s *next;
-	
+	struct cvar_s* next;
+
 	cvar_s(const char* name, const char* string, bool archive = false, bool server = false, float value = 0)
 		: name(name)
 		, string(const_cast<char*>(string))
@@ -73,35 +73,35 @@ typedef struct cvar_s
 	}
 } cvar_t;
 
-void 	Cvar_RegisterVariable (cvar_t *variable);
+void 	Cvar_RegisterVariable(cvar_t* variable);
 // registers a cvar that allready has the name, string, and optionally the
 // archive elements set.
 
-void 	Cvar_Set (const char *var_name, const char *value);
+void 	Cvar_Set(const char* var_name, const char* value);
 // equivelant to "<name> <variable>" typed at the console
 
-void	Cvar_SetValue (const char *var_name, float value);
+void	Cvar_SetValue(const char* var_name, float value);
 // expands value to a string and calls Cvar_Set
 
-float	Cvar_VariableValue (const char *var_name);
+float	Cvar_VariableValue(const char* var_name);
 // returns 0 if not defined or non numeric
 
-const char	*Cvar_VariableString (const char *var_name);
+const char* Cvar_VariableString(const char* var_name);
 // returns an empty string if not defined
 
-const char 	*Cvar_CompleteVariable (const char *partial);
+const char* Cvar_CompleteVariable(const char* partial);
 // attempts to match a partial variable name for command line completion
 // returns NULL if nothing fits
 
-bool Cvar_Command (void);
+bool Cvar_Command(void);
 // called by Cmd_ExecuteString when Cmd_Argv(0) doesn't match a known
 // command.  Returns true if the command was a variable reference that
 // was handled. (print or change)
 
-void 	Cvar_WriteVariables (FILE *f);
+void 	Cvar_WriteVariables(FILE* f);
 // Writes lines containing "set variable value" for all variables
 // with the archive flag set to true.
 
-cvar_t *Cvar_FindVar (const char *var_name);
+cvar_t* Cvar_FindVar(const char* var_name);
 
-extern cvar_t	*cvar_vars;
+extern cvar_t* cvar_vars;

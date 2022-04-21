@@ -75,7 +75,7 @@ enemy as activator.
 */
 void monster_death_use(edict_t* self)
 {
-// fall to ground
+	// fall to ground
 	if ((int)self->v.flags & FL_FLY)
 		self->v.flags &= ~FL_FLY;
 	if ((int)self->v.flags & FL_SWIM)
@@ -97,7 +97,7 @@ void walkmonster_start_go(edict_t* self)
 	self->v.origin[2] = self->v.origin[2] + 1;	// raise off floor a bit
 	PF_droptofloor(self);
 
-	if (!PF_walkmove(self, 0,0))
+	if (!PF_walkmove(self, 0, 0))
 	{
 		dprint("walkmonster in wall at: ");
 		dprint(PF_vtos(self->v.origin));
@@ -129,7 +129,7 @@ void walkmonster_start_go(edict_t* self)
 			self->v.th_walk(self);
 		else
 			self->v.pausetime = (float)99999999;
-			self->v.th_stand(self);
+		self->v.th_stand(self);
 	}
 	else
 	{
@@ -164,7 +164,7 @@ void flymonster_start_go(edict_t* self)
 
 	self->v.flags |= FL_FLY | FL_MONSTER;
 
-	if (!PF_walkmove(self, 0,0))
+	if (!PF_walkmove(self, 0, 0))
 	{
 		dprint("flymonster in wall at: ");
 		dprint(PF_vtos(self->v.origin));
@@ -185,7 +185,7 @@ void flymonster_start_go(edict_t* self)
 			self->v.th_walk(self);
 		else
 			self->v.pausetime = (float)99999999;
-			self->v.th_stand(self);
+		self->v.th_stand(self);
 	}
 	else
 	{

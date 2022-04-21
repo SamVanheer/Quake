@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -90,7 +90,7 @@ typedef struct
 
 typedef struct
 {
-	int			version;	
+	int			version;
 	lump_t		lumps[HEADER_LUMPS];
 } dheader_t;
 
@@ -189,10 +189,10 @@ typedef struct
 	short		side;
 
 	int			firstedge;		// we must support > 64k edges
-	short		numedges;	
+	short		numedges;
 	short		texinfo;
 
-// lighting info
+	// lighting info
 	byte		styles[MAXLIGHTMAPS];
 	int			lightofs;		// start of [numstyles*surfsize] samples
 } dface_t;
@@ -279,21 +279,21 @@ extern	int			numsurfedges;
 extern	int			dsurfedges[MAX_MAP_SURFEDGES];
 
 
-void DecompressVis (byte *in, byte *decompressed);
-int CompressVis (byte *vis, byte *dest);
+void DecompressVis(byte* in, byte* decompressed);
+int CompressVis(byte* vis, byte* dest);
 
-void	LoadBSPFile (char *filename);
-void	WriteBSPFile (char *filename);
-void	PrintBSPFileSizes (void);
+void	LoadBSPFile(char* filename);
+void	WriteBSPFile(char* filename);
+void	PrintBSPFileSizes(void);
 
 //===============
 
 
 typedef struct epair_s
 {
-	struct epair_s	*next;
-	char	*key;
-	char	*value;
+	struct epair_s* next;
+	char* key;
+	char* value;
 } epair_t;
 
 typedef struct
@@ -301,22 +301,22 @@ typedef struct
 	vec3_t		origin;
 	int			firstbrush;
 	int			numbrushes;
-	epair_t		*epairs;
+	epair_t* epairs;
 } entity_t;
 
 extern	int			num_entities;
 extern	entity_t	entities[MAX_MAP_ENTITIES];
 
-void	ParseEntities (void);
-void	UnparseEntities (void);
+void	ParseEntities(void);
+void	UnparseEntities(void);
 
-void 	SetKeyValue (entity_t *ent, char *key, char *value);
-char 	*ValueForKey (entity_t *ent, char *key);
+void 	SetKeyValue(entity_t* ent, char* key, char* value);
+char* ValueForKey(entity_t* ent, char* key);
 // will return "" if not present
 
-vec_t	FloatForKey (entity_t *ent, char *key);
-void 	GetVectorForKey (entity_t *ent, char *key, vec3_t vec);
+vec_t	FloatForKey(entity_t* ent, char* key);
+void 	GetVectorForKey(entity_t* ent, char* key, vec3_t vec);
 
-epair_t *ParseEpair (void);
+epair_t* ParseEpair(void);
 
 #endif

@@ -220,11 +220,11 @@ void Tar_JumpTouch(edict_t* self, edict_t* other)
 {
 	if (other->v.takedamage && other->v.classname != self->v.classname)
 	{
-		if ( PF_vlen(self->v.velocity) > 400 )
+		if (PF_vlen(self->v.velocity) > 400)
 		{
-			const float ldmg = 10 + 10*PF_random();
-			T_Damage (self, other, self, self, ldmg);	
-			PF_sound (self, CHAN_WEAPON, "blob/hit1.wav", 1, ATTN_NORM);
+			const float ldmg = 10 + 10 * PF_random();
+			T_Damage(self, other, self, self, ldmg);
+			PF_sound(self, CHAN_WEAPON, "blob/hit1.wav", 1, ATTN_NORM);
 		}
 	}
 	else
@@ -236,15 +236,15 @@ void Tar_JumpTouch(edict_t* self, edict_t* other)
 		if (self->v.flags & FL_ONGROUND)
 		{	// jump randomly to not get hung up
 //dprint ("popjump\n");
-	self->v.touch = SUB_NullTouch;
-	self->v.think = tbaby_run1;
-	self->v.movetype = MOVETYPE_STEP;
-	self->v.nextthink = pr_global_struct->time + 0.1;
+			self->v.touch = SUB_NullTouch;
+			self->v.think = tbaby_run1;
+			self->v.movetype = MOVETYPE_STEP;
+			self->v.nextthink = pr_global_struct->time + 0.1;
 
-//			self->v.velocity_x = (PF_random() - 0.5) * 600;
-//			self->v.velocity_y = (PF_random() - 0.5) * 600;
-//			self->v.velocity_z = 200;
-//			self->v.flags &= ~FL_ONGROUND;
+			//			self->v.velocity_x = (PF_random() - 0.5) * 600;
+			//			self->v.velocity_y = (PF_random() - 0.5) * 600;
+			//			self->v.velocity_z = 200;
+			//			self->v.flags &= ~FL_ONGROUND;
 		}
 		return;	// not on ground yet
 	}
@@ -290,19 +290,19 @@ void monster_tarbaby(edict_t* self)
 		PF_Remove(self);
 		return;
 	}
-	PF_precache_model ("progs/tarbaby.mdl");
+	PF_precache_model("progs/tarbaby.mdl");
 
-	PF_precache_sound ("blob/death1.wav");
-	PF_precache_sound ("blob/hit1.wav");
-	PF_precache_sound ("blob/land1.wav");
-	PF_precache_sound ("blob/sight1.wav");
-	
+	PF_precache_sound("blob/death1.wav");
+	PF_precache_sound("blob/hit1.wav");
+	PF_precache_sound("blob/land1.wav");
+	PF_precache_sound("blob/sight1.wav");
+
 	self->v.solid = SOLID_SLIDEBOX;
 	self->v.movetype = MOVETYPE_STEP;
 
-	PF_setmodel (self, "progs/tarbaby.mdl");
+	PF_setmodel(self, "progs/tarbaby.mdl");
 
-	PF_setsize (self, Vector3D{-16, -16, -24}, Vector3D{16, 16, 40});
+	PF_setsize(self, Vector3D{-16, -16, -24}, Vector3D{16, 16, 40});
 	self->v.health = 80;
 
 	self->v.th_stand = tbaby_stand1;
@@ -312,8 +312,8 @@ void monster_tarbaby(edict_t* self)
 	self->v.th_melee = tbaby_jump1;
 	self->v.th_die = tbaby_die1;
 	self->v.animations_get = &tbaby_animations_get;
-	
-	walkmonster_start (self);
+
+	walkmonster_start(self);
 }
 
 LINK_ENTITY_TO_CLASS(monster_tarbaby);

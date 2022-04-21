@@ -147,7 +147,7 @@ LINK_ENTITY_TO_CLASS(light_globe);
 void FireAmbient(edict_t* self)
 {
 	PF_precache_sound("ambience/fire1.wav");
-// attenuate fast
+	// attenuate fast
 	PF_ambientsound(self->v.origin, "ambience/fire1.wav", 0.5, ATTN_STATIC);
 }
 
@@ -495,7 +495,7 @@ void bubble_remove(edict_t* self, edict_t* other)
 {
 	if (other->v.classname == self->v.classname)
 	{
-//		dprint ("bump");
+		//		dprint ("bump");
 		return;
 	}
 	PF_Remove(self);

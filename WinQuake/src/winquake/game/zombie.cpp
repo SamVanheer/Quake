@@ -480,12 +480,12 @@ void ZombieGrenadeTouch(edict_t* self, edict_t* other)
 		return;		// don't explode on owner
 	if (other->v.takedamage)
 	{
-		T_Damage (self, other, self, self->v.owner, 10 );
-		PF_sound (self, CHAN_WEAPON, "zombie/z_hit.wav", 1, ATTN_NORM);
-		PF_Remove (self);
+		T_Damage(self, other, self, self->v.owner, 10);
+		PF_sound(self, CHAN_WEAPON, "zombie/z_hit.wav", 1, ATTN_NORM);
+		PF_Remove(self);
 		return;
 	}
-	PF_sound (self, CHAN_WEAPON, "zombie/z_miss.wav", 1, ATTN_NORM);	// bounce sound
+	PF_sound(self, CHAN_WEAPON, "zombie/z_miss.wav", 1, ATTN_NORM);	// bounce sound
 	AsVector(self->v.velocity) = AsVector(vec3_origin);
 	AsVector(self->v.avelocity) = AsVector(vec3_origin);
 	self->v.touch = SUB_TouchRemove;
@@ -500,21 +500,21 @@ ZombieFireGrenade
 */
 void ZombieFireGrenade(edict_t* self, vec3_t st)
 {
-	PF_sound (self, CHAN_WEAPON, "zombie/z_shot1.wav", 1, ATTN_NORM);
+	PF_sound(self, CHAN_WEAPON, "zombie/z_shot1.wav", 1, ATTN_NORM);
 
-	auto missile = PF_Spawn ();
+	auto missile = PF_Spawn();
 	missile->v.owner = self;
 	missile->v.movetype = MOVETYPE_BOUNCE;
 	missile->v.solid = SOLID_BBOX;
 
-// calc org
+	// calc org
 	auto org = AsVector(self->v.origin) + st[0] * AsVector(pr_global_struct->v_forward)
 		+ st[1] * AsVector(pr_global_struct->v_right)
 		+ (st[2] - 24) * AsVector(pr_global_struct->v_up);
-	
-// set missile speed	
 
-	PF_makevectors (self->v.angles);
+	// set missile speed	
+
+	PF_makevectors(self->v.angles);
 
 	PF_normalize(AsVector(self->v.enemy->v.origin) - AsVector(org), missile->v.velocity);
 	AsVector(missile->v.velocity) = AsVector(missile->v.velocity) * 600;
@@ -523,26 +523,26 @@ void ZombieFireGrenade(edict_t* self, vec3_t st)
 	AsVector(missile->v.avelocity) = Vector3D{3000, 1000, 2000};
 
 	missile->v.touch = ZombieGrenadeTouch;
-	
-// set missile duration
+
+	// set missile duration
 	missile->v.nextthink = pr_global_struct->time + 2.5;
 	missile->v.think = SUB_Remove;
 
-	PF_setmodel (missile, "progs/zom_gib.mdl");
-	PF_setsize (missile, Vector3D{0, 0, 0}, Vector3D{0, 0, 0});		
-	PF_setorigin (missile, org);
+	PF_setmodel(missile, "progs/zom_gib.mdl");
+	PF_setsize(missile, Vector3D{0, 0, 0}, Vector3D{0, 0, 0});
+	PF_setorigin(missile, org);
 }
 
 void zombie_missile(edict_t* self)
 {
 	const float r = PF_random();
-	
+
 	if (r < 0.3)
-		zombie_atta1 (self);
+		zombie_atta1(self);
 	else if (r < 0.6)
-		zombie_attb1 (self);
+		zombie_attb1(self);
 	else
-		zombie_attc1 (self);
+		zombie_attc1(self);
 }
 
 LINK_FUNCTION_TO_NAME(zombie_missile);
@@ -556,11 +556,11 @@ PAIN
 */
 void zombie_die(edict_t* self)
 {
-	PF_sound (self, CHAN_VOICE, "zombie/z_gib.wav", 1, ATTN_NORM);
-	ThrowHead (self, "progs/h_zombie.mdl", self->v.health);
-	ThrowGib (self,"progs/gib1.mdl", self->v.health);
-	ThrowGib (self,"progs/gib2.mdl", self->v.health);
-	ThrowGib (self,"progs/gib3.mdl", self->v.health);
+	PF_sound(self, CHAN_VOICE, "zombie/z_gib.wav", 1, ATTN_NORM);
+	ThrowHead(self, "progs/h_zombie.mdl", self->v.health);
+	ThrowGib(self, "progs/gib1.mdl", self->v.health);
+	ThrowGib(self, "progs/gib2.mdl", self->v.health);
+	ThrowGib(self, "progs/gib3.mdl", self->v.health);
 }
 
 LINK_FUNCTION_TO_NAME(zombie_die);
@@ -598,37 +598,37 @@ void zombie_pain(edict_t* self, edict_t* attacker, float take)
 	if (take >= 25)
 	{
 		self->v.inpain = 2;
-		zombie_paine1 (self);
-		return;
-	}
-	
-	if (self->v.inpain)
-	{
-// if hit again in next gre seconds while not in pain frames, definately drop
-		self->v.pain_finished = pr_global_struct->time + 3;
-		return;			// currently going through an animation, don't change
-	}
-	
-	if (self->v.pain_finished > pr_global_struct->time)
-	{
-// hit again, so drop down
-		self->v.inpain = 2;
-		zombie_paine1 (self);
+		zombie_paine1(self);
 		return;
 	}
 
-// gp into one of the fast pain animations	
+	if (self->v.inpain)
+	{
+		// if hit again in next gre seconds while not in pain frames, definately drop
+		self->v.pain_finished = pr_global_struct->time + 3;
+		return;			// currently going through an animation, don't change
+	}
+
+	if (self->v.pain_finished > pr_global_struct->time)
+	{
+		// hit again, so drop down
+		self->v.inpain = 2;
+		zombie_paine1(self);
+		return;
+	}
+
+	// gp into one of the fast pain animations	
 	self->v.inpain = 1;
 
 	const float r = PF_random();
 	if (r < 0.25)
-		zombie_paina1 (self);
-	else if (r <  0.5)
-		zombie_painb1 (self);
-	else if (r <  0.75)
-		zombie_painc1 (self);
+		zombie_paina1(self);
+	else if (r < 0.5)
+		zombie_painb1(self);
+	else if (r < 0.75)
+		zombie_painc1(self);
 	else
-		zombie_paind1 (self);
+		zombie_paind1(self);
 }
 
 LINK_FUNCTION_TO_NAME(zombie_pain);
@@ -647,27 +647,27 @@ void monster_zombie(edict_t* self)
 		return;
 	}
 
-	PF_precache_model ("progs/zombie.mdl");
+	PF_precache_model("progs/zombie.mdl");
 	PF_precache_model("progs/h_zombie.mdl");
 	PF_precache_model("progs/zom_gib.mdl");
 
-	PF_precache_sound ("zombie/z_idle.wav");
-	PF_precache_sound ("zombie/z_idle1.wav");
-	PF_precache_sound ("zombie/z_shot1.wav");
-	PF_precache_sound ("zombie/z_gib.wav");
-	PF_precache_sound ("zombie/z_pain.wav");
-	PF_precache_sound ("zombie/z_pain1.wav");
-	PF_precache_sound ("zombie/z_fall.wav");
-	PF_precache_sound ("zombie/z_miss.wav");
-	PF_precache_sound ("zombie/z_hit.wav");
-	PF_precache_sound ("zombie/idle_w2.wav");
+	PF_precache_sound("zombie/z_idle.wav");
+	PF_precache_sound("zombie/z_idle1.wav");
+	PF_precache_sound("zombie/z_shot1.wav");
+	PF_precache_sound("zombie/z_gib.wav");
+	PF_precache_sound("zombie/z_pain.wav");
+	PF_precache_sound("zombie/z_pain1.wav");
+	PF_precache_sound("zombie/z_fall.wav");
+	PF_precache_sound("zombie/z_miss.wav");
+	PF_precache_sound("zombie/z_hit.wav");
+	PF_precache_sound("zombie/idle_w2.wav");
 
 	self->v.solid = SOLID_SLIDEBOX;
 	self->v.movetype = MOVETYPE_STEP;
 
-	PF_setmodel (self, "progs/zombie.mdl");
+	PF_setmodel(self, "progs/zombie.mdl");
 
-	PF_setsize (self, Vector3D{-16, -16, -24}, Vector3D{16, 16, 40});
+	PF_setsize(self, Vector3D{-16, -16, -24}, Vector3D{16, 16, 40});
 	self->v.health = 60;
 
 	self->v.th_stand = zombie_stand1;
@@ -681,7 +681,7 @@ void monster_zombie(edict_t* self)
 	if (self->v.spawnflags & SPAWN_CRUCIFIED)
 	{
 		self->v.movetype = MOVETYPE_NONE;
-		zombie_cruc1 (self);
+		zombie_cruc1(self);
 	}
 	else
 		walkmonster_start(self);
