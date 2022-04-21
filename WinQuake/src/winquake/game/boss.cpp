@@ -97,9 +97,11 @@ void boss_shocka_frame(edict_t* self, const Animation* animation, int frame)
 	}
 }
 
-void boss_shockb_postframes(edict_t* self)
+void boss_shockb_finish(edict_t* self)
 {
-	if (self->v.frame >= 9)
+	self->v.nextthink = pr_global_struct->time + 0.1f;
+
+	if (self->v.frame >= animations_get(self)->FindAnimationEnd("shockb"))
 	{
 		self->v.think = boss_missile1;
 	}
@@ -107,6 +109,13 @@ void boss_shockb_postframes(edict_t* self)
 	{
 		++self->v.frame;
 	}
+}
+
+void boss_shockb_postframes(edict_t* self)
+{
+	self->v.nextthink = pr_global_struct->time + 0.1f;
+	self->v.frame = animations_get(self)->FindAnimationStart("shockb");
+	self->v.think = boss_shockb_finish;
 }
 
 void boss_shockb_frame(edict_t* self, const Animation* animation, int frame)

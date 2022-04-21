@@ -20,7 +20,7 @@
 #include "quakedef.h"
 #include "animation.h"
 
-static const Animations* animations_get(edict_t* self)
+const Animations* animations_get(edict_t* self)
 {
 	if (!self->v.animations_get)
 	{
