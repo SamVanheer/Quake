@@ -48,7 +48,7 @@ void army_walk_frame(edict_t* self, const Animation* animation, int frame)
 {
 	if (frame == 0)
 	{
-		if (random() < 0.2)
+		if (PF_random() < 0.2)
 			PF_sound(self, CHAN_VOICE, "soldier/idle.wav", 1, ATTN_IDLE);
 	}
 
@@ -89,7 +89,7 @@ void army_run_frame(edict_t* self, const Animation* animation, int frame)
 {
 	if (frame == 0)
 	{
-		if (random() < 0.2)
+		if (PF_random() < 0.2)
 			PF_sound(self, CHAN_VOICE, "soldier/idle.wav", 1, ATTN_IDLE);
 	}
 
@@ -340,7 +340,7 @@ void army_pain(edict_t* self, edict_t* attacker, float damage)
 	if (self->v.pain_finished > pr_global_struct->time)
 		return;
 
-	const float r = random();
+	const float r = PF_random();
 
 	if (r < 0.2)
 	{
@@ -394,7 +394,7 @@ void army_die(edict_t* self)
 
 // regular death
 	PF_sound(self, CHAN_VOICE, "soldier/death1.wav", 1, ATTN_NORM);
-	if (random() < 0.5)
+	if (PF_random() < 0.5)
 		army_die1 (self);
 	else
 		army_cdie1 (self);

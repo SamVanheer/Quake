@@ -49,7 +49,7 @@ void demon1_walk_frame(edict_t* self, const Animation* animation, int frame)
 {
 	if (frame == 0)
 	{
-		if (random() < 0.2)
+		if (PF_random() < 0.2)
 			PF_sound(self, CHAN_VOICE, "demon/idle1.wav", 1, ATTN_IDLE);
 	}
 
@@ -88,7 +88,7 @@ void demon1_run_frame(edict_t* self, const Animation* animation, int frame)
 	switch (frame)
 	{
 	case 0:
-		if (random() < 0.2)
+		if (PF_random() < 0.2)
 			PF_sound(self, CHAN_VOICE, "demon/idle1.wav", 1, ATTN_IDLE);
 
 		[[fallthrough]];
@@ -305,7 +305,7 @@ void demon1_pain(edict_t* self, edict_t* attacker, float damage)
 	self->v.pain_finished = pr_global_struct->time + 1;
 	PF_sound (self, CHAN_VOICE, "demon/dpain1.wav", 1, ATTN_NORM);
 
-	if (random()*200 > damage)
+	if (PF_random()*200 > damage)
 		return;		// didn't flinch
 		
 	demon1_pain1 (self);
@@ -432,7 +432,7 @@ bool CheckDemonJump(edict_t* self)
 		
 	if (d > 200)
 	{
-		if (random() < 0.9)
+		if (PF_random() < 0.9)
 			return false;
 	}
 		
@@ -473,7 +473,7 @@ void Demon_Melee(edict_t* self, float side)
 		return;
 		
 	PF_sound (self, CHAN_WEAPON, "demon/dhit2.wav", 1, ATTN_NORM);
-	const float ldmg = 10 + 5*random();
+	const float ldmg = 10 + 5*PF_random();
 	T_Damage (self, self->v.enemy, self, self, ldmg);	
 
 	PF_makevectors (self->v.angles);
@@ -489,7 +489,7 @@ void Demon_JumpTouch(edict_t* self, edict_t* other)
 	{
 		if ( PF_vlen(self->v.velocity) > 400 )
 		{
-			const float ldmg = 40 + 10*random();
+			const float ldmg = 40 + 10*PF_random();
 			T_Damage (self, other, self, self, ldmg);	
 		}
 	}
@@ -503,8 +503,8 @@ void Demon_JumpTouch(edict_t* self, edict_t* other)
 	self->v.think = demon1_jump1;
 	self->v.nextthink = pr_global_struct->time + 0.1;
 
-//			self->v.velocity[0] = (random() - 0.5) * 600;
-//			self->v.velocity[1] = (random() - 0.5) * 600;
+//			self->v.velocity[0] = (PF_random() - 0.5) * 600;
+//			self->v.velocity[1] = (PF_random() - 0.5) * 600;
 //			self->v.velocity[2] = 200;
 //			self->v.flags &= ~FL_ONGROUND;
 		}

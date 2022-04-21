@@ -206,7 +206,7 @@ void finale_4(edict_t* self)
 				self->v.origin[1] = oldo[1] + y;
 				self->v.origin[2] = oldo[2] + z;
 
-				const float r = random();
+				const float r = PF_random();
 				if (r < 0.3)				
 					ThrowGib (self, "progs/gib1.mdl", -999);
 				else if (r < 0.6)

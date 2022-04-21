@@ -90,7 +90,7 @@ void shambler_walk_frame(edict_t* self, const Animation* animation, int frame)
 
 	if (animation->ReachedEnd(frame))
 	{
-		if (random() > 0.8)
+		if (PF_random() > 0.8)
 			PF_sound(self, CHAN_VOICE, "shambler/sidle.wav", 1, ATTN_IDLE);
 	}
 }
@@ -111,7 +111,7 @@ void shambler_run_frame(edict_t* self, const Animation* animation, int frame)
 
 	if (animation->ReachedEnd(frame))
 	{
-		if (random() > 0.8)
+		if (PF_random() > 0.8)
 			PF_sound(self, CHAN_VOICE, "shambler/sidle.wav", 1, ATTN_IDLE);
 	}
 }
@@ -165,7 +165,7 @@ void shambler_smash_frame(edict_t* self, const Animation* animation, int frame)
 		if (!CanDamage(self, self->v.enemy, self))
 			return;
 
-		const float ldmg = (random() + random() + random()) * 40;
+		const float ldmg = (PF_random() + PF_random() + PF_random()) * 40;
 		T_Damage(self, self->v.enemy, self, self, ldmg);
 		PF_sound(self, CHAN_VOICE, "shambler/smack.wav", 1, ATTN_NORM);
 
@@ -227,7 +227,7 @@ void shambler_swingl_frame(edict_t* self, const Animation* animation, int frame)
 	{
 		self->v.think = &sham_run1;
 
-		if (random() < 0.5)
+		if (PF_random() < 0.5)
 			self->v.think = sham_swingr1;
 	}
 }
@@ -282,7 +282,7 @@ void shambler_swingr_frame(edict_t* self, const Animation* animation, int frame)
 	{
 		self->v.think = &sham_run1;
 
-		if (random() < 0.5)
+		if (PF_random() < 0.5)
 			self->v.think = sham_swingl1;
 	}
 }
@@ -431,7 +431,7 @@ void ShamClaw(edict_t* self, float side)
 	if (PF_vlen(delta) > 100)
 		return;
 		
-	const float ldmg = (random() + random() + random()) * 20;
+	const float ldmg = (PF_random() + PF_random() + PF_random()) * 20;
 	T_Damage (self, self->v.enemy, self, self, ldmg);
 	PF_sound (self, CHAN_VOICE, "shambler/smack.wav", 1, ATTN_NORM);
 
@@ -458,7 +458,7 @@ LINK_FUNCTION_TO_NAME(sham_swingr1);
 
 void sham_melee(edict_t* self)
 {
-	const float chance = random();
+	const float chance = PF_random();
 	if (chance > 0.6 || self->v.health == 600)
 		sham_smash1 (self);
 	else if (chance > 0.3)
@@ -516,7 +516,7 @@ void sham_pain(edict_t* self, edict_t* attacker, float damage)
 	if (self->v.health <= 0)
 		return;		// allready dying, don't go into pain frame
 
-	if (random()*400 > damage)
+	if (PF_random()*400 > damage)
 		return;		// didn't flinch
 
 	if (self->v.pain_finished > pr_global_struct->time)

@@ -980,7 +980,7 @@ void CheckPowerups(edict_t* self)
 		if (self->v.invisible_sound < pr_global_struct->time)
 		{
 			PF_sound(self, CHAN_AUTO, "items/inv3.wav", 0.5, ATTN_IDLE);
-			self->v.invisible_sound = pr_global_struct->time + ((random() * 3) + 1);
+			self->v.invisible_sound = pr_global_struct->time + ((PF_random() * 3) + 1);
 		}
 
 
@@ -1327,7 +1327,7 @@ void ClientObituary(edict_t* self, edict_t* targ, edict_t* attacker)
 			bprint(targ->v.netname);
 			if (rnum == -3)
 			{
-				if (random() < 0.5)
+				if (PF_random() < 0.5)
 					bprint(" sleeps with the fishes\n");
 				else
 					bprint(" sucks it down\n");
@@ -1335,7 +1335,7 @@ void ClientObituary(edict_t* self, edict_t* targ, edict_t* attacker)
 			}
 			else if (rnum == -4)
 			{
-				if (random() < 0.5)
+				if (PF_random() < 0.5)
 					bprint(" gulped a load of slime\n");
 				else
 					bprint(" can't exist on slime alone\n");
@@ -1348,7 +1348,7 @@ void ClientObituary(edict_t* self, edict_t* targ, edict_t* attacker)
 					bprint(" burst into flames\n");
 					return;
 				}
-				if (random() < 0.5)
+				if (PF_random() < 0.5)
 					bprint(" turned into hot slag\n");
 				else
 					bprint(" visits the Volcano God\n");

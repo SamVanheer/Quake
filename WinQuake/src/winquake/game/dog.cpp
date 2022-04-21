@@ -48,7 +48,7 @@ void dog_walk_frame(edict_t* self, const Animation* animation, int frame)
 {
 	if (frame == 0)
 	{
-		if (random() < 0.2)
+		if (PF_random() < 0.2)
 			PF_sound(self, CHAN_VOICE, "dog/idle.wav", 1, ATTN_IDLE);
 	}
 
@@ -59,7 +59,7 @@ void dog_run_frame(edict_t* self, const Animation* animation, int frame)
 {
 	if (frame == 0)
 	{
-		if (random() < 0.2)
+		if (PF_random() < 0.2)
 			PF_sound(self, CHAN_VOICE, "dog/idle.wav", 1, ATTN_IDLE);
 	}
 
@@ -210,7 +210,7 @@ void dog_bite(edict_t* self)
 	if (PF_vlen(delta) > 100)
 		return;
 		
-	const float ldmg = (random() + random() + random()) * 8;
+	const float ldmg = (PF_random() + PF_random() + PF_random()) * 8;
 	T_Damage (self, self->v.enemy, self, self, ldmg);
 }
 
@@ -223,7 +223,7 @@ void Dog_JumpTouch(edict_t* self, edict_t* other)
 	{
 		if ( PF_vlen(self->v.velocity) > 300 )
 		{
-			const float ldmg = 10 + 10*random();
+			const float ldmg = 10 + 10*PF_random();
 			T_Damage (self, other, self, self, ldmg);
 		}
 	}
@@ -237,8 +237,8 @@ void Dog_JumpTouch(edict_t* self, edict_t* other)
 	self->v.think = dog_leap1;
 	self->v.nextthink = pr_global_struct->time + 0.1;
 
-//			self->v.velocity[0] = (random() - 0.5) * 600;
-//			self->v.velocity[1] = (random() - 0.5) * 600;
+//			self->v.velocity[0] = (PF_random() - 0.5) * 600;
+//			self->v.velocity[1] = (PF_random() - 0.5) * 600;
 //			self->v.velocity[2] = 200;
 //			self->v.flags &= ~FL_ONGROUND;
 		}
@@ -311,7 +311,7 @@ void dog_pain(edict_t* self, edict_t* attacker, float damage)
 {
 	PF_sound (self, CHAN_VOICE, "dog/dpain1.wav", 1, ATTN_NORM);
 
-	if (random() > 0.5)
+	if (PF_random() > 0.5)
 		dog_pain1 (self);
 	else
 		dog_painb1 (self);
@@ -336,7 +336,7 @@ void dog_die(edict_t* self)
 	PF_sound(self, CHAN_VOICE, "dog/ddeath.wav", 1, ATTN_NORM);
 	self->v.solid = SOLID_NOT;
 
-	if (random() > 0.5)
+	if (PF_random() > 0.5)
 		dog_die1 (self);
 	else
 		dog_dieb1 (self);

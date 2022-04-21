@@ -44,7 +44,7 @@ void knight_walk_frame(edict_t* self, const Animation* animation, int frame)
 {
 	if (frame == 0)
 	{
-		if (random() < 0.2)
+		if (PF_random() < 0.2)
 			PF_sound(self, CHAN_VOICE, "knight/idle.wav", 1, ATTN_IDLE);
 	}
 
@@ -71,7 +71,7 @@ void knight_run_frame(edict_t* self, const Animation* animation, int frame)
 {
 	if (frame == 0)
 	{
-		if (random() < 0.2)
+		if (PF_random() < 0.2)
 			PF_sound(self, CHAN_VOICE, "knight/idle.wav", 1, ATTN_IDLE);
 	}
 
@@ -108,7 +108,7 @@ void knight_runattack_frame(edict_t* self, const Animation* animation, int frame
 {
 	if (frame == 0)
 	{
-		if (random() > 0.5)
+		if (PF_random() > 0.5)
 			PF_sound(self, CHAN_WEAPON, "knight/sword2.wav", 1, ATTN_NORM);
 		else
 			PF_sound(self, CHAN_WEAPON, "knight/sword1.wav", 1, ATTN_NORM);
@@ -336,7 +336,7 @@ void knight_pain(edict_t* self, edict_t* attacker, float damage)
 	if (self->v.pain_finished > pr_global_struct->time)
 		return;
 
-	const float r = random();
+	const float r = PF_random();
 	
 	PF_sound (self, CHAN_VOICE, "knight/khurt.wav", 1, ATTN_NORM);
 	if (r < 0.85)
@@ -384,7 +384,7 @@ void knight_die(edict_t* self)
 
 // regular death
 	PF_sound(self, CHAN_VOICE, "knight/kdeath.wav", 1, ATTN_NORM);
-	if (random() < 0.5)
+	if (PF_random() < 0.5)
 		knight_die1 (self);
 	else
 		knight_dieb1 (self);

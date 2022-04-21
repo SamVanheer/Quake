@@ -130,10 +130,10 @@ bool CheckAttack(edict_t* self)
 	else
 		chance = 0;
 
-	if (random() < chance)
+	if (PF_random() < chance)
 	{
 		self->v.th_missile(self);
-		SUB_AttackFinished(self, 2 * random());
+		SUB_AttackFinished(self, 2 * PF_random());
 		return true;
 	}
 
@@ -199,7 +199,7 @@ void ai_melee(edict_t* self)
 	if (PF_vlen(delta) > 60)
 		return;
 
-	const float ldmg = (random() + random() + random()) * 3;
+	const float ldmg = (PF_random() + PF_random() + PF_random()) * 3;
 	T_Damage(self, self->v.enemy, self, self, ldmg);
 }
 
@@ -217,7 +217,7 @@ void ai_melee_side(edict_t* self)
 		return;
 	if (!CanDamage(self, self->v.enemy, self))
 		return;
-	const float ldmg = (random() + random() + random()) * 3;
+	const float ldmg = (PF_random() + PF_random() + PF_random()) * 3;
 	T_Damage(self, self->v.enemy, self, self, ldmg);
 }
 
@@ -267,11 +267,11 @@ float SoldierCheckAttack(edict_t* self)
 	else
 		chance = 0;
 
-	if (random() < chance)
+	if (PF_random() < chance)
 	{
 		self->v.th_missile(self);
-		SUB_AttackFinished(self, 1 + random());
-		if (random() < 0.3)
+		SUB_AttackFinished(self, 1 + PF_random());
+		if (PF_random() < 0.3)
 			self->v.lefty = !self->v.lefty;
 
 		return TRUE;
@@ -330,7 +330,7 @@ float ShamCheckAttack(edict_t* self)
 		return FALSE;
 
 	self->v.attack_state = AS_MISSILE;
-	SUB_AttackFinished(self, 2 + 2 * random());
+	SUB_AttackFinished(self, 2 + 2 * PF_random());
 	return TRUE;
 }
 
@@ -394,6 +394,6 @@ float OgreCheckAttack(edict_t* self)
 		chance = 0;
 
 	self->v.attack_state = AS_MISSILE;
-	SUB_AttackFinished(self, 1 + 2 * random());
+	SUB_AttackFinished(self, 1 + 2 * PF_random());
 	return TRUE;
 }

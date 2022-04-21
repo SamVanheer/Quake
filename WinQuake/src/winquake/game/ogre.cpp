@@ -44,7 +44,7 @@ void ogre_stand_frame(edict_t* self, const Animation* animation, int frame)
 {
 	if (frame == 4)
 	{
-		if (random() < 0.2)
+		if (PF_random() < 0.2)
 			PF_sound(self, CHAN_VOICE, "ogre/ogidle.wav", 1, ATTN_IDLE);
 	}
 
@@ -84,12 +84,12 @@ void ogre_walk_frame(edict_t* self, const Animation* animation, int frame)
 	switch (frame)
 	{
 	case 3:
-		if (random() < 0.2)
+		if (PF_random() < 0.2)
 			PF_sound(self, CHAN_VOICE, "ogre/ogidle.wav", 1, ATTN_IDLE);
 		break;
 
 	case 5:
-		if (random() < 0.1)
+		if (PF_random() < 0.1)
 			PF_sound(self, CHAN_VOICE, "ogre/ogdrag.wav", 1, ATTN_IDLE);
 		break;
 	}
@@ -101,7 +101,7 @@ void ogre_run_frame(edict_t* self, const Animation* animation, int frame)
 	{
 	case 0:
 		ai_run(self, 9);
-		if (random() < 0.2)
+		if (PF_random() < 0.2)
 			PF_sound(self, CHAN_VOICE, "ogre/ogidle2.wav", 1, ATTN_IDLE);
 		break;
 
@@ -159,12 +159,12 @@ void ogre_swing_frame(edict_t* self, const Animation* animation, int frame)
 	case 4:
 		ai_charge(self, 9);
 		chainsaw(self, 0);
-		self->v.angles[1] = self->v.angles[1] + random() * 25;
+		self->v.angles[1] = self->v.angles[1] + PF_random() * 25;
 		break;
 
 	case 5:
 		chainsaw(self, 200);
-		self->v.angles[1] = self->v.angles[1] + random() * 25;
+		self->v.angles[1] = self->v.angles[1] + PF_random() * 25;
 		break;
 
 	case 6:
@@ -172,12 +172,12 @@ void ogre_swing_frame(edict_t* self, const Animation* animation, int frame)
 	case 8:
 	case 10:
 		chainsaw(self, 0);
-		self->v.angles[1] = self->v.angles[1] + random() * 25;
+		self->v.angles[1] = self->v.angles[1] + PF_random() * 25;
 		break;
 
 	case 9:
 		chainsaw(self, -200);
-		self->v.angles[1] = self->v.angles[1] + random() * 25;
+		self->v.angles[1] = self->v.angles[1] + PF_random() * 25;
 		break;
 
 	case 11:
@@ -247,7 +247,7 @@ void ogre_smash_frame(edict_t* self, const Animation* animation, int frame)
 		ai_charge(self, 2);
 		chainsaw(self, 0);
 		// slight variation
-		self->v.nextthink = self->v.nextthink + random() * 0.2;
+		self->v.nextthink = self->v.nextthink + PF_random() * 0.2;
 		break;
 
 	case 13:
@@ -476,7 +476,7 @@ void chainsaw(edict_t* self, float side)
 	if (PF_vlen(delta) > 100)
 		return;
 		
-	const float ldmg = (random() + random() + random()) * 4;
+	const float ldmg = (PF_random() + PF_random() + PF_random()) * 4;
 	T_Damage (self, self->v.enemy, self, self, ldmg);
 	
 	if (side)
@@ -570,7 +570,7 @@ void ogre_pain(edict_t* self, edict_t* attacker, float damage)
 
 	PF_sound (self, CHAN_VOICE, "ogre/ogpain1.wav", 1, ATTN_NORM);		
 
-	const float r = random();
+	const float r = PF_random();
 	
 	if (r < 0.25)
 	{
@@ -616,7 +616,7 @@ void ogre_die(edict_t* self)
 
 	PF_sound (self, CHAN_VOICE, "ogre/ogdth.wav", 1, ATTN_NORM);
 	
-	if (random() < 0.5)
+	if (PF_random() < 0.5)
 		ogre_die1 (self);
 	else
 		ogre_bdie1 (self);
@@ -626,7 +626,7 @@ LINK_FUNCTION_TO_NAME(ogre_die);
 
 void ogre_melee(edict_t* self)
 {
-	if (random() > 0.5)
+	if (PF_random() > 0.5)
 		ogre_smash1 (self);
 	else
 		ogre_swing1 (self);

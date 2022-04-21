@@ -125,7 +125,7 @@ void tarbaby_jump_frame(edict_t* self, const Animation* animation, int frame)
 		PF_makevectors(self->v.angles);
 		self->v.origin[2] = self->v.origin[2] + 1;
 		AsVector(self->v.velocity) = AsVector(pr_global_struct->v_forward) * 600 + Vector3D{0, 0, 200};
-		self->v.velocity[2] = self->v.velocity[2] + random() * 150;
+		self->v.velocity[2] = self->v.velocity[2] + PF_random() * 150;
 		if (self->v.flags & FL_ONGROUND)
 			self->v.flags &= ~FL_ONGROUND;
 		self->v.cnt = 0;
@@ -222,7 +222,7 @@ void Tar_JumpTouch(edict_t* self, edict_t* other)
 	{
 		if ( PF_vlen(self->v.velocity) > 400 )
 		{
-			const float ldmg = 10 + 10*random();
+			const float ldmg = 10 + 10*PF_random();
 			T_Damage (self, other, self, self, ldmg);	
 			PF_sound (self, CHAN_WEAPON, "blob/hit1.wav", 1, ATTN_NORM);
 		}
@@ -241,8 +241,8 @@ void Tar_JumpTouch(edict_t* self, edict_t* other)
 	self->v.movetype = MOVETYPE_STEP;
 	self->v.nextthink = pr_global_struct->time + 0.1;
 
-//			self->v.velocity_x = (random() - 0.5) * 600;
-//			self->v.velocity_y = (random() - 0.5) * 600;
+//			self->v.velocity_x = (PF_random() - 0.5) * 600;
+//			self->v.velocity_y = (PF_random() - 0.5) * 600;
 //			self->v.velocity_z = 200;
 //			self->v.flags &= ~FL_ONGROUND;
 		}

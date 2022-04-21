@@ -1350,8 +1350,8 @@ void DropBackpack(edict_t* self)
 	item->v.ammo_cells = self->v.ammo_cells;
 
 	item->v.velocity[2] = 300;
-	item->v.velocity[0] = -100 + (random() * 200);
-	item->v.velocity[1] = -100 + (random() * 200);
+	item->v.velocity[0] = -100 + (PF_random() * 200);
+	item->v.velocity[1] = -100 + (PF_random() * 200);
 	
 	item->v.flags = FL_ITEM;
 	item->v.solid = SOLID_TRIGGER;

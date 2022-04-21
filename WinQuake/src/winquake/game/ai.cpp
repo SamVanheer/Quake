@@ -244,7 +244,7 @@ void SightSound(edict_t* self)
 		PF_sound(self, CHAN_VOICE, "vomitus/v_sight1.wav", 1, ATTN_NORM);
 	else if (!strcmp(self->v.classname, "monster_enforcer"))
 	{
-		float rsnd = rint(random() * 3);
+		float rsnd = rint(PF_random() * 3);
 		if (rsnd == 1)
 			PF_sound(self, CHAN_VOICE, "enforcer/sight1.wav", 1, ATTN_NORM);
 		else if (rsnd == 2)
@@ -389,7 +389,7 @@ void ai_pain(edict_t* self, float dist)
 		local float	away;
 
 		away = game_anglemod (vectoyaw (self->v.origin - self->v.enemy->v.origin)
-		+ 180*(random()- 0.5) );
+		+ 180*(PF_random()- 0.5) );
 
 		walkmove (away, dist);
 	*/

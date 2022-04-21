@@ -133,9 +133,9 @@ void wizard_death_frame(edict_t* self, const Animation* animation, int frame)
 	switch (frame)
 	{
 	case 0:
-		self->v.velocity[0] = -200 + 400 * random();
-		self->v.velocity[1] = -200 + 400 * random();
-		self->v.velocity[2] = 100 + 100 * random();
+		self->v.velocity[0] = -200 + 400 * PF_random();
+		self->v.velocity[1] = -200 + 400 * PF_random();
+		self->v.velocity[2] = 100 + 100 * PF_random();
 		self->v.flags &= ~FL_ONGROUND;
 		PF_sound(self, CHAN_VOICE, "wizard/wdeath.wav", 1, ATTN_NORM);
 		break;
@@ -200,7 +200,7 @@ void LaunchMissile(edict_t* self, edict_t* missile, float mspeed, float accuracy
 	vec = vec + move * fly;
 	
 	PF_normalize(vec, vec);
-	vec = vec + accuracy* AsVector(pr_global_struct->v_up)*(random()- 0.5) + accuracy* AsVector(pr_global_struct->v_right)*(random()- 0.5);
+	vec = vec + accuracy* AsVector(pr_global_struct->v_up)*(PF_random()- 0.5) + accuracy* AsVector(pr_global_struct->v_right)*(PF_random()- 0.5);
 	
 	AsVector(missile->v.velocity) = vec * mspeed;
 
@@ -263,7 +263,7 @@ bool WizardCheckAttack(edict_t* self)
 	else
 		chance = 0;
 
-	if (random () < chance)
+	if (PF_random () < chance)
 	{
 		self->v.attack_state = AS_MISSILE;
 		return true;
@@ -370,7 +370,7 @@ void Wiz_StartFast(edict_t* self)
 
 void Wiz_idlesound(edict_t* self)
 {
-	const float wr = random() * 5;
+	const float wr = PF_random() * 5;
 
 	if (self->v.waitmin < pr_global_struct->time)
 	{
@@ -450,7 +450,7 @@ LINK_FUNCTION_TO_NAME(wiz_die);
 void Wiz_Pain(edict_t* self, edict_t* attacker, float damage)
 {
 	PF_sound (self, CHAN_VOICE, "wizard/wpain.wav", 1, ATTN_NORM);
-	if (random()*70 > damage)
+	if (PF_random()*70 > damage)
 		return;		// didn't flinch
 
 	wiz_pain1 (self);

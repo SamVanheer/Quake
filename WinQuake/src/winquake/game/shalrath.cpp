@@ -55,7 +55,7 @@ void shalrath_walk_core_frame(edict_t* self, const Animation* animation, int fra
 {
 	if (frame == 0)
 	{
-		if (random() < 0.2)
+		if (PF_random() < 0.2)
 			PF_sound(self, CHAN_VOICE, "shalrath/idle.wav", 1, ATTN_IDLE);
 	}
 
@@ -91,7 +91,7 @@ void shalrath_run_frame(edict_t* self, const Animation* animation, int frame)
 {
 	if (frame == 0)
 	{
-		if (random() < 0.2)
+		if (PF_random() < 0.2)
 			PF_sound(self, CHAN_VOICE, "shalrath/idle.wav", 1, ATTN_IDLE);
 	}
 
@@ -391,7 +391,7 @@ void monster_shalrath(edict_t* self)
 	self->v.animations_get = &shal_animations_get;
 
 	self->v.think = walkmonster_start;
-	self->v.nextthink = pr_global_struct->time + 0.1 + random ()*0.1;
+	self->v.nextthink = pr_global_struct->time + 0.1 + PF_random ()*0.1;
 
 }
 

@@ -173,11 +173,6 @@ inline void PF_setmodel(edict_t* e, const char* m)
 	PF_setmodel(e, const_cast<char*>(m));
 }
 
-inline float random()
-{
-	return PF_random();
-}
-
 inline void PF_sound(edict_t* entity, int channel, const char* sample, float volumeFloat, float attenuation)
 {
 	PF_sound(entity, channel, const_cast<char*>(sample), volumeFloat, attenuation);

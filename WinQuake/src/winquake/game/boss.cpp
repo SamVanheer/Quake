@@ -193,7 +193,7 @@ void boss_face(edict_t* self)
 {
 	
 // go for another player if multi player
-	if (self->v.enemy->v.health <= 0 || random() < 0.02)
+	if (self->v.enemy->v.health <= 0 || PF_random() < 0.02)
 	{
 		self->v.enemy = PF_Find(self->v.enemy, "classname", "player");
 		if (self->v.enemy == pr_global_struct->world)

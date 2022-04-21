@@ -46,12 +46,12 @@ void zombie_cruc_frame(edict_t* self, const Animation* animation, int frame)
 {
 	if (frame == 0)
 	{
-		if (random() < 0.1)
+		if (PF_random() < 0.1)
 			PF_sound(self, CHAN_VOICE, "zombie/idle_w2.wav", 1, ATTN_STATIC);
 	}
 	else
 	{
-		self->v.nextthink = pr_global_struct->time + 0.1 + random() * 0.1;
+		self->v.nextthink = pr_global_struct->time + 0.1 + PF_random() * 0.1;
 	}
 }
 
@@ -82,7 +82,7 @@ void zombie_walk_frame(edict_t* self, const Animation* animation, int frame)
 
 	if (animation->ReachedEnd(frame))
 	{
-		if (random() < 0.2)
+		if (PF_random() < 0.2)
 			PF_sound(self, CHAN_VOICE, "zombie/z_idle.wav", 1, ATTN_IDLE);
 	}
 }
@@ -138,9 +138,9 @@ void zombie_run_frame(edict_t* self, const Animation* animation, int frame)
 
 	if (animation->ReachedEnd(frame))
 	{
-		if (random() < 0.2)
+		if (PF_random() < 0.2)
 			PF_sound(self, CHAN_VOICE, "zombie/z_idle.wav", 1, ATTN_IDLE);
-		if (random() > 0.8)
+		if (PF_random() > 0.8)
 			PF_sound(self, CHAN_VOICE, "zombie/z_idle1.wav", 1, ATTN_IDLE);
 	}
 }
@@ -535,7 +535,7 @@ void ZombieFireGrenade(edict_t* self, vec3_t st)
 
 void zombie_missile(edict_t* self)
 {
-	const float r = random();
+	const float r = PF_random();
 	
 	if (r < 0.3)
 		zombie_atta1 (self);
@@ -620,7 +620,7 @@ void zombie_pain(edict_t* self, edict_t* attacker, float take)
 // gp into one of the fast pain animations	
 	self->v.inpain = 1;
 
-	const float r = random();
+	const float r = PF_random();
 	if (r < 0.25)
 		zombie_paina1 (self);
 	else if (r <  0.5)

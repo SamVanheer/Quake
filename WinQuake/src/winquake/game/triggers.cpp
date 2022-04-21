@@ -318,7 +318,7 @@ void play_teleport(edict_t* self)
 {
 	const char* tmpstr;
 
-	const float v = random() * 5;
+	const float v = PF_random() * 5;
 	if (v < 1)
 		tmpstr = "misc/r_tele1.wav";
 	else if (v < 2)

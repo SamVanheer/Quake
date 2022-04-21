@@ -525,7 +525,7 @@ void hknight_shot(edict_t* self, float offset)
 
 // set missile speed
 	PF_normalize (pr_global_struct->v_forward, vec);
-	vec[2] = 0 - vec[2] + (random() - 0.5) * 0.1;
+	vec[2] = 0 - vec[2] + (PF_random() - 0.5) * 0.1;
 	
 	auto newmis = launch_spike (self, org, vec);
 	newmis->v.classname = "knightspike";
@@ -561,7 +561,7 @@ void CheckContinueCharge(edict_t* self)
 		hknight_run1 (self);
 		return;		// done charging
 	}
-	if (random() > 0.5)
+	if (PF_random() > 0.5)
 		PF_sound (self, CHAN_WEAPON, "knight/sword2.wav", 1, ATTN_NORM);
 	else
 		PF_sound (self, CHAN_WEAPON, "knight/sword1.wav", 1, ATTN_NORM);
@@ -628,7 +628,7 @@ void hknight_die(edict_t* self)
 
 // regular death
 	PF_sound (self, CHAN_VOICE, "hknight/death1.wav", 1, ATTN_NORM);
-	if (random() > 0.5)
+	if (PF_random() > 0.5)
 		hknight_die1 (self);
 	else
 		hknight_dieb1 (self);
@@ -698,7 +698,7 @@ void hknight_watk1(edict_t* self)
 
 void hk_idle_sound(edict_t* self)
 {
-	if (random() < 0.2)
+	if (PF_random() < 0.2)
 		PF_sound (self, CHAN_VOICE, "hknight/idle.wav", 1, ATTN_NORM);
 }
 
@@ -716,7 +716,7 @@ void hknight_pain(edict_t* self, edict_t* attacker, float damage)
 		return;
 	}
 	
-	if ((random()*30 > damage) )
+	if ((PF_random()*30 > damage) )
 		return;		// didn't flinch
 
 	self->v.pain_finished = pr_global_struct->time + 1;

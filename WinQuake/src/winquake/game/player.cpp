@@ -276,7 +276,7 @@ void PainSound(edict_t* self)
 	if (self->v.watertype == CONTENT_WATER && self->v.waterlevel == 3)
 	{
 		DeathBubbles(self, 1);
-		if (random() > 0.5)
+		if (PF_random() > 0.5)
 			PF_sound(self, CHAN_VOICE, "player/drown1.wav", 1, ATTN_NORM);
 		else
 			PF_sound(self, CHAN_VOICE, "player/drown2.wav", 1, ATTN_NORM);
@@ -287,7 +287,7 @@ void PainSound(edict_t* self)
 	if (self->v.watertype == CONTENT_SLIME)
 	{
 		// FIX ME	put in some steam here
-		if (random() > 0.5)
+		if (PF_random() > 0.5)
 			PF_sound(self, CHAN_VOICE, "player/lburn1.wav", 1, ATTN_NORM);
 		else
 			PF_sound(self, CHAN_VOICE, "player/lburn2.wav", 1, ATTN_NORM);
@@ -296,7 +296,7 @@ void PainSound(edict_t* self)
 
 	if (self->v.watertype == CONTENT_LAVA)
 	{
-		if (random() > 0.5)
+		if (PF_random() > 0.5)
 			PF_sound(self, CHAN_VOICE, "player/lburn1.wav", 1, ATTN_NORM);
 		else
 			PF_sound(self, CHAN_VOICE, "player/lburn2.wav", 1, ATTN_NORM);
@@ -321,7 +321,7 @@ void PainSound(edict_t* self)
 	}
 
 
-	const float rs = rint((random() * 5) + 1);
+	const float rs = rint((PF_random() * 5) + 1);
 
 	self->v.noise = "";
 	if (rs == 1)
@@ -420,7 +420,7 @@ void DeathSound(edict_t* self)
 		return;
 	}
 
-	const float rs = rint((random() * 4) + 1);
+	const float rs = rint((PF_random() * 4) + 1);
 	if (rs == 1)
 		self->v.noise = "player/death1.wav";
 	if (rs == 2)

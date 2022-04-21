@@ -220,7 +220,7 @@ void misc_fireball(edict_t* self)
 
 	PF_precache_model("progs/lavaball.mdl");
 	self->v.classname = "fireball";
-	self->v.nextthink = pr_global_struct->time + (random() * 5);
+	self->v.nextthink = pr_global_struct->time + (PF_random() * 5);
 	self->v.think = fire_fly;
 
 	//Disabled because the original code never did anything.
@@ -238,9 +238,9 @@ void fire_fly(edict_t* self)
 	fireball->v.solid = SOLID_TRIGGER;
 	fireball->v.movetype = MOVETYPE_TOSS;
 	AsVector(fireball->v.velocity) = Vector3D{0, 0, 1000};
-	fireball->v.velocity[0] = (random() * 100) - 50;
-	fireball->v.velocity[1] = (random() * 100) - 50;
-	fireball->v.velocity[2] = self->v.speed + (random() * 200);
+	fireball->v.velocity[0] = (PF_random() * 100) - 50;
+	fireball->v.velocity[1] = (PF_random() * 100) - 50;
+	fireball->v.velocity[2] = self->v.speed + (PF_random() * 200);
 	fireball->v.classname = "fireball";
 	PF_setmodel(fireball, "progs/lavaball.mdl");
 	PF_setsize(fireball, vec3_origin, vec3_origin);
@@ -249,7 +249,7 @@ void fire_fly(edict_t* self)
 	fireball->v.think = SUB_Remove;
 	fireball->v.touch = fire_touch;
 
-	self->v.nextthink = pr_global_struct->time + (random() * 5) + 3;
+	self->v.nextthink = pr_global_struct->time + (PF_random() * 5) + 3;
 	self->v.think = fire_fly;
 }
 
@@ -464,7 +464,7 @@ void make_bubbles(edict_t* self)
 	bubble->v.frame = 0;
 	bubble->v.cnt = 0;
 	PF_setsize(bubble, Vector3D{-8, -8, -8}, Vector3D{8, 8, 8});
-	self->v.nextthink = pr_global_struct->time + random() + 0.5;
+	self->v.nextthink = pr_global_struct->time + PF_random() + 0.5;
 	self->v.think = make_bubbles;
 }
 
@@ -511,9 +511,9 @@ void bubble_bob(edict_t* self)
 	if (self->v.cnt == 20)
 		PF_Remove(self);
 
-	float rnd1 = self->v.velocity[0] + (-10 + (random() * 20));
-	float rnd2 = self->v.velocity[1] + (-10 + (random() * 20));
-	float rnd3 = self->v.velocity[2] + 10 + random() * 10;
+	float rnd1 = self->v.velocity[0] + (-10 + (PF_random() * 20));
+	float rnd2 = self->v.velocity[1] + (-10 + (PF_random() * 20));
+	float rnd3 = self->v.velocity[2] + 10 + PF_random() * 10;
 
 	if (rnd1 > 10)
 		rnd1 = 5;
@@ -760,7 +760,7 @@ void misc_noisemaker(edict_t* self)
 	PF_precache_sound("enforcer/death1.wav");
 	PF_precache_sound("enforcer/idle1.wav");
 
-	self->v.nextthink = pr_global_struct->time + 0.1 + random();
+	self->v.nextthink = pr_global_struct->time + 0.1 + PF_random();
 	self->v.think = noise_think;
 }
 

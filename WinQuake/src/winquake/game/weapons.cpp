@@ -43,7 +43,7 @@ void W_Precache(edict_t* self)
 
 float crandom()
 {
-	return 2 * (random() - 0.5);
+	return 2 * (PF_random() - 0.5);
 }
 
 /*
@@ -84,7 +84,7 @@ void W_FireAxe(edict_t* self)
 void wall_velocity(edict_t* self, vec3_t result)
 {
 	PF_normalize(self->v.velocity, result);
-	PF_normalize(AsVector(result) + AsVector(pr_global_struct->v_up) * (random() - 0.5) + AsVector(pr_global_struct->v_right) * (random() - 0.5), result);
+	PF_normalize(AsVector(result) + AsVector(pr_global_struct->v_up) * (PF_random() - 0.5) + AsVector(pr_global_struct->v_right) * (PF_random() - 0.5), result);
 	AsVector(result) = AsVector(result) + 2 * AsVector(pr_global_struct->trace_plane_normal);
 	AsVector(result) = AsVector(result) * 200;
 }
@@ -105,7 +105,7 @@ void SpawnMeatSpray(edict_t* self, vec3_t org, vec3_t vel)
 	PF_makevectors(self->v.angles);
 
 	VectorCopy(vel, missile->v.velocity);
-	missile->v.velocity[2] = missile->v.velocity[2] + 250 + 50 * random();
+	missile->v.velocity[2] = missile->v.velocity[2] + 250 + 50 * PF_random();
 
 	AsVector(missile->v.avelocity) = Vector3D{3000, 1000, 2000};
 
@@ -387,7 +387,7 @@ void T_MissileTouch(edict_t* self, edict_t* other)
 		return;
 	}
 
-	float damg = 100 + random() * 20;
+	float damg = 100 + PF_random() * 20;
 
 	if (other->v.health)
 	{
@@ -930,7 +930,7 @@ void W_Attack(edict_t* self)
 	if (self->v.weapon == IT_AXE)
 	{
 		PF_sound(self, CHAN_WEAPON, "weapons/ax1.wav", 1, ATTN_NORM);
-		const float r = random();
+		const float r = PF_random();
 		if (r < 0.25)
 			player_axe1(self);
 		else if (r < 0.5)

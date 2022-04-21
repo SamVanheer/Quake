@@ -49,7 +49,7 @@ void enforcer_walk_frame(edict_t* self, const Animation* animation, int frame)
 {
 	if (frame == 0)
 	{
-		if (random() < 0.2)
+		if (PF_random() < 0.2)
 			PF_sound(self, CHAN_VOICE, "enforcer/idle1.wav", 1, ATTN_IDLE);
 	}
 
@@ -85,7 +85,7 @@ void enforcer_run_frame(edict_t* self, const Animation* animation, int frame)
 {
 	if (frame == 0)
 	{
-		if (random() < 0.2)
+		if (PF_random() < 0.2)
 			PF_sound(self, CHAN_VOICE, "enforcer/idle1.wav", 1, ATTN_IDLE);
 	}
 
@@ -372,7 +372,7 @@ void enforcer_fire(edict_t* self)
 
 void enf_pain(edict_t* self, edict_t* attacker, float damage)
 {
-	const float r = random();
+	const float r = PF_random();
 	if (self->v.pain_finished > pr_global_struct->time)
 		return;
 
@@ -423,7 +423,7 @@ void enf_die(edict_t* self)
 
 	// regular death
 	PF_sound(self, CHAN_VOICE, "enforcer/death1.wav", 1, ATTN_NORM);
-	if (random() > 0.5)
+	if (PF_random() > 0.5)
 		enf_die1(self);
 	else
 		enf_fdie1(self);

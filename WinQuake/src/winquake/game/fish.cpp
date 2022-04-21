@@ -51,7 +51,7 @@ void fish_run_frame(edict_t* self, const Animation* animation, int frame)
 
 	if (frame == 0)
 	{
-		if (random() < 0.5)
+		if (PF_random() < 0.5)
 			PF_sound(self, CHAN_VOICE, "fish/idle.wav", 1, ATTN_NORM);
 	}
 }
@@ -172,7 +172,7 @@ void fish_melee(edict_t* self)
 		return;
 		
 	PF_sound (self, CHAN_VOICE, "fish/bite.wav", 1, ATTN_NORM);
-	const float ldmg = (random() + random()) * 3;
+	const float ldmg = (PF_random() + PF_random()) * 3;
 	T_Damage (self, self->v.enemy, self, self, ldmg);
 }
 

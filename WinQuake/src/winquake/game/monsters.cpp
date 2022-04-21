@@ -138,7 +138,7 @@ void walkmonster_start_go(edict_t* self)
 	}
 
 	// spread think times so they don't all happen at same time
-	self->v.nextthink = self->v.nextthink + random() * 0.5;
+	self->v.nextthink = self->v.nextthink + PF_random() * 0.5;
 }
 
 LINK_FUNCTION_TO_NAME(walkmonster_start_go);
@@ -147,7 +147,7 @@ void walkmonster_start(edict_t* self)
 {
 	// delay drop to floor to make sure all doors have been spawned
 	// spread think times so they don't all happen at same time
-	self->v.nextthink = self->v.nextthink + random() * 0.5;
+	self->v.nextthink = self->v.nextthink + PF_random() * 0.5;
 	self->v.think = walkmonster_start_go;
 	pr_global_struct->total_monsters = pr_global_struct->total_monsters + 1;
 }
@@ -199,7 +199,7 @@ LINK_FUNCTION_TO_NAME(flymonster_start_go);
 void flymonster_start(edict_t* self)
 {
 	// spread think times so they don't all happen at same time
-	self->v.nextthink = self->v.nextthink + random() * 0.5;
+	self->v.nextthink = self->v.nextthink + PF_random() * 0.5;
 	self->v.think = flymonster_start_go;
 	pr_global_struct->total_monsters = pr_global_struct->total_monsters + 1;
 }
@@ -243,7 +243,7 @@ void swimmonster_start_go(edict_t* self)
 	}
 
 	// spread think times so they don't all happen at same time
-	self->v.nextthink = self->v.nextthink + random() * 0.5;
+	self->v.nextthink = self->v.nextthink + PF_random() * 0.5;
 }
 
 LINK_FUNCTION_TO_NAME(swimmonster_start_go);
@@ -251,7 +251,7 @@ LINK_FUNCTION_TO_NAME(swimmonster_start_go);
 void swimmonster_start(edict_t* self)
 {
 	// spread think times so they don't all happen at same time
-	self->v.nextthink = self->v.nextthink + random() * 0.5;
+	self->v.nextthink = self->v.nextthink + PF_random() * 0.5;
 	self->v.think = swimmonster_start_go;
 	pr_global_struct->total_monsters = pr_global_struct->total_monsters + 1;
 }
