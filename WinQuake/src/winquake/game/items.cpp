@@ -407,9 +407,9 @@ Deathmatch weapon change rules for picking up a weapon
 void Deathmatch_Weapon(edict_t* self, float old, float newWeapon)
 {
 // change self->v.weapon if desired
-	const float or = RankForWeapon (self, self->v.weapon);
-	const float nr = RankForWeapon (self, newWeapon);
-	if ( nr < or )
+	const float oldRank = RankForWeapon (self, self->v.weapon);
+	const float newRank = RankForWeapon (self, newWeapon);
+	if (newRank < oldRank)
 		self->v.weapon = newWeapon;
 }
 
