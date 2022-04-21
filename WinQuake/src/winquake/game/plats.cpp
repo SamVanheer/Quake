@@ -68,11 +68,15 @@ void plat_hit_top(edict_t* self)
 	self->v.nextthink = self->v.ltime + 3;
 }
 
+LINK_FUNCTION_TO_NAME(plat_hit_top);
+
 void plat_hit_bottom(edict_t* self)
 {
 	PF_sound (self, CHAN_VOICE, self->v.noise1, 1, ATTN_NORM);
 	self->v.state = STATE_BOTTOM;
 }
+
+LINK_FUNCTION_TO_NAME(plat_hit_bottom);
 
 void plat_go_down(edict_t* self)
 {
@@ -80,6 +84,8 @@ void plat_go_down(edict_t* self)
 	self->v.state = STATE_DOWN;
 	SUB_CalcMove (self, self->v.pos2, self->v.speed, plat_hit_bottom);
 }
+
+LINK_FUNCTION_TO_NAME(plat_go_down);
 
 void plat_go_up(edict_t* self)
 {
@@ -103,6 +109,8 @@ void plat_center_touch(edict_t* self, edict_t* other)
 		self->v.nextthink = self->v.ltime + 1;	// delay going down
 }
 
+LINK_FUNCTION_TO_NAME(plat_center_touch);
+
 void plat_outside_touch(edict_t* self, edict_t* other)
 {
 	if (strcmp(other->v.classname, "player"))
@@ -117,6 +125,8 @@ void plat_outside_touch(edict_t* self, edict_t* other)
 		plat_go_down (self);
 }
 
+LINK_FUNCTION_TO_NAME(plat_outside_touch);
+
 void plat_trigger_use(edict_t* self, edict_t* other)
 {
 	if (self->v.think)
@@ -124,6 +134,7 @@ void plat_trigger_use(edict_t* self, edict_t* other)
 	plat_go_down(self);
 }
 
+LINK_FUNCTION_TO_NAME(plat_trigger_use);
 
 void plat_crush(edict_t* self, edict_t* other)
 {
@@ -139,6 +150,8 @@ void plat_crush(edict_t* self, edict_t* other)
 		PF_objerror ("plat_crush: bad self->v.state\n");
 }
 
+LINK_FUNCTION_TO_NAME(plat_crush);
+
 void plat_use(edict_t* self, edict_t* other)
 {
 	self->v.use = SUB_NullUse;
@@ -147,6 +160,7 @@ void plat_use(edict_t* self, edict_t* other)
 	plat_go_down(self);
 }
 
+LINK_FUNCTION_TO_NAME(plat_use);
 
 /*QUAKED func_plat (0 .5 .8) ? PLAT_LOW_TRIGGER
 speed	default 150
@@ -243,12 +257,17 @@ void train_blocked(edict_t* self, edict_t* other)
 	self->v.attack_finished = pr_global_struct->time + 0.5;
 	T_Damage (self, other, self, self, self->v.dmg);
 }
+
+LINK_FUNCTION_TO_NAME(train_blocked);
+
 void train_use(edict_t* self, edict_t* other)
 {
 	if (self->v.think != func_train_find)
 		return;		// already activated
 	train_next(self);
 }
+
+LINK_FUNCTION_TO_NAME(train_use);
 
 void train_wait(edict_t* self)
 {
@@ -262,6 +281,8 @@ void train_wait(edict_t* self)
 	
 	self->v.think = train_next;
 }
+
+LINK_FUNCTION_TO_NAME(train_wait);
 
 void train_next(edict_t* self)
 {
@@ -277,6 +298,8 @@ void train_next(edict_t* self)
 	SUB_CalcMove (self, AsVector(targ->v.origin) - AsVector(self->v.mins), self->v.speed, train_wait);
 }
 
+LINK_FUNCTION_TO_NAME(train_next);
+
 void func_train_find(edict_t* self)
 
 {
@@ -289,6 +312,8 @@ void func_train_find(edict_t* self)
 		self->v.think = train_next;
 	}
 }
+
+LINK_FUNCTION_TO_NAME(func_train_find);
 
 /*QUAKED func_train (0 .5 .8) ?
 Trains are moving platforms that players can ride.

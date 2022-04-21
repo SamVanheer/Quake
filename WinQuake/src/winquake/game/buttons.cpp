@@ -37,10 +37,14 @@ void button_wait(edict_t* self)
 	self->v.frame = 1;			// use alternate textures
 }
 
+LINK_FUNCTION_TO_NAME(button_wait);
+
 void button_done(edict_t* self)
 {
 	self->v.state = STATE_BOTTOM;
 }
+
+LINK_FUNCTION_TO_NAME(button_done);
 
 void button_return(edict_t* self)
 {
@@ -51,9 +55,13 @@ void button_return(edict_t* self)
 		self->v.takedamage = DAMAGE_YES;	// can be shot again
 }
 
+LINK_FUNCTION_TO_NAME(button_return);
+
 void button_blocked(edict_t* self, edict_t* other)
 {	// do nothing, just don't ome all the way back out
 }
+
+LINK_FUNCTION_TO_NAME(button_blocked);
 
 void button_fire(edict_t* self)
 {
@@ -72,6 +80,8 @@ void button_use(edict_t* self, edict_t* other)
 	button_fire(self);
 }
 
+LINK_FUNCTION_TO_NAME(button_use);
+
 void button_touch(edict_t* self, edict_t* other)
 {
 	if (strcmp(other->v.classname, "player"))
@@ -80,6 +90,8 @@ void button_touch(edict_t* self, edict_t* other)
 	button_fire(self);
 }
 
+LINK_FUNCTION_TO_NAME(button_touch);
+
 void button_killed(edict_t* self)
 {
 	self->v.enemy = pr_global_struct->damage_attacker;
@@ -87,6 +99,8 @@ void button_killed(edict_t* self)
 	self->v.takedamage = DAMAGE_NO;	// wil be reset upon return
 	button_fire(self);
 }
+
+LINK_FUNCTION_TO_NAME(button_killed);
 
 /*QUAKED func_button (0 .5 .8) ?
 When a button is touched, it moves some distance in the direction of it's angle, triggers all of it's targets, waits some time, then returns to it's original position where it can be triggered again.

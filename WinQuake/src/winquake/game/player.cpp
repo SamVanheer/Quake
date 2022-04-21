@@ -148,6 +148,8 @@ const Animations* player_animations_get(edict_t* self)
 	return &PlayerAnimations;
 }
 
+LINK_FUNCTION_TO_NAME(player_animations_get);
+
 /*
 ==============================================================================
 PLAYER
@@ -182,6 +184,8 @@ void player_stand1(edict_t* self)
 	++self->v.walkframe;
 }
 
+LINK_FUNCTION_TO_NAME(player_stand1);
+
 void player_run(edict_t* self)
 {
 	self->v.think = &player_run;
@@ -209,6 +213,8 @@ void player_run(edict_t* self)
 	}
 	++self->v.walkframe;
 }
+
+LINK_FUNCTION_TO_NAME(player_run);
 
 void player_shot1(edict_t* self)
 {
@@ -363,12 +369,7 @@ void player_pain(edict_t* self, edict_s* attacker, float damage)
 		player_pain1(self);
 }
 
-void player_diea1(edict_t* self);
-void player_dieb1(edict_t* self);
-void player_diec1(edict_t* self);
-void player_died1(edict_t* self);
-void player_diee1(edict_t* self);
-void player_die_ax1(edict_t* self);
+LINK_FUNCTION_TO_NAME(player_pain);
 
 void DeathBubblesSpawn(edict_t* self)
 {
@@ -392,6 +393,8 @@ void DeathBubblesSpawn(edict_t* self)
 	if (self->v.air_finished >= self->v.bubble_count)
 		PF_Remove(self);
 }
+
+LINK_FUNCTION_TO_NAME(DeathBubblesSpawn);
 
 void DeathBubbles(edict_t* self, float num_bubbles)
 {
@@ -439,6 +442,8 @@ void PlayerDead(edict_t* self)
 	// allow respawn after a certain time
 	self->v.deadflag = DEAD_DEAD;
 }
+
+LINK_FUNCTION_TO_NAME(PlayerDead);
 
 void VelocityForDamage(edict_t* self, float dm, vec3_t result)
 {
@@ -524,6 +529,36 @@ void GibPlayer(edict_t* self)
 		PF_sound(self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NONE);
 }
 
+void player_diea1(edict_t* self)
+{
+	animation_set(self, "deatha");
+}
+
+void player_dieb1(edict_t* self)
+{
+	animation_set(self, "deathb");
+}
+
+void player_diec1(edict_t* self)
+{
+	animation_set(self, "deathc");
+}
+
+void player_died1(edict_t* self)
+{
+	animation_set(self, "deathd");
+}
+
+void player_diee1(edict_t* self)
+{
+	animation_set(self, "deathe");
+}
+
+void player_die_ax1(edict_t* self)
+{
+	animation_set(self, "axdeth");
+}
+
 void PlayerDie(edict_t* self)
 {
 	self->v.items = self->v.items - ((int)self->v.items & IT_INVISIBILITY);
@@ -582,6 +617,8 @@ void PlayerDie(edict_t* self)
 		player_diee1(self);
 }
 
+LINK_FUNCTION_TO_NAME(PlayerDie);
+
 void set_suicide_frame(edict_t* self)
 {	// used by klill command and diconnect command
 	if (strcmp(self->v.model, "progs/player.mdl"))
@@ -591,34 +628,4 @@ void set_suicide_frame(edict_t* self)
 	self->v.movetype = MOVETYPE_TOSS;
 	self->v.deadflag = DEAD_DEAD;
 	self->v.nextthink = -1;
-}
-
-void player_diea1(edict_t* self)
-{
-	animation_set(self, "deatha");
-}
-
-void player_dieb1(edict_t* self)
-{
-	animation_set(self, "deathb");
-}
-
-void player_diec1(edict_t* self)
-{
-	animation_set(self, "deathc");
-}
-
-void player_died1(edict_t* self)
-{
-	animation_set(self, "deathd");
-}
-
-void player_diee1(edict_t* self)
-{
-	animation_set(self, "deathe");
-}
-
-void player_die_ax1(edict_t* self)
-{
-	animation_set(self, "axdeth");
 }

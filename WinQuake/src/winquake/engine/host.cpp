@@ -650,6 +650,8 @@ void _Host_Frame (float time)
 // allow mice or other external controllers to add commands
 	IN_Commands ();
 
+	Cbuf_AddText("edicts_verifyfunctionslinked\n");
+
 // process console commands
 	Cbuf_Execute ();
 

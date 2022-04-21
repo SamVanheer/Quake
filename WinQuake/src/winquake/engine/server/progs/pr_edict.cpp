@@ -503,13 +503,12 @@ char* PR_ValueString(void* base, const fielddescription& field)
 		sprintf(line, "entity %i", NUM_FOR_EDICT(ent));
 		break;
 	}
-		//TODO
-		/*
 	case ev_function:
-		f = pr_functions + val->function;
-		sprintf(line, "%s()", pr_strings + f->s_name);
+	{
+		auto name = g_Game->FindFunctionName(ED_GetValue<void*>(base, field));
+		sprintf(line, "%s()", name ? name : "(null)");
 		break;
-		*/
+	}
 	case ev_void:
 		sprintf(line, "void");
 		break;
@@ -563,13 +562,12 @@ char* PR_UglyValueString(void* base, const fielddescription& field)
 		sprintf(line, "%i", NUM_FOR_EDICT(ent));
 		break;
 	}
-		//TODO
-		/*
 	case ev_function:
-		f = pr_functions + val->function;
-		sprintf(line, "%s", pr_strings + f->s_name);
+	{
+		auto name = g_Game->FindFunctionName(ED_GetValue<void*>(base, field));
+		sprintf(line, "%s", name ? name : "(null)");
 		break;
-		*/
+	}
 	case ev_void:
 		sprintf(line, "void");
 		break;
@@ -893,6 +891,20 @@ bool ED_ParseEpair (void *base, const fielddescription& key, const char *s)
 	case ev_entity:
 		ED_SetValue(base, key, EDICT_NUM(atoi (s)));
 		break;
+
+	case ev_function:
+	{
+		//Unlike QuakeC functions can be null here, so we need to distinguish the name "null" from null pointers.
+		void* address = nullptr;
+
+		if (strcmp("(null)", s))
+		{
+			address = g_Game->FindFunctionAddress(s);
+		}
+
+		ED_SetValue(base, key, address);
+		break;
+	}
 		
 	default:
 		break;
@@ -1081,6 +1093,36 @@ void PR_LoadProgs()
 	g_Game->NewMapStarted();
 }
 
+#ifdef _DEBUG
+void PR_VerifyFunctionsLinked()
+{
+	for (int i = 0; i < sv.num_edicts; ++i)
+	{
+		auto e = &sv.edicts[i];
+
+		if (e->free)
+		{
+			continue;
+		}
+
+		for (const auto& field : EntvarsFields)
+		{
+			if (field.Type == ev_function)
+			{
+				auto address = ED_GetValue<void*>(&e->v, field);
+
+				if (address && !g_Game->FindFunctionName(address))
+				{
+					//Set a breakpoint here to find out which functions don't have LINK_FUNCTION_TO_NAME defined for them.
+					//The Visual Studio debugger can show function names for addresses when compiled with debug symbols.
+					int x = 10;
+				}
+			}
+		}
+	}
+}
+#endif
+
 /*
 ===============
 PR_Init
@@ -1091,6 +1133,9 @@ void PR_Init (void)
 	Cmd_AddCommand("edict", ED_PrintEdict_f);
 	Cmd_AddCommand("edicts", ED_PrintEdicts);
 	Cmd_AddCommand ("edictcount", ED_Count);
+#ifdef _DEBUG
+	Cmd_AddCommand("edicts_verifyfunctionslinked", PR_VerifyFunctionsLinked);
+#endif
 }
 
 edict_t *EDICT_NUM(int n)

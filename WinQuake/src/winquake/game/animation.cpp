@@ -19,6 +19,7 @@
 
 #include "quakedef.h"
 #include "animation.h"
+#include "Game.h"
 
 const Animations* animations_get(edict_t* self)
 {
@@ -104,3 +105,5 @@ void animation_advance(edict_t* self)
 
 	animation_set_frame(self, animation, self->v.frame + 1);
 }
+
+LINK_FUNCTION_TO_NAME(animation_advance);

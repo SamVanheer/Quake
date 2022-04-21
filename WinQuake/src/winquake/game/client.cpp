@@ -288,6 +288,8 @@ void execute_changelevel(edict_t* self)
 	PF_WriteByte(MSG_ALL, SVC_INTERMISSION);
 }
 
+LINK_FUNCTION_TO_NAME(execute_changelevel);
+
 void changelevel_touch(edict_t* self, edict_t* other)
 {
 	if (strcmp(other->v.classname, "player"))
@@ -317,7 +319,9 @@ void changelevel_touch(edict_t* self, edict_t* other)
 	// in the middle of C movement code, so set a think time to do it
 	self->v.think = &execute_changelevel;
 	self->v.nextthink = pr_global_struct->time + 0.1;
-};
+}
+
+LINK_FUNCTION_TO_NAME(changelevel_touch);
 
 /*QUAKED trigger_changelevel (0.5 0.5 0.5) ? NO_INTERMISSION
 When the player touches this, he gets sent to the map listed in the "map" variable.  Unless the NO_INTERMISSION flag is set, the view will go to the info_intermission spot and display stats.

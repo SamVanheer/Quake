@@ -269,6 +269,13 @@ const Animations SoldierAnimations = MakeAnimations(
 		{"prowl_", 24, &army_walk_frame, AnimationFlag::Looping}
 	});
 
+const Animations* army_animations_get(edict_t* self)
+{
+	return &SoldierAnimations;
+}
+
+LINK_FUNCTION_TO_NAME(army_animations_get);
+
 /*
 ==============================================================================
 SOLDIER CODE
@@ -280,20 +287,28 @@ void army_stand1(edict_t* self)
 	animation_set(self, "stand");
 }
 
+LINK_FUNCTION_TO_NAME(army_stand1);
+
 void army_walk1(edict_t* self)
 {
 	animation_set(self, "prowl_");
 }
+
+LINK_FUNCTION_TO_NAME(army_walk1);
 
 void army_run1(edict_t* self)
 {
 	animation_set(self, "run");
 }
 
+LINK_FUNCTION_TO_NAME(army_run1);
+
 void army_atk1(edict_t* self)
 {
 	animation_set(self, "shoot");
 }
+
+LINK_FUNCTION_TO_NAME(army_atk1);
 
 void army_pain1(edict_t* self)
 {
@@ -347,6 +362,8 @@ void army_pain(edict_t* self, edict_t* attacker, float damage)
 	}
 }
 
+LINK_FUNCTION_TO_NAME(army_pain);
+
 void army_fire(edict_t* self)
 {
 	ai_face(self);
@@ -383,6 +400,7 @@ void army_die(edict_t* self)
 		army_cdie1 (self);
 }
 
+LINK_FUNCTION_TO_NAME(army_die);
 
 /*QUAKED monster_army (1 0 0) (-16 -16 -24) (16 16 40) Ambush
 */
@@ -423,7 +441,7 @@ void monster_army(edict_t* self)
 	self->v.th_missile = army_atk1;
 	self->v.th_pain = army_pain;
 	self->v.th_die = army_die;
-	self->v.animations_get = [](edict_t* self) {return &SoldierAnimations; };
+	self->v.animations_get = &army_animations_get;
 
 	walkmonster_start (self);
 }

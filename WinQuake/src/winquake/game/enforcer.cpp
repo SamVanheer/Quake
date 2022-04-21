@@ -230,25 +230,40 @@ const Animations EnforcerAnimations = MakeAnimations(
 		{"paind", 19, &enforcer_paind_frame}
 	});
 
+const Animations* enf_animations_get(edict_t* self)
+{
+	return &EnforcerAnimations;
+}
+
+LINK_FUNCTION_TO_NAME(enf_animations_get);
+
 void enf_stand1(edict_t* self)
 {
 	animation_set(self, "stand");
 }
+
+LINK_FUNCTION_TO_NAME(enf_stand1);
 
 void enf_walk1(edict_t* self)
 {
 	animation_set(self, "walk");
 }
 
+LINK_FUNCTION_TO_NAME(enf_walk1);
+
 void enf_run1(edict_t* self)
 {
 	animation_set(self, "run");
 }
 
+LINK_FUNCTION_TO_NAME(enf_run1);
+
 void enf_atk1(edict_t* self)
 {
 	animation_set(self, "attack");
 }
+
+LINK_FUNCTION_TO_NAME(enf_atk1);
 
 void enf_paina1(edict_t* self)
 {
@@ -312,6 +327,8 @@ void Laser_Touch(edict_t* self, edict_t* other)
 
 	PF_Remove(self);
 }
+
+LINK_FUNCTION_TO_NAME(Laser_Touch);
 
 edict_t* LaunchLaser(edict_t* self, vec3_t org, vec3_t vec)
 {
@@ -387,6 +404,8 @@ void enf_pain(edict_t* self, edict_t* attacker, float damage)
 	}
 }
 
+LINK_FUNCTION_TO_NAME(enf_pain);
+
 //============================================================================
 
 void enf_die(edict_t* self)
@@ -409,6 +428,8 @@ void enf_die(edict_t* self)
 	else
 		enf_fdie1(self);
 }
+
+LINK_FUNCTION_TO_NAME(enf_die);
 
 /*QUAKED monster_enforcer (1 0 0) (-16 -16 -24) (16 16 40) Ambush
 
@@ -449,7 +470,7 @@ void monster_enforcer(edict_t* self)
 	self->v.th_pain = enf_pain;
 	self->v.th_die = enf_die;
 	self->v.th_missile = enf_atk1;
-	self->v.animations_get = [](edict_t* self) { return &EnforcerAnimations; };
+	self->v.animations_get = &enf_animations_get;
 
 	walkmonster_start(self);
 }

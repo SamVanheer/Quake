@@ -155,6 +155,13 @@ const Animations WizardAnimations = MakeAnimations(
 		{"death", 8, &wizard_death_frame}
 	});
 
+const Animations* wizard_animations_get(edict_t* self)
+{
+	return &WizardAnimations;
+}
+
+LINK_FUNCTION_TO_NAME(wizard_animations_get);
+
 /*
 ==============================================================================
 
@@ -332,6 +339,8 @@ void Wiz_FastFire(edict_t* self)
 	PF_Remove (self);
 }
 
+LINK_FUNCTION_TO_NAME(Wiz_FastFire);
+
 void Wiz_StartFast(edict_t* self)
 {
 	PF_sound (self, CHAN_WEAPON, "wizard/wattack.wav", 1, ATTN_NORM);
@@ -380,11 +389,15 @@ void wiz_stand1(edict_t* self)
 	animation_set(self, "hover");
 }
 
+LINK_FUNCTION_TO_NAME(wiz_stand1);
+
 void wiz_walk1(edict_t* self)
 {
 	self->v.animation_mode = static_cast<int>(WizardHoverMode::Walk);
 	animation_set(self, "hover");
 }
+
+LINK_FUNCTION_TO_NAME(wiz_walk1);
 
 void wiz_side1(edict_t* self)
 {
@@ -392,10 +405,14 @@ void wiz_side1(edict_t* self)
 	animation_set(self, "hover");
 }
 
+LINK_FUNCTION_TO_NAME(wiz_side1);
+
 void wiz_run1(edict_t* self)
 {
 	animation_set(self, "fly");
 }
+
+LINK_FUNCTION_TO_NAME(wiz_run1);
 
 void wiz_fast1(edict_t* self)
 {
@@ -428,6 +445,8 @@ void wiz_die(edict_t* self)
 	wiz_death1 (self);
 }
 
+LINK_FUNCTION_TO_NAME(wiz_die);
+
 void Wiz_Pain(edict_t* self, edict_t* attacker, float damage)
 {
 	PF_sound (self, CHAN_VOICE, "wizard/wpain.wav", 1, ATTN_NORM);
@@ -437,11 +456,14 @@ void Wiz_Pain(edict_t* self, edict_t* attacker, float damage)
 	wiz_pain1 (self);
 }
 
+LINK_FUNCTION_TO_NAME(Wiz_Pain);
 
 void Wiz_Missile(edict_t* self)
 {
 	wiz_fast1(self);
 }
+
+LINK_FUNCTION_TO_NAME(Wiz_Missile);
 
 /*QUAKED monster_wizard (1 0 0) (-16 -16 -24) (16 16 40) Ambush
 */
@@ -478,7 +500,7 @@ void monster_wizard(edict_t* self)
 	self->v.th_missile = Wiz_Missile;
 	self->v.th_pain = Wiz_Pain;
 	self->v.th_die = wiz_die;
-	self->v.animations_get = [](edict_t* self) { return &WizardAnimations; };
+	self->v.animations_get = &wizard_animations_get;
 		
 	flymonster_start (self);
 }

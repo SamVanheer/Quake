@@ -504,6 +504,13 @@ const Animations HellKnightAnimations = MakeAnimations(
 		{"magicc", 11, &hknight_magicac_frame}
 	});
 
+const Animations* hknight_animations_get(edict_t* self)
+{
+	return &HellKnightAnimations;
+}
+
+LINK_FUNCTION_TO_NAME(hknight_animations_get);
+
 void hknight_shot(edict_t* self, float offset)
 {
 	Vector3D offang;
@@ -567,6 +574,8 @@ void hknight_stand1(edict_t* self)
 	animation_set(self, "stand");
 }
 
+LINK_FUNCTION_TO_NAME(hknight_stand1);
+
 //===========================================================================
 
 void hknight_walk1(edict_t* self)
@@ -574,12 +583,16 @@ void hknight_walk1(edict_t* self)
 	animation_set(self, "walk");
 }
 
+LINK_FUNCTION_TO_NAME(hknight_walk1);
+
 //===========================================================================
 
 void hknight_run1(edict_t* self)
 {
 	animation_set(self, "run");
 }
+
+LINK_FUNCTION_TO_NAME(hknight_run1);
 
 //============================================================================
 
@@ -621,6 +634,8 @@ void hknight_die(edict_t* self)
 		hknight_dieb1 (self);
 }
 
+LINK_FUNCTION_TO_NAME(hknight_die);
+
 //============================================================================
 
 void hknight_magica1(edict_t* self)
@@ -641,6 +656,8 @@ void hknight_magicc1(edict_t* self)
 {
 	animation_set(self, "magicc");
 }
+
+LINK_FUNCTION_TO_NAME(hknight_magicc1);
 
 //===========================================================================
 
@@ -706,6 +723,8 @@ void hknight_pain(edict_t* self, edict_t* attacker, float damage)
 	hknight_pain1 (self);
 }
 
+LINK_FUNCTION_TO_NAME(hknight_pain);
+
 void hknight_melee(edict_t* self)
 {
 	++pr_global_struct->hknight_type;
@@ -721,6 +740,8 @@ void hknight_melee(edict_t* self)
 		pr_global_struct->hknight_type = 0;
 	}
 }
+
+LINK_FUNCTION_TO_NAME(hknight_melee);
 
 /*QUAKED monster_hell_knight (1 0 0) (-16 -16 -24) (16 16 40) Ambush
 */
@@ -763,7 +784,7 @@ void monster_hell_knight(edict_t* self)
 	self->v.th_missile = hknight_magicc1;
 	self->v.th_pain = hknight_pain;
 	self->v.th_die = hknight_die;
-	self->v.animations_get = [](edict_t* self) { return &HellKnightAnimations; };
+	self->v.animations_get = &hknight_animations_get;
 	
 	walkmonster_start (self);
 }

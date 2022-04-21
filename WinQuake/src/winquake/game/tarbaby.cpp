@@ -159,6 +159,8 @@ void tarbaby_exp_finish(edict_t* self)
 	BecomeExplosion(self);
 }
 
+LINK_FUNCTION_TO_NAME(tarbaby_exp_finish);
+
 void tarbaby_exp_frame(edict_t* self, const Animation* animation, int frame)
 {
 	self->v.takedamage = DAMAGE_NO;
@@ -174,11 +176,20 @@ const Animations TarBabyAnimations = MakeAnimations(
 		{"exp", 1, &tarbaby_exp_frame}
 	});
 
+const Animations* tbaby_animations_get(edict_t* self)
+{
+	return &TarBabyAnimations;
+}
+
+LINK_FUNCTION_TO_NAME(tbaby_animations_get);
+
 void tbaby_stand1(edict_t* self)
 {
 	self->v.animation_mode = static_cast<int>(TarBabyWalkMode::Stand);
 	animation_set(self, "walk");
 }
+
+LINK_FUNCTION_TO_NAME(tbaby_stand1);
 
 void tbaby_hang1(edict_t* self)
 {
@@ -192,10 +203,14 @@ void tbaby_walk1(edict_t* self)
 	animation_set(self, "walk");
 }
 
+LINK_FUNCTION_TO_NAME(tbaby_walk1);
+
 void tbaby_run1(edict_t* self)
 {
 	animation_set(self, "run");
 }
+
+LINK_FUNCTION_TO_NAME(tbaby_run1);
 
 //============================================================================
 
@@ -239,15 +254,21 @@ void Tar_JumpTouch(edict_t* self, edict_t* other)
 	self->v.nextthink = pr_global_struct->time + 0.1;
 }
 
+LINK_FUNCTION_TO_NAME(Tar_JumpTouch);
+
 void tbaby_fly1(edict_t* self)
 {
 	animation_set(self, "fly");
 }
 
+LINK_FUNCTION_TO_NAME(tbaby_fly1);
+
 void tbaby_jump1(edict_t* self)
 {
 	animation_set(self, "jump");
 }
+
+LINK_FUNCTION_TO_NAME(tbaby_jump1);
 
 //=============================================================================
 
@@ -255,6 +276,8 @@ void tbaby_die1(edict_t* self)
 {
 	animation_set(self, "exp");
 }
+
+LINK_FUNCTION_TO_NAME(tbaby_die1);
 
 //=============================================================================
 
@@ -288,7 +311,7 @@ void monster_tarbaby(edict_t* self)
 	self->v.th_missile = tbaby_jump1;
 	self->v.th_melee = tbaby_jump1;
 	self->v.th_die = tbaby_die1;
-	self->v.animations_get = [](edict_t* self) { return &TarBabyAnimations; };
+	self->v.animations_get = &tbaby_animations_get;
 	
 	walkmonster_start (self);
 }

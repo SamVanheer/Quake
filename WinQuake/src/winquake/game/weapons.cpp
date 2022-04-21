@@ -319,12 +319,16 @@ void s_explode6(edict_t* self)
 	self->v.think = &SUB_Remove;
 }
 
+LINK_FUNCTION_TO_NAME(s_explode6);
+
 void s_explode5(edict_t* self)
 {
 	self->v.frame = 4;
 	self->v.nextthink = pr_global_struct->time + 0.1f;
 	self->v.think = &s_explode6;
 }
+
+LINK_FUNCTION_TO_NAME(s_explode5);
 
 void s_explode4(edict_t* self)
 {
@@ -333,12 +337,16 @@ void s_explode4(edict_t* self)
 	self->v.think = &s_explode5;
 }
 
+LINK_FUNCTION_TO_NAME(s_explode4);
+
 void s_explode3(edict_t* self)
 {
 	self->v.frame = 2;
 	self->v.nextthink = pr_global_struct->time + 0.1f;
 	self->v.think = &s_explode4;
 }
+
+LINK_FUNCTION_TO_NAME(s_explode3);
 
 void s_explode2(edict_t* self)
 {
@@ -347,12 +355,16 @@ void s_explode2(edict_t* self)
 	self->v.think = &s_explode3;
 }
 
+LINK_FUNCTION_TO_NAME(s_explode2);
+
 void s_explode1(edict_t* self)
 {
 	self->v.frame = 0;
 	self->v.nextthink = pr_global_struct->time + 0.1f;
 	self->v.think = &s_explode2;
 }
+
+LINK_FUNCTION_TO_NAME(s_explode1);
 
 void BecomeExplosion(edict_t* self)
 {
@@ -402,7 +414,7 @@ void T_MissileTouch(edict_t* self, edict_t* other)
 	BecomeExplosion(self);
 }
 
-
+LINK_FUNCTION_TO_NAME(T_MissileTouch);
 
 /*
 ================
@@ -560,6 +572,8 @@ void GrenadeExplode(edict_t* self)
 	BecomeExplosion(self);
 }
 
+LINK_FUNCTION_TO_NAME(GrenadeExplode);
+
 void GrenadeTouch(edict_t* self, edict_t* other)
 {
 	if (other == self->v.owner)
@@ -575,6 +589,8 @@ void GrenadeTouch(edict_t* self, edict_t* other)
 		VectorCopy(vec3_origin, self->v.avelocity);
 	}
 }
+
+LINK_FUNCTION_TO_NAME(GrenadeTouch);
 
 /*
 ================
@@ -740,6 +756,8 @@ void spike_touch(edict_t* self, edict_t* other)
 
 }
 
+LINK_FUNCTION_TO_NAME(spike_touch);
+
 void superspike_touch(edict_t* self, edict_t* other)
 {
 	if (other == self->v.owner)
@@ -773,6 +791,7 @@ void superspike_touch(edict_t* self, edict_t* other)
 
 }
 
+LINK_FUNCTION_TO_NAME(superspike_touch);
 
 /*
 ===============================================================================

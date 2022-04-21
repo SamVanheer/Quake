@@ -68,6 +68,7 @@ void door_blocked(edict_t* self, edict_t* other)
 	}
 }
 
+LINK_FUNCTION_TO_NAME(door_blocked);
 
 void door_hit_top(edict_t* self)
 {
@@ -79,11 +80,15 @@ void door_hit_top(edict_t* self)
 	self->v.nextthink = self->v.ltime + self->v.wait;
 }
 
+LINK_FUNCTION_TO_NAME(door_hit_top);
+
 void door_hit_bottom(edict_t* self)
 {
 	PF_sound(self, CHAN_VOICE, self->v.noise1, 1, ATTN_NORM);
 	self->v.state = STATE_BOTTOM;
 }
+
+LINK_FUNCTION_TO_NAME(door_hit_bottom);
 
 void door_go_down(edict_t* self)
 {
@@ -97,6 +102,8 @@ void door_go_down(edict_t* self)
 	self->v.state = STATE_DOWN;
 	SUB_CalcMove(self, self->v.pos1, self->v.speed, door_hit_bottom);
 }
+
+LINK_FUNCTION_TO_NAME(door_go_down);
 
 void door_go_up(edict_t* self)
 {
@@ -171,6 +178,7 @@ void door_use(edict_t* self, edict_t* other = nullptr)
 	door_fire(self->v.owner);
 }
 
+LINK_FUNCTION_TO_NAME(door_use);
 
 void door_trigger_touch(edict_t* self, edict_t* other)
 {
@@ -187,6 +195,7 @@ void door_trigger_touch(edict_t* self, edict_t* other)
 	door_use(owner);
 }
 
+LINK_FUNCTION_TO_NAME(door_trigger_touch);
 
 void door_killed(edict_t* self)
 {
@@ -196,6 +205,7 @@ void door_killed(edict_t* self)
 	door_use(owner);
 }
 
+LINK_FUNCTION_TO_NAME(door_killed);
 
 /*
 ================
@@ -271,6 +281,8 @@ void door_touch(edict_t* self, edict_t* other)
 		self->v.enemy->v.touch = SUB_NullTouch;	// get paired door
 	door_use(self);
 }
+
+LINK_FUNCTION_TO_NAME(door_touch);
 
 /*
 =============================================================================
@@ -394,6 +406,7 @@ void LinkDoors(edict_t* self)
 
 }
 
+LINK_FUNCTION_TO_NAME(LinkDoors);
 
 /*QUAKED func_door (0 .5 .8) ? START_OPEN x DOOR_DONT_LINK GOLD_KEY SILVER_KEY TOGGLE
 if two doors touch, they are assumed to be connected and operate as a unit.
@@ -616,10 +629,14 @@ void fd_secret_use(edict_t* self, edict_t* other)
 	PF_sound(self, CHAN_VOICE, self->v.noise2, 1, ATTN_NORM);
 }
 
+LINK_FUNCTION_TO_NAME(fd_secret_use);
+
 void fd_secret_pain(edict_t* self, edict_t* attacker, float damage)
 {
 	fd_secret_use(self, attacker);
 }
+
+LINK_FUNCTION_TO_NAME(fd_secret_pain);
 
 // Wait after first movement...
 void fd_secret_move1(edict_t* self)
@@ -629,12 +646,16 @@ void fd_secret_move1(edict_t* self)
 	PF_sound(self, CHAN_VOICE, self->v.noise3, 1, ATTN_NORM);
 }
 
+LINK_FUNCTION_TO_NAME(fd_secret_move1);
+
 // Start moving sideways w/sound...
 void fd_secret_move2(edict_t* self)
 {
 	PF_sound(self, CHAN_VOICE, self->v.noise2, 1, ATTN_NORM);
 	SUB_CalcMove(self, self->v.dest2, self->v.speed, fd_secret_move3);
 }
+
+LINK_FUNCTION_TO_NAME(fd_secret_move2);
 
 // Wait here until time to go back...
 void fd_secret_move3(edict_t* self)
@@ -647,12 +668,16 @@ void fd_secret_move3(edict_t* self)
 	}
 }
 
+LINK_FUNCTION_TO_NAME(fd_secret_move3);
+
 // Move backward...
 void fd_secret_move4(edict_t* self)
 {
 	PF_sound(self, CHAN_VOICE, self->v.noise2, 1, ATTN_NORM);
 	SUB_CalcMove(self, self->v.dest1, self->v.speed, fd_secret_move5);
 }
+
+LINK_FUNCTION_TO_NAME(fd_secret_move4);
 
 // Wait 1 second...
 void fd_secret_move5(edict_t* self)
@@ -662,11 +687,15 @@ void fd_secret_move5(edict_t* self)
 	PF_sound(self, CHAN_VOICE, self->v.noise3, 1, ATTN_NORM);
 }
 
+LINK_FUNCTION_TO_NAME(fd_secret_move5);
+
 void fd_secret_move6(edict_t* self)
 {
 	PF_sound(self, CHAN_VOICE, self->v.noise2, 1, ATTN_NORM);
 	SUB_CalcMove(self, self->v.oldorigin, self->v.speed, fd_secret_done);
 }
+
+LINK_FUNCTION_TO_NAME(fd_secret_move6);
 
 void fd_secret_done(edict_t* self)
 {
@@ -679,6 +708,8 @@ void fd_secret_done(edict_t* self)
 	PF_sound(self, CHAN_VOICE, self->v.noise3, 1, ATTN_NORM);
 }
 
+LINK_FUNCTION_TO_NAME(fd_secret_done);
+
 void secret_blocked(edict_t* self, edict_t* other)
 {
 	if (pr_global_struct->time < self->v.attack_finished)
@@ -686,6 +717,8 @@ void secret_blocked(edict_t* self, edict_t* other)
 	self->v.attack_finished = pr_global_struct->time + 0.5;
 	T_Damage(self, other, self, self, self->v.dmg);
 }
+
+LINK_FUNCTION_TO_NAME(secret_blocked);
 
 /*
 ================
@@ -710,6 +743,7 @@ void secret_touch(edict_t* self, edict_t* other)
 	}
 }
 
+LINK_FUNCTION_TO_NAME(secret_touch);
 
 /*QUAKED func_door_secret (0 .5 .8) ? open_once 1st_left 1st_down no_shoot always_shoot
 Basic secret door. Slides back, then to the side. Angle determines direction.

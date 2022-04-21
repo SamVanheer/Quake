@@ -387,20 +387,33 @@ const Animations ShamblerAnimations = MakeAnimations(
 		{"death", 11, &shambler_death_frame}
 	});
 
+const Animations* shambler_animations_get(edict_t* self)
+{
+	return &ShamblerAnimations;
+}
+
+LINK_FUNCTION_TO_NAME(shambler_animations_get);
+
 void sham_stand1(edict_t* self)
 {
 	animation_set(self, "stand");
 }
+
+LINK_FUNCTION_TO_NAME(sham_stand1);
 
 void sham_walk1(edict_t* self)
 {
 	animation_set(self, "walk");
 }
 
+LINK_FUNCTION_TO_NAME(sham_walk1);
+
 void sham_run1(edict_t* self)
 {
 	animation_set(self, "run");
 }
+
+LINK_FUNCTION_TO_NAME(sham_run1);
 
 void sham_smash1(edict_t* self)
 {
@@ -434,10 +447,14 @@ void sham_swingl1(edict_t* self)
 	animation_set(self, "swingl");
 }
 
+LINK_FUNCTION_TO_NAME(sham_swingl1);
+
 void sham_swingr1(edict_t* self)
 {
 	animation_set(self, "swingr");
 }
+
+LINK_FUNCTION_TO_NAME(sham_swingr1);
 
 void sham_melee(edict_t* self)
 {
@@ -450,6 +467,7 @@ void sham_melee(edict_t* self)
 		sham_swingl1 (self);
 }
 
+LINK_FUNCTION_TO_NAME(sham_melee);
 
 //============================================================================
 
@@ -484,6 +502,8 @@ void sham_magic1(edict_t* self)
 	animation_set(self, "magic");
 }
 
+LINK_FUNCTION_TO_NAME(sham_magic1);
+
 void sham_pain1(edict_t* self)
 {
 	animation_set(self, "pain");
@@ -506,6 +526,7 @@ void sham_pain(edict_t* self, edict_t* attacker, float damage)
 	sham_pain1 (self);
 }
 
+LINK_FUNCTION_TO_NAME(sham_pain);
 
 //============================================================================
 
@@ -531,6 +552,8 @@ void sham_die(edict_t* self)
 	PF_sound (self, CHAN_VOICE, "shambler/sdeath.wav", 1, ATTN_NORM);
 	sham_death1 (self);
 }
+
+LINK_FUNCTION_TO_NAME(sham_die);
 
 //============================================================================
 
@@ -573,7 +596,7 @@ void monster_shambler(edict_t* self)
 	self->v.th_melee = sham_melee;
 	self->v.th_missile = sham_magic1;
 	self->v.th_pain = sham_pain;
-	self->v.animations_get = [](edict_t* self) { return &ShamblerAnimations; };
+	self->v.animations_get = &shambler_animations_get;
 	
 	walkmonster_start(self);
 }

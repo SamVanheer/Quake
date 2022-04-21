@@ -85,6 +85,13 @@ const Animations OldOneAnimations = MakeAnimations(
 		{"shake", 20, &oldone_shake_frame}
 	});
 
+const Animations* old_animations_get(edict_t* self)
+{
+	return &OldOneAnimations;
+}
+
+LINK_FUNCTION_TO_NAME(old_animations_get);
+
 //void() old_stand     =[      $old1,       old_stand    ] {}
 
 void old_idle1(edict_t* self)
@@ -92,10 +99,14 @@ void old_idle1(edict_t* self)
 	animation_set(self, "old");
 }
 
+LINK_FUNCTION_TO_NAME(old_idle1);
+
 void old_thrash1(edict_t* self)
 {
 	animation_set(self, "shake");
 }
+
+LINK_FUNCTION_TO_NAME(old_thrash1);
 
 //============================================================================
 
@@ -144,6 +155,8 @@ void finale_1(edict_t* self)
 	timer->v.think = finale_2;	
 }
 
+LINK_FUNCTION_TO_NAME(finale_1);
+
 void finale_2(edict_t* self)
 {
 	// start a teleport splash inside shub
@@ -161,6 +174,8 @@ void finale_2(edict_t* self)
 	self->v.think = finale_3;
 }
 
+LINK_FUNCTION_TO_NAME(finale_2);
+
 void finale_3(edict_t* self)
 {
 	// start shub thrashing wildly
@@ -168,6 +183,8 @@ void finale_3(edict_t* self)
 	PF_sound (pr_global_struct->shub, CHAN_VOICE, "boss2/death.wav", 1, ATTN_NORM);
 	PF_lightstyle(0, "abcdefghijklmlkjihgfedcb");	
 }
+
+LINK_FUNCTION_TO_NAME(finale_3);
 
 void finale_4(edict_t* self)
 {
@@ -223,6 +240,8 @@ void finale_4(edict_t* self)
 	PF_lightstyle(0, "m");	
 }
 
+LINK_FUNCTION_TO_NAME(finale_4);
+
 //============================================================================
 
 
@@ -254,7 +273,7 @@ void monster_oldone(edict_t* self)
 	self->v.nextthink = pr_global_struct->time + 0.1;
 	self->v.takedamage = DAMAGE_YES;
 	self->v.th_die = finale_1;
-	self->v.animations_get = [](edict_t* self) { return &OldOneAnimations; };
+	self->v.animations_get = &old_animations_get;
 	pr_global_struct->shub = self;
 	
 	pr_global_struct->total_monsters = pr_global_struct->total_monsters + 1;

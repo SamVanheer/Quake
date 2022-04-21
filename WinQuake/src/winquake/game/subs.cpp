@@ -26,27 +26,39 @@ void SUB_NullThink(edict_t*)
 {
 }
 
+LINK_FUNCTION_TO_NAME(SUB_NullThink);
+
 void SUB_NullTouch(edict_t*, edict_t*)
 {
 }
+
+LINK_FUNCTION_TO_NAME(SUB_NullTouch);
 
 void SUB_NullUse(edict_t*, edict_t*)
 {
 }
 
+LINK_FUNCTION_TO_NAME(SUB_NullUse);
+
 void SUB_NullPain(edict_t*, edict_t*, float)
 {
 }
+
+LINK_FUNCTION_TO_NAME(SUB_NullPain);
 
 void SUB_Remove(edict_t* self)
 {
 	PF_Remove(self);
 }
 
+LINK_FUNCTION_TO_NAME(SUB_Remove);
+
 void SUB_TouchRemove(edict_t* self, edict_t* other)
 {
 	SUB_Remove(self);
 }
+
+LINK_FUNCTION_TO_NAME(SUB_TouchRemove);
 
 vec3_t Up{0, -1, 0};
 vec3_t Down{0, -2, 0};
@@ -159,6 +171,8 @@ void SUB_CalcMoveDone(edict_t* self)
 		self->v.think1(self);
 }
 
+LINK_FUNCTION_TO_NAME(SUB_CalcMoveDone);
+
 /*
 =============
 SUB_CalcAngleMove
@@ -214,6 +228,7 @@ void SUB_CalcAngleMoveDone(edict_t* self)
 		self->v.think1(self);
 }
 
+LINK_FUNCTION_TO_NAME(SUB_CalcAngleMoveDone);
 
 //=============================================================================
 
@@ -223,6 +238,8 @@ void DelayThink(edict_t* self)
 	SUB_UseTargets(self);
 	PF_Remove(self);
 }
+
+LINK_FUNCTION_TO_NAME(DelayThink);
 
 /*
 ==============================
@@ -313,6 +330,8 @@ void SUB_UseTargets(edict_t* self, edict_t* other)
 
 
 }
+
+LINK_FUNCTION_TO_NAME(SUB_UseTargets);
 
 /*
 

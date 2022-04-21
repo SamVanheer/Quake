@@ -21,6 +21,7 @@
 
 #include "IGame.h"
 #include "entitymap.h"
+#include "functionmap.h"
 #include "vector.h"
 
 class Game : public IGame
@@ -30,6 +31,9 @@ public:
 	void Shutdown() override;
 
 	void NewMapStarted() override;
+
+	void* FindFunctionAddress(const char* name) override;
+	const char* FindFunctionName(void* address) override;
 
 	bool SpawnEntity(edict_t* entity, const char* classname) override;
 	void EntityThink(edict_t* entity, edict_t* other) override;

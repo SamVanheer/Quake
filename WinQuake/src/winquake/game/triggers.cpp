@@ -44,6 +44,7 @@ void multi_wait(edict_t* self)
 	}
 }
 
+LINK_FUNCTION_TO_NAME(multi_wait);
 
 // the trigger was just touched/killed/used
 // self->v.enemy should be set to the activator so it can be held through a delay
@@ -93,11 +94,15 @@ void multi_killed(edict_t* self)
 	multi_trigger(self);
 }
 
+LINK_FUNCTION_TO_NAME(multi_killed);
+
 void multi_use(edict_t* self, edict_t* other)
 {
 	self->v.enemy = pr_global_struct->activator;
 	multi_trigger(self);
 }
+
+LINK_FUNCTION_TO_NAME(multi_use);
 
 void multi_touch(edict_t* self, edict_t* other)
 {
@@ -115,6 +120,8 @@ void multi_touch(edict_t* self, edict_t* other)
 	self->v.enemy = other;
 	multi_trigger(self);
 }
+
+LINK_FUNCTION_TO_NAME(multi_touch);
 
 /*QUAKED trigger_multiple (.5 .5 .5) ? notouch
 Variable sized repeatable trigger.  Must be targeted at one or more entities.  If "health" is set, the trigger must be killed to activate each time.
@@ -276,6 +283,8 @@ void counter_use(edict_t* self, edict_t* other)
 	multi_trigger(self);
 }
 
+LINK_FUNCTION_TO_NAME(counter_use);
+
 /*QUAKED trigger_counter (.5 .5 .5) ? nomessage
 Acts as an intermediary for an action that takes multiple inputs.
 
@@ -325,6 +334,8 @@ void play_teleport(edict_t* self)
 	PF_Remove(self);
 }
 
+LINK_FUNCTION_TO_NAME(play_teleport);
+
 void spawn_tfog(edict_t* self, vec3_t org)
 {
 	auto s = PF_Spawn();
@@ -364,6 +375,7 @@ void tdeath_touch(edict_t* self, edict_t* other)
 	}
 }
 
+LINK_FUNCTION_TO_NAME(tdeath_touch);
 
 void spawn_tdeath(edict_t* self, vec3_t org, edict_t* death_owner)
 {
@@ -437,6 +449,8 @@ void teleport_touch(edict_t* self, edict_t* other)
 	other->v.flags &= ~FL_ONGROUND;
 }
 
+LINK_FUNCTION_TO_NAME(teleport_touch);
+
 /*QUAKED info_teleport_destination (.5 .5 .5) (-8 -8 -8) (8 8 32)
 This is the destination marker for a teleporter.  It should have a "targetname" field with the same value as a teleporter's "target" field.
 */
@@ -459,6 +473,8 @@ void teleport_use(edict_t* self, edict_t* other)
 	pr_global_struct->force_retouch = 2;		// make sure even still objects get hit
 	self->v.think = SUB_NullThink;
 }
+
+LINK_FUNCTION_TO_NAME(teleport_use);
 
 /*QUAKED trigger_teleport (.5 .5 .5) ? PLAYER_ONLY SILENT
 Any object touching this will be transported to the corresponding info_teleport_destination entity. You must set the "target" field, and create an object with a "targetname" field that matches.
@@ -499,6 +515,8 @@ void trigger_skill_touch(edict_t* self, edict_t* other)
 
 	PF_cvar_set("skill", self->v.message);
 }
+
+LINK_FUNCTION_TO_NAME(trigger_skill_touch);
 
 /*QUAKED trigger_setskill (.5 .5 .5) ?
 sets skill level to the value of "message".
@@ -544,6 +562,8 @@ void trigger_onlyregistered_touch(edict_t* self, edict_t* other)
 	}
 }
 
+LINK_FUNCTION_TO_NAME(trigger_onlyregistered_touch);
+
 /*QUAKED trigger_onlyregistered (.5 .5 .5) ?
 Only fires if playing the registered version, otherwise prints the message
 */
@@ -564,6 +584,8 @@ void hurt_on(edict_t* self)
 	self->v.nextthink = -1;
 }
 
+LINK_FUNCTION_TO_NAME(hurt_on);
+
 void hurt_touch(edict_t* self, edict_t* other)
 {
 	if (other->v.takedamage)
@@ -576,6 +598,8 @@ void hurt_touch(edict_t* self, edict_t* other)
 
 	return;
 }
+
+LINK_FUNCTION_TO_NAME(hurt_touch);
 
 /*QUAKED trigger_hurt (.5 .5 .5) ?
 Any object touching this will be hurt
@@ -616,6 +640,7 @@ void trigger_push_touch(edict_t* self, edict_t* other)
 		PF_Remove(self);
 }
 
+LINK_FUNCTION_TO_NAME(trigger_push_touch);
 
 /*QUAKED trigger_push (.5 .5 .5) ? PUSH_ONCE
 Pushes the player
@@ -649,6 +674,8 @@ void trigger_monsterjump_touch(edict_t* self, edict_t* other)
 
 	other->v.velocity[2] = self->v.height;
 }
+
+LINK_FUNCTION_TO_NAME(trigger_monsterjump_touch);
 
 /*QUAKED trigger_monsterjump (.5 .5 .5) ?
 Walking monsters that touch this will jump in the direction of the trigger's angle

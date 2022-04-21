@@ -38,6 +38,16 @@ void Game::NewMapStarted()
 {
 }
 
+void* Game::FindFunctionAddress(const char* name)
+{
+	return GetFunctionMap().FindAddress(name);
+}
+
+const char* Game::FindFunctionName(void* address)
+{
+	return GetFunctionMap().FindName(address);
+}
+
 bool Game::SpawnEntity(edict_t* entity, const char* classname)
 {
 	return GetEntityMap().TrySpawn(classname, entity);

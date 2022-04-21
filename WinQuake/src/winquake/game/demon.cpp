@@ -234,32 +234,50 @@ const Animations DemonAnimations = MakeAnimations(
 		{"attacka", 15, &demon1_attack_frame}
 	});
 
+const Animations* demon_animations_get(edict_t* self)
+{
+	return &DemonAnimations;
+}
+
+LINK_FUNCTION_TO_NAME(demon_animations_get);
+
 //============================================================================
 void demon1_stand1(edict_t* self)
 {
 	animation_set(self, "stand");
 }
 
+LINK_FUNCTION_TO_NAME(demon1_stand1);
+
 void demon1_walk1(edict_t* self)
 {
 	animation_set(self, "walk");
 }
+
+LINK_FUNCTION_TO_NAME(demon1_walk1);
 
 void demon1_run1(edict_t* self)
 {
 	animation_set(self, "run");
 }
 
+LINK_FUNCTION_TO_NAME(demon1_run1);
+
 void demon1_jump1(edict_t* self)
 {
 	animation_set(self, "leap");
 }
 
+LINK_FUNCTION_TO_NAME(demon1_jump1);
+
 void demon1_jump11(edict_t* self)
 {
 	animation_set(self, "leap");
+	//TODO: pass frame index to set
 	self->v.frame = DemonAnimations.FindAnimationStart("leap") + 10;
 }
+
+LINK_FUNCTION_TO_NAME(demon1_jump11);
 
 void demon1_atta1(edict_t* self)
 {
@@ -293,6 +311,8 @@ void demon1_pain(edict_t* self, edict_t* attacker, float damage)
 	demon1_pain1 (self);
 }
 
+LINK_FUNCTION_TO_NAME(demon1_pain);
+
 void demon_die(edict_t* self)
 {
 // check for gib
@@ -310,10 +330,14 @@ void demon_die(edict_t* self)
 	demon1_die1 (self);
 }
 
+LINK_FUNCTION_TO_NAME(demon_die);
+
 void Demon_MeleeAttack(edict_t* self)
 {
 	demon1_atta1 (self);
 }
+
+LINK_FUNCTION_TO_NAME(Demon_MeleeAttack);
 
 /*QUAKED monster_demon1 (1 0 0) (-32 -32 -24) (32 32 64) Ambush
 
@@ -350,7 +374,7 @@ void monster_demon1(edict_t* self)
 	self->v.th_melee = Demon_MeleeAttack;		// one of two attacks
 	self->v.th_missile = demon1_jump1;			// jump attack
 	self->v.th_pain = demon1_pain;
-	self->v.animations_get = [](edict_t* self) { return &DemonAnimations; };
+	self->v.animations_get = &demon_animations_get;
 		
 	walkmonster_start(self);
 }
@@ -491,3 +515,5 @@ void Demon_JumpTouch(edict_t* self, edict_t* other)
 	self->v.think = demon1_jump11;
 	self->v.nextthink = pr_global_struct->time + 0.1;
 }
+
+LINK_FUNCTION_TO_NAME(Demon_JumpTouch);

@@ -280,20 +280,33 @@ const Animations KnightAnimations = MakeAnimations(
 		{"deathb", 11, &knight_die_frame}
 	});
 
+const Animations* knight_animations_get(edict_t* self)
+{
+	return &KnightAnimations;
+}
+
+LINK_FUNCTION_TO_NAME(knight_animations_get);
+
 void knight_stand1(edict_t* self)
 {
 	animation_set(self, "stand");
 }
+
+LINK_FUNCTION_TO_NAME(knight_stand1);
 
 void knight_walk1(edict_t* self)
 {
 	animation_set(self, "walk");
 }
 
+LINK_FUNCTION_TO_NAME(knight_walk1);
+
 void knight_run1(edict_t* self)
 {
 	animation_set(self, "runb");
 }
+
+LINK_FUNCTION_TO_NAME(knight_run1);
 
 void knight_runatk1(edict_t* self)
 {
@@ -304,6 +317,8 @@ void knight_atk1(edict_t* self)
 {
 	animation_set(self, "attackb");
 }
+
+LINK_FUNCTION_TO_NAME(knight_atk1);
 
 //===========================================================================
 void knight_pain1(edict_t* self)
@@ -335,6 +350,8 @@ void knight_pain(edict_t* self, edict_t* attacker, float damage)
 		self->v.pain_finished = pr_global_struct->time + 1;
 	}
 }
+
+LINK_FUNCTION_TO_NAME(knight_pain);
 
 //===========================================================================
 void knight_bow1(edict_t* self)
@@ -373,6 +390,8 @@ void knight_die(edict_t* self)
 		knight_dieb1 (self);
 }
 
+LINK_FUNCTION_TO_NAME(knight_die);
+
 /*QUAKED monster_knight (1 0 0) (-16 -16 -24) (16 16 40) Ambush
 */
 void monster_knight(edict_t* self)
@@ -406,7 +425,7 @@ void monster_knight(edict_t* self)
 	self->v.th_melee = knight_atk1;
 	self->v.th_pain = knight_pain;
 	self->v.th_die = knight_die;
-	self->v.animations_get = [](edict_t*) { return &KnightAnimations; };
+	self->v.animations_get = &knight_animations_get;
 	
 	walkmonster_start (self);
 }

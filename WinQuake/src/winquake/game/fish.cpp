@@ -130,11 +130,20 @@ const Animations FishAnimations = MakeAnimations(
 		{"pain", 9, &fish_pain_frame}
 	});
 
+const Animations* fish_animations_get(edict_t* self)
+{
+	return &FishAnimations;
+}
+
+LINK_FUNCTION_TO_NAME(fish_animations_get);
+
 void f_stand1(edict_t* self)
 {
 	self->v.animation_mode = static_cast<int>(FishSwimMode::Stand);
 	animation_set(self, "swim");
 }
+
+LINK_FUNCTION_TO_NAME(f_stand1);
 
 void f_walk1(edict_t* self)
 {
@@ -142,11 +151,15 @@ void f_walk1(edict_t* self)
 	animation_set(self, "swim");
 }
 
+LINK_FUNCTION_TO_NAME(f_walk1);
+
 void f_run1(edict_t* self)
 {
 	self->v.animation_mode = static_cast<int>(FishSwimMode::Run);
 	animation_set(self, "swim");
 }
+
+LINK_FUNCTION_TO_NAME(f_run1);
 
 void fish_melee(edict_t* self)
 {
@@ -168,10 +181,14 @@ void f_attack1(edict_t* self)
 	animation_set(self, "attack");
 }
 
+LINK_FUNCTION_TO_NAME(f_attack1);
+
 void f_death1(edict_t* self)
 {
 	animation_set(self, "death");
 }
+
+LINK_FUNCTION_TO_NAME(f_death1);
 
 void f_pain1(edict_t* self)
 {
@@ -184,6 +201,8 @@ void fish_pain(edict_t* self, edict_t* attacker, float damage)
 // fish allways do pain frames
 	f_pain1 (self);
 }
+
+LINK_FUNCTION_TO_NAME(fish_pain);
 
 /*QUAKED monster_fish (1 0 0) (-16 -16 -24) (16 16 24) Ambush
 */
@@ -214,7 +233,7 @@ void monster_fish(edict_t* self)
 	self->v.th_die = f_death1;
 	self->v.th_pain = fish_pain;
 	self->v.th_melee = f_attack1;
-	self->v.animations_get = [](edict_t* self) { return &FishAnimations; };
+	self->v.animations_get = &fish_animations_get;
 	
 	swimmonster_start (self);
 }

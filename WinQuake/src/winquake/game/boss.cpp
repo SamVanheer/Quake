@@ -111,12 +111,16 @@ void boss_shockb_finish(edict_t* self)
 	}
 }
 
+LINK_FUNCTION_TO_NAME(boss_shockb_finish);
+
 void boss_shockb_postframes(edict_t* self)
 {
 	self->v.nextthink = pr_global_struct->time + 0.1f;
 	self->v.frame = animations_get(self)->FindAnimationStart("shockb");
 	self->v.think = boss_shockb_finish;
 }
+
+LINK_FUNCTION_TO_NAME(boss_shockb_postframes);
 
 void boss_shockb_frame(edict_t* self, const Animation* animation, int frame)
 {
@@ -142,6 +146,8 @@ void boss_death_final(edict_t* self)
 	SUB_UseTargets(self);
 	PF_Remove(self);
 }
+
+LINK_FUNCTION_TO_NAME(boss_death_final);
 
 void boss_death_frame(edict_t* self, const Animation* animation, int frame)
 {
@@ -176,6 +182,13 @@ const Animations BossAnimations = MakeAnimations(
 		{"shockc", 10, &boss_shockc_frame}
 	});
 
+const Animations* boss_animations_get(edict_t* self)
+{
+	return &BossAnimations;
+}
+
+LINK_FUNCTION_TO_NAME(boss_animations_get);
+
 void boss_face(edict_t* self)
 {
 	
@@ -204,6 +217,8 @@ void boss_missile1(edict_t* self)
 	animation_set(self, "attack");
 }
 
+LINK_FUNCTION_TO_NAME(boss_missile1);
+
 void boss_shocka1(edict_t* self)
 {
 	animation_set(self, "shocka");
@@ -223,6 +238,8 @@ void boss_death1(edict_t* self)
 {
 	animation_set(self, "death");
 }
+
+LINK_FUNCTION_TO_NAME(boss_death1);
 
 void boss_missile(edict_t* self, vec3_t p)
 {
@@ -289,6 +306,7 @@ void boss_awake(edict_t* self, edict_t* other)
 	boss_rise1 (self);
 }
 
+LINK_FUNCTION_TO_NAME(boss_awake);
 
 /*QUAKED monster_boss (1 0 0) (-128 -128 -24) (128 128 256)
 */
@@ -313,7 +331,7 @@ void monster_boss(edict_t* self)
 	pr_global_struct->total_monsters = pr_global_struct->total_monsters + 1;
 
 	self->v.use = boss_awake;
-	self->v.animations_get = [](edict_t* self) { return &BossAnimations; };
+	self->v.animations_get = &boss_animations_get;
 }
 
 LINK_ENTITY_TO_CLASS(monster_boss);
@@ -354,6 +372,8 @@ void lightning_fire(edict_t* self)
 	PF_WriteCoord (MSG_ALL, p2[1]);
 	PF_WriteCoord (MSG_ALL, p2[2]);
 }
+
+LINK_FUNCTION_TO_NAME(lightning_fire);
 
 void lightning_use(edict_t* self, edict_t* other)
 {
@@ -403,6 +423,7 @@ void lightning_use(edict_t* self, edict_t* other)
 	}	
 }
 
+LINK_FUNCTION_TO_NAME(lightning_use);
 
 /*QUAKED event_lightning (0 1 1) (-16 -16 -16) (16 16 16)
 Just for boss level.

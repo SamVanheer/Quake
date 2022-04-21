@@ -182,6 +182,13 @@ const Animations DogAnimations = MakeAnimations(
 		{"walk", 8, &dog_walk_frame, AnimationFlag::Looping}
 	});
 
+const Animations* dog_animations_get(edict_t* self)
+{
+	return &DogAnimations;
+}
+
+LINK_FUNCTION_TO_NAME(dog_animations_get);
+
 /*
 ================
 dog_bite
@@ -243,30 +250,42 @@ void Dog_JumpTouch(edict_t* self, edict_t* other)
 	self->v.nextthink = pr_global_struct->time + 0.1;
 }
 
+LINK_FUNCTION_TO_NAME(Dog_JumpTouch);
+
 void dog_stand1(edict_t* self)
 {
 	animation_set(self, "stand");
 }
+
+LINK_FUNCTION_TO_NAME(dog_stand1);
 
 void dog_walk1(edict_t* self)
 {
 	animation_set(self, "walk");
 }
 
+LINK_FUNCTION_TO_NAME(dog_walk1);
+
 void dog_run1(edict_t* self)
 {
 	animation_set(self, "run");
 }
+
+LINK_FUNCTION_TO_NAME(dog_run1);
 
 void dog_atta1(edict_t* self)
 {
 	animation_set(self, "attack");
 }
 
+LINK_FUNCTION_TO_NAME(dog_atta1);
+
 void dog_leap1(edict_t* self)
 {
 	animation_set(self, "leap");
 }
+
+LINK_FUNCTION_TO_NAME(dog_leap1);
 
 void dog_pain1(edict_t* self)
 {
@@ -298,6 +317,8 @@ void dog_pain(edict_t* self, edict_t* attacker, float damage)
 		dog_painb1 (self);
 }
 
+LINK_FUNCTION_TO_NAME(dog_pain);
+
 void dog_die(edict_t* self)
 {
 // check for gib
@@ -320,6 +341,8 @@ void dog_die(edict_t* self)
 	else
 		dog_dieb1 (self);
 }
+
+LINK_FUNCTION_TO_NAME(dog_die);
 
 //============================================================================
 
@@ -425,7 +448,7 @@ void monster_dog(edict_t* self)
 	self->v.th_die = dog_die;
 	self->v.th_melee = dog_atta1;
 	self->v.th_missile = dog_leap1;
-	self->v.animations_get = [](edict_t* self) { return &DogAnimations; };
+	self->v.animations_get = &dog_animations_get;
 
 	walkmonster_start(self);
 }

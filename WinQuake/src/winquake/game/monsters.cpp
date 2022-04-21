@@ -63,6 +63,8 @@ void monster_use(edict_t* self, edict_t* other)
 	self->v.think = FoundTarget;
 }
 
+LINK_FUNCTION_TO_NAME(monster_use);
+
 /*
 ================
 monster_death_use
@@ -85,6 +87,8 @@ void monster_death_use(edict_t* self)
 	pr_global_struct->activator = self->v.enemy;
 	SUB_UseTargets(self);
 }
+
+LINK_FUNCTION_TO_NAME(monster_death_use);
 
 //============================================================================
 
@@ -137,6 +141,8 @@ void walkmonster_start_go(edict_t* self)
 	self->v.nextthink = self->v.nextthink + random() * 0.5;
 }
 
+LINK_FUNCTION_TO_NAME(walkmonster_start_go);
+
 void walkmonster_start(edict_t* self)
 {
 	// delay drop to floor to make sure all doors have been spawned
@@ -188,6 +194,8 @@ void flymonster_start_go(edict_t* self)
 	}
 }
 
+LINK_FUNCTION_TO_NAME(flymonster_start_go);
+
 void flymonster_start(edict_t* self)
 {
 	// spread think times so they don't all happen at same time
@@ -237,6 +245,8 @@ void swimmonster_start_go(edict_t* self)
 	// spread think times so they don't all happen at same time
 	self->v.nextthink = self->v.nextthink + random() * 0.5;
 }
+
+LINK_FUNCTION_TO_NAME(swimmonster_start_go);
 
 void swimmonster_start(edict_t* self)
 {

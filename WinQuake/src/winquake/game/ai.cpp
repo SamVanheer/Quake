@@ -136,7 +136,7 @@ void t_movetarget(edict_t* self, edict_t* other)
 	}
 }
 
-
+LINK_FUNCTION_TO_NAME(t_movetarget);
 
 //============================================================================
 
@@ -273,6 +273,8 @@ void FoundTarget(edict_t* self)
 	SightSound(self);
 	HuntTarget(self);
 }
+
+LINK_FUNCTION_TO_NAME(FoundTarget);
 
 /*
 ===========

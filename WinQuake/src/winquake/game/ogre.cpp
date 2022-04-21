@@ -367,6 +367,13 @@ const Animations OgreAnimations = MakeAnimations(
 		{"pull", 11} //Never used
 	});
 
+const Animations* ogre_animations_get(edict_t* self)
+{
+	return &OgreAnimations;
+}
+
+LINK_FUNCTION_TO_NAME(ogre_animations_get);
+
 //=============================================================================
 
 
@@ -388,6 +395,8 @@ void OgreGrenadeExplode(edict_t* self)
 	s_explode1 (self);
 }
 
+LINK_FUNCTION_TO_NAME(OgreGrenadeExplode);
+
 void OgreGrenadeTouch(edict_t* self, edict_t* other)
 {
 	if (other == self->v.owner)
@@ -401,6 +410,8 @@ void OgreGrenadeTouch(edict_t* self, edict_t* other)
 	if (AsVector(self->v.velocity) == AsVector(vec3_origin))
 		AsVector(self->v.avelocity) = AsVector(vec3_origin);
 }
+
+LINK_FUNCTION_TO_NAME(OgreGrenadeTouch);
 
 /*
 ================
@@ -483,15 +494,21 @@ void ogre_stand1(edict_t* self)
 	animation_set(self, "stand");
 }
 
+LINK_FUNCTION_TO_NAME(ogre_stand1);
+
 void ogre_walk1(edict_t* self)
 {
 	animation_set(self, "walk");
 }
 
+LINK_FUNCTION_TO_NAME(ogre_walk1);
+
 void ogre_run1(edict_t* self)
 {
 	animation_set(self, "run");
 }
+
+LINK_FUNCTION_TO_NAME(ogre_run1);
 
 void ogre_swing1(edict_t* self)
 {
@@ -507,6 +524,8 @@ void ogre_nail1(edict_t* self)
 {
 	animation_set(self, "shoot");
 }
+
+LINK_FUNCTION_TO_NAME(ogre_nail1);
 
 void ogre_pain1(edict_t* self)
 {
@@ -580,6 +599,8 @@ void ogre_pain(edict_t* self, edict_t* attacker, float damage)
 	}
 }
 
+LINK_FUNCTION_TO_NAME(ogre_pain);
+
 void ogre_die(edict_t* self)
 {
 // check for gib
@@ -601,6 +622,8 @@ void ogre_die(edict_t* self)
 		ogre_bdie1 (self);
 }
 
+LINK_FUNCTION_TO_NAME(ogre_die);
+
 void ogre_melee(edict_t* self)
 {
 	if (random() > 0.5)
@@ -608,6 +631,8 @@ void ogre_melee(edict_t* self)
 	else
 		ogre_swing1 (self);
 }
+
+LINK_FUNCTION_TO_NAME(ogre_melee);
 
 /*QUAKED monster_ogre (1 0 0) (-32 -32 -24) (32 32 64) Ambush
 
@@ -646,7 +671,7 @@ void monster_ogre(edict_t* self)
 	self->v.th_melee = ogre_melee;
 	self->v.th_missile = ogre_nail1;
 	self->v.th_pain = ogre_pain;
-	self->v.animations_get = [](edict_t* self) { return &OgreAnimations; };
+	self->v.animations_get = &ogre_animations_get;
 	
 	walkmonster_start(self);
 }

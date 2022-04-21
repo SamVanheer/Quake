@@ -35,7 +35,7 @@ void SUB_regen(edict_t* self)
 	PF_setorigin (self, self->v.origin);
 }
 
-
+LINK_FUNCTION_TO_NAME(SUB_regen);
 
 /*QUAKED noclass (0 0 0) (-8 -8 -8) (8 8 8)
 prints a warning message when spawned
@@ -74,6 +74,8 @@ void PlaceItem(edict_t* self)
 		return;
 	}
 }
+
+LINK_FUNCTION_TO_NAME(PlaceItem);
 
 /*
 ============
@@ -220,7 +222,9 @@ void health_touch(edict_t* self, edict_t* other)
 	
 	pr_global_struct->activator = other;
 	SUB_UseTargets(self);				// fire all targets / killtargets
-}	
+}
+
+LINK_FUNCTION_TO_NAME(health_touch);
 
 void item_megahealth_rot(edict_t* self)
 {
@@ -243,6 +247,8 @@ void item_megahealth_rot(edict_t* self)
 		self->v.think = SUB_regen;
 	}
 }
+
+LINK_FUNCTION_TO_NAME(item_megahealth_rot);
 
 /*
 ===============================================================================
@@ -304,6 +310,7 @@ void armor_touch(edict_t* self, edict_t* other)
 	SUB_UseTargets(self);				// fire all targets / killtargets
 }
 
+LINK_FUNCTION_TO_NAME(armor_touch);
 
 /*QUAKED item_armor1 (0 .5 .8) (-16 -16 0) (16 16 32)
 */
@@ -517,6 +524,7 @@ void weapon_touch(edict_t* self, edict_t* other)
 	SUB_UseTargets(self);				// fire all targets / killtargets
 }
 
+LINK_FUNCTION_TO_NAME(weapon_touch);
 
 /*QUAKED weapon_supershotgun (0 .5 .8) (-16 -16 0) (16 16 32)
 */
@@ -697,8 +705,7 @@ void ammo_touch(edict_t* self, edict_t* other)
 	SUB_UseTargets(self);				// fire all targets / killtargets
 }
 
-
-
+LINK_FUNCTION_TO_NAME(ammo_touch);
 
 constexpr int WEAPON_BIG2 = 1;
 
@@ -917,6 +924,7 @@ void key_touch(edict_t* self, edict_t* other)
 	SUB_UseTargets(self);				// fire all targets / killtargets
 }
 
+LINK_FUNCTION_TO_NAME(key_touch);
 
 void key_setPF_sounds(edict_t* self)
 {
@@ -1045,6 +1053,7 @@ void sigil_touch(edict_t* self, edict_t* other)
 	SUB_UseTargets(self);				// fire all targets / killtargets
 }
 
+LINK_FUNCTION_TO_NAME(sigil_touch);
 
 /*QUAKED item_sigil (0 .5 .8) (-16 -16 -24) (16 16 32) E1 E2 E3 E4
 End of level sigil, pick up to end episode and return to jrstart.
@@ -1152,7 +1161,7 @@ void powerup_touch(edict_t* self, edict_t* other)
 	SUB_UseTargets(self);				// fire all targets / killtargets
 }
 
-
+LINK_FUNCTION_TO_NAME(powerup_touch);
 
 /*QUAKED item_artifact_invulnerability (0 .5 .8) (-16 -16 -24) (16 16 32)
 Player is invulnerable for 30 seconds
@@ -1317,6 +1326,8 @@ void BackpackTouch(edict_t* self, edict_t* other)
 	self = other;
 	W_SetCurrentAmmo (self);
 }
+
+LINK_FUNCTION_TO_NAME(BackpackTouch);
 
 /*
 ===============

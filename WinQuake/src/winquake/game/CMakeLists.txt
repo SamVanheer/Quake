@@ -20,6 +20,7 @@ target_sources(winquake
 		fight.cpp
 		fight.h
 		fish.cpp
+		functionmap.h
 		Game.cpp
 		Game.h
 		game_world.cpp

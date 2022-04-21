@@ -61,6 +61,8 @@ void light_use(edict_t* self, edict_t* other)
 	}
 }
 
+LINK_FUNCTION_TO_NAME(light_use);
+
 /*QUAKED light (0 1 0) (-8 -8 -8) (8 8 8) START_OFF
 Non-displayed light.
 Default light value is 300
@@ -251,11 +253,15 @@ void fire_fly(edict_t* self)
 	self->v.think = fire_fly;
 }
 
+LINK_FUNCTION_TO_NAME(fire_fly);
+
 void fire_touch(edict_t* self, edict_t* other)
 {
 	T_Damage(self, other, self, self, 20);
 	PF_Remove(self);
 }
+
+LINK_FUNCTION_TO_NAME(fire_touch);
 
 //============================================================================
 
@@ -271,6 +277,8 @@ void barrel_explode(edict_t* self)
 	self->v.origin[2] += 32;
 	BecomeExplosion(self);
 }
+
+LINK_FUNCTION_TO_NAME(barrel_explode);
 
 /*QUAKED misc_explobox (0 .5 .8) (0 0 0) (32 32 64)
 TESTING THING
@@ -361,12 +369,16 @@ void spikeshooter_use(edict_t* self, edict_t* other)
 	spikeshooter_fire(self, other);
 }
 
+LINK_FUNCTION_TO_NAME(spikeshooter_use);
+
 void shooter_think(edict_t* self)
 {
 	auto newmis = spikeshooter_fire(self, nullptr);
 	self->v.nextthink = pr_global_struct->time + self->v.wait;
 	AsVector(newmis->v.velocity) = AsVector(self->v.movedir) * 500;
 }
+
+LINK_FUNCTION_TO_NAME(shooter_think);
 
 /*QUAKED trap_spikeshooter (0 .5 .8) (-8 -8 -8) (8 8 8) superspike laser
 When triggered, fires a spike in the direction set in QuakeEd.
@@ -456,6 +468,8 @@ void make_bubbles(edict_t* self)
 	self->v.think = make_bubbles;
 }
 
+LINK_FUNCTION_TO_NAME(make_bubbles);
+
 void bubble_split(edict_t* self)
 {
 	auto bubble = PF_Spawn();
@@ -486,6 +500,8 @@ void bubble_remove(edict_t* self, edict_t* other)
 	}
 	PF_Remove(self);
 }
+
+LINK_FUNCTION_TO_NAME(bubble_remove);
 
 void bubble_bob(edict_t* self)
 {
@@ -522,6 +538,8 @@ void bubble_bob(edict_t* self)
 	self->v.think = bubble_bob;
 }
 
+LINK_FUNCTION_TO_NAME(bubble_bob);
+
 /*~>~<~>~<~>~<~>~<~>~<~>~<~>~<~>~<~>~<~>~<~>~<~>~<~>~<~>~<~>~<~>~<~>~<~>
 ~>~<~>~<~>~<~>~<~>~<~>~<~>~<~>~<~>~<~>~<~>~<~>~<~>~<~>~<~>~<~>~<~>~<~>~*/
 
@@ -553,6 +571,8 @@ void func_wall_use(edict_t* self, edict_t* other)
 {	// change to alternate textures
 	self->v.frame = 1 - self->v.frame;
 }
+
+LINK_FUNCTION_TO_NAME(func_wall_use);
 
 /*QUAKED func_wall (0 .5 .8) ?
 This is just a solid wall if not inhibitted
@@ -719,6 +739,8 @@ void noise_think(edict_t* self)
 	PF_sound(self, 6, "enforcer/sight4.wav", 1, ATTN_NORM);
 	PF_sound(self, 7, "enforcer/pain1.wav", 1, ATTN_NORM);
 }
+
+LINK_FUNCTION_TO_NAME(noise_think);
 
 /*QUAKED misc_noisemaker (1 0.5 0) (-10 -10 -10) (10 10 10)
 

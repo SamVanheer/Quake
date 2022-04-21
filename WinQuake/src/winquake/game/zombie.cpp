@@ -390,6 +390,13 @@ const Animations ZombieAnimations = MakeAnimations(
 		{"cruc_", 6, &zombie_cruc_frame, AnimationFlag::Looping}
 	});
 
+const Animations* zombie_animations_get(edict_t* self)
+{
+	return &ZombieAnimations;
+}
+
+LINK_FUNCTION_TO_NAME(zombie_animations_get);
+
 constexpr int SPAWN_CRUCIFIED = 1;
 
 //=============================================================================
@@ -397,6 +404,8 @@ void zombie_stand1(edict_t* self)
 {
 	animation_set(self, "stand");
 }
+
+LINK_FUNCTION_TO_NAME(zombie_stand1);
 
 void zombie_cruc1(edict_t* self)
 {
@@ -408,10 +417,14 @@ void zombie_walk1(edict_t* self)
 	animation_set(self, "walk");
 }
 
+LINK_FUNCTION_TO_NAME(zombie_walk1);
+
 void zombie_run1(edict_t* self)
 {
 	animation_set(self, "run");
 }
+
+LINK_FUNCTION_TO_NAME(zombie_run1);
 
 void zombie_atta1(edict_t* self)
 {
@@ -478,6 +491,8 @@ void ZombieGrenadeTouch(edict_t* self, edict_t* other)
 	self->v.touch = SUB_TouchRemove;
 }
 
+LINK_FUNCTION_TO_NAME(ZombieGrenadeTouch);
+
 /*
 ================
 ZombieFireGrenade
@@ -530,6 +545,8 @@ void zombie_missile(edict_t* self)
 		zombie_attc1 (self);
 }
 
+LINK_FUNCTION_TO_NAME(zombie_missile);
+
 /*
 =============================================================================
 
@@ -545,6 +562,8 @@ void zombie_die(edict_t* self)
 	ThrowGib (self,"progs/gib2.mdl", self->v.health);
 	ThrowGib (self,"progs/gib3.mdl", self->v.health);
 }
+
+LINK_FUNCTION_TO_NAME(zombie_die);
 
 /*
 =================
@@ -612,6 +631,8 @@ void zombie_pain(edict_t* self, edict_t* attacker, float take)
 		zombie_paind1 (self);
 }
 
+LINK_FUNCTION_TO_NAME(zombie_pain);
+
 //============================================================================
 
 /*QUAKED monster_zombie (1 0 0) (-16 -16 -24) (16 16 32) Crucified ambush
@@ -655,7 +676,7 @@ void monster_zombie(edict_t* self)
 	self->v.th_pain = zombie_pain;
 	self->v.th_die = zombie_die;
 	self->v.th_missile = zombie_missile;
-	self->v.animations_get = [](edict_t* self) { return &ZombieAnimations; };
+	self->v.animations_get = &zombie_animations_get;
 
 	if (self->v.spawnflags & SPAWN_CRUCIFIED)
 	{

@@ -188,11 +188,20 @@ const Animations ShalrathAnimations = MakeAnimations(
 		{"walk", 12, &shalrath_walk_frame, AnimationFlag::Looping}
 	});
 
+const Animations* shal_animations_get(edict_t* self)
+{
+	return &ShalrathAnimations;
+}
+
+LINK_FUNCTION_TO_NAME(shal_animations_get);
+
 void shal_stand(edict_t* self)
 {
 	self->v.animation_mode = static_cast<int>(ShalrathWalkMode::Stand);
 	animation_set(self, "walk");
 }
+
+LINK_FUNCTION_TO_NAME(shal_stand);
 
 void shal_walk1(edict_t* self)
 {
@@ -200,16 +209,22 @@ void shal_walk1(edict_t* self)
 	animation_set(self, "walk");
 }
 
+LINK_FUNCTION_TO_NAME(shal_walk1);
+
 void shal_run1(edict_t* self)
 {
 	self->v.animation_mode = static_cast<int>(ShalrathWalkMode::Run);
 	animation_set(self, "walk");
 }
 
+LINK_FUNCTION_TO_NAME(shal_run1);
+
 void shal_attack1(edict_t* self)
 {
 	animation_set(self, "attack");
 }
+
+LINK_FUNCTION_TO_NAME(shal_attack1);
 
 void shal_pain1(edict_t* self)
 {
@@ -231,6 +246,8 @@ void shalrath_pain(edict_t* self, edict_t* attacker, float damage)
 	self->v.pain_finished = pr_global_struct->time + 3;
 }
 
+LINK_FUNCTION_TO_NAME(shalrath_pain);
+
 void shalrath_die(edict_t* self)
 {
 // check for gib
@@ -249,6 +266,8 @@ void shalrath_die(edict_t* self)
 	self->v.solid = SOLID_NOT;
 	// insert death sounds here
 }
+
+LINK_FUNCTION_TO_NAME(shalrath_die);
 
 /*
 ================
@@ -307,6 +326,8 @@ void ShalHome(edict_t* self)
 	self->v.think = ShalHome;	
 }
 
+LINK_FUNCTION_TO_NAME(ShalHome);
+
 void ShalMissileTouch(edict_t* self, edict_t* other)
 {
 	if (other == self->v.owner)
@@ -329,6 +350,8 @@ void ShalMissileTouch(edict_t* self, edict_t* other)
 	self->v.solid = SOLID_NOT;
 	s_explode1 (self);
 }
+
+LINK_FUNCTION_TO_NAME(ShalMissileTouch);
 
 //=================================================================
 
@@ -365,7 +388,7 @@ void monster_shalrath(edict_t* self)
 	self->v.th_die = shalrath_die;
 	self->v.th_pain = shalrath_pain;
 	self->v.th_missile = shal_attack1;
-	self->v.animations_get = [](edict_t* self) { return &ShalrathAnimations; };
+	self->v.animations_get = &shal_animations_get;
 
 	self->v.think = walkmonster_start;
 	self->v.nextthink = pr_global_struct->time + 0.1 + random ()*0.1;
