@@ -32,8 +32,8 @@ public:
 
 	void NewMapStarted() override;
 
-	void* FindFunctionAddress(const char* name) override;
-	const char* FindFunctionName(void* address) override;
+	FunctionMap::Function FindFunctionAddress(const char* name) override;
+	const char* FindFunctionName(FunctionMap::Function address) override;
 
 	bool SpawnEntity(edict_t* entity, const char* classname) override;
 	void EntityThink(edict_t* entity, edict_t* other) override;

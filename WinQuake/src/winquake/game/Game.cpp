@@ -19,7 +19,7 @@
 
 #include "quakedef.h"
 #include "entitymap.h"
-#include "game.h"
+#include "Game.h"
 #include "IGame.h"
 
 Game g_GameImplementation;
@@ -38,12 +38,12 @@ void Game::NewMapStarted()
 {
 }
 
-void* Game::FindFunctionAddress(const char* name)
+FunctionMap::Function Game::FindFunctionAddress(const char* name)
 {
 	return GetFunctionMap().FindAddress(name);
 }
 
-const char* Game::FindFunctionName(void* address)
+const char* Game::FindFunctionName(FunctionMap::Function address)
 {
 	return GetFunctionMap().FindName(address);
 }

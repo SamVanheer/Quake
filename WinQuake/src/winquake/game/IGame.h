@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "game/functionmap.h"
+
 /**
 *	@brief The engine uses this to call into game code.
 */
@@ -29,8 +31,8 @@ struct IGame
 
 	virtual void NewMapStarted() = 0;
 
-	virtual void* FindFunctionAddress(const char* name) = 0;
-	virtual const char* FindFunctionName(void* address) = 0;
+	virtual FunctionMap::Function FindFunctionAddress(const char* name) = 0;
+	virtual const char* FindFunctionName(FunctionMap::Function address) = 0;
 
 	virtual bool SpawnEntity(edict_t* entity, const char* classname) = 0;
 	virtual void EntityThink(edict_t* entity, edict_t* other) = 0;

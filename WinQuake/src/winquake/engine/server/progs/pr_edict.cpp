@@ -505,7 +505,7 @@ char* PR_ValueString(void* base, const fielddescription& field)
 	}
 	case ev_function:
 	{
-		auto name = g_Game->FindFunctionName(ED_GetValue<void*>(base, field));
+		auto name = g_Game->FindFunctionName(ED_GetValue<FunctionMap::Function>(base, field));
 		sprintf(line, "%s()", name ? name : "(null)");
 		break;
 	}
@@ -564,7 +564,7 @@ char* PR_UglyValueString(void* base, const fielddescription& field)
 	}
 	case ev_function:
 	{
-		auto name = g_Game->FindFunctionName(ED_GetValue<void*>(base, field));
+		auto name = g_Game->FindFunctionName(ED_GetValue<FunctionMap::Function>(base, field));
 		sprintf(line, "%s", name ? name : "(null)");
 		break;
 	}
@@ -905,7 +905,7 @@ bool ED_ParseEpair (void *base, const fielddescription& key, const char *s)
 	case ev_function:
 	{
 		//Unlike QuakeC functions can be null here, so we need to distinguish the name "null" from null pointers.
-		void* address = nullptr;
+		FunctionMap::Function address = nullptr;
 
 		if (strcmp("(null)", s))
 		{

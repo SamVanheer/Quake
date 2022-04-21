@@ -30,14 +30,16 @@
 class FunctionMap final
 {
 public:
-	void Add(const char* name, void* address);
+	using Function = void (*)();
 
-	void* FindAddress(const char* name) const;
+	void Add(const char* name, Function address);
 
-	const char* FindName(void* address) const;
+	Function FindAddress(const char* name) const;
+
+	const char* FindName(Function address) const;
 
 private:
-	std::vector<std::pair<const char*, void*>> m_Map;
+	std::vector<std::pair<const char*, Function>> m_Map;
 };
 
 inline FunctionMap& GetFunctionMap()
@@ -46,7 +48,7 @@ inline FunctionMap& GetFunctionMap()
 	return map;
 }
 
-inline void FunctionMap::Add(const char* name, void* address)
+inline void FunctionMap::Add(const char* name, Function address)
 {
 	if (!name || !address)
 	{
@@ -61,7 +63,7 @@ inline void FunctionMap::Add(const char* name, void* address)
 	m_Map.emplace_back(name, address);
 }
 
-inline void* FunctionMap::FindAddress(const char* name) const
+inline FunctionMap::Function FunctionMap::FindAddress(const char* name) const
 {
 	if (auto it = std::find_if(m_Map.begin(), m_Map.end(), [&](const auto& candidate)
 		{
@@ -74,7 +76,7 @@ inline void* FunctionMap::FindAddress(const char* name) const
 	return nullptr;
 }
 
-inline const char* FunctionMap::FindName(void* address) const
+inline const char* FunctionMap::FindName(Function address) const
 {
 	if (auto it = std::find_if(m_Map.begin(), m_Map.end(), [&](const auto& candidate)
 		{
@@ -89,7 +91,7 @@ inline const char* FunctionMap::FindName(void* address) const
 
 struct FunctionDefinition final
 {
-	FunctionDefinition(const char* name, void* address)
+	FunctionDefinition(const char* name, FunctionMap::Function address)
 	{
 		GetFunctionMap().Add(name, address);
 	}
@@ -99,4 +101,4 @@ struct FunctionDefinition final
 *	@brief Macro to simplify linking names to functions.
 */
 #define LINK_FUNCTION_TO_NAME(name) \
-static const FunctionDefinition g_##name##FunctionDefinition(#name, &name)
+static const FunctionDefinition g_##name##FunctionDefinition(#name, reinterpret_cast<FunctionMap::Function>(&name))
