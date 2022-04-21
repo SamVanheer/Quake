@@ -300,8 +300,8 @@ void changelevel_touch(edict_t* self, edict_t* other)
 		T_Damage(self, other, self, self, 50000);
 		return;
 	}
-	bprint(other->v.netname);
-	bprint(" exited the level\n");
+	PF_bprint(other->v.netname);
+	PF_bprint(" exited the level\n");
 
 	pr_global_struct->nextmap = self->v.map;
 
@@ -383,8 +383,8 @@ Player entered the suicide command
 */
 void Game::ClientKill(edict_t* self)
 {
-	bprint(self->v.netname);
-	bprint(" suicides\n");
+	PF_bprint(self->v.netname);
+	PF_bprint(" suicides\n");
 	set_suicide_frame(self);
 	self->v.modelindex = modelindex_player;
 	self->v.frags = self->v.frags - 2;	// extra penalty
@@ -576,18 +576,18 @@ RULES
 void PrintClientScore(edict_t* self, edict_t* c)
 {
 	if (c->v.frags > -10 && c->v.frags < 0)
-		bprint(" ");
+		PF_bprint(" ");
 	else if (c->v.frags >= 0)
 	{
 		if (c->v.frags < 100)
-			bprint(" ");
+			PF_bprint(" ");
 		if (c->v.frags < 10)
-			bprint(" ");
+			PF_bprint(" ");
 	}
-	bprint(PF_ftos(c->v.frags));
-	bprint(" ");
-	bprint(c->v.netname);
-	bprint("\n");
+	PF_bprint(PF_ftos(c->v.frags));
+	PF_bprint(" ");
+	PF_bprint(c->v.netname);
+	PF_bprint("\n");
 }
 
 void DumpScore(edict_t* self)
@@ -689,10 +689,10 @@ void CheckRules(edict_t* self)
 		NextLevel(self);
 		/*
 				pr_global_struct->gameover = TRUE;
-				bprint ("\n\n\n==============================\n");
-				bprint ("game exited after ");
-				bprint (ftos(timelimit/60));
-				bprint (" minutes\n");
+				PF_bprint ("\n\n\n==============================\n");
+				PF_bprint ("game exited after ");
+				PF_bprint (ftos(timelimit/60));
+				PF_bprint (" minutes\n");
 				DumpScore ();
 				localcmd ("killserver\n");
 		*/
@@ -704,10 +704,10 @@ void CheckRules(edict_t* self)
 		NextLevel(self);
 		/*
 				pr_global_struct->gameover = TRUE;
-				bprint ("\n\n\n==============================\n");
-				bprint ("game exited after ");
-				bprint (ftos(self->v.frags));
-				bprint (" frags\n");
+				PF_bprint ("\n\n\n==============================\n");
+				PF_bprint ("game exited after ");
+				PF_bprint (ftos(self->v.frags));
+				PF_bprint (" frags\n");
 				DumpScore ();
 				localcmd ("killserver\n");
 		*/
@@ -1166,8 +1166,8 @@ called when a player connects to a server
 */
 void Game::ClientConnect(edict_t* self)
 {
-	bprint(self->v.netname);
-	bprint(" entered the game\n");
+	PF_bprint(self->v.netname);
+	PF_bprint(" entered the game\n");
 
 	// a client connecting during an intermission can cause problems
 	if (pr_global_struct->intermission_running)
@@ -1189,10 +1189,10 @@ void Game::ClientDisconnect(edict_t* self)
 	// since they aren't *really* leaving
 
 	// let everyone else know
-	bprint(self->v.netname);
-	bprint(" left the game with ");
-	bprint(PF_ftos(self->v.frags));
-	bprint(" frags\n");
+	PF_bprint(self->v.netname);
+	PF_bprint(" left the game with ");
+	PF_bprint(PF_ftos(self->v.frags));
+	PF_bprint(" frags\n");
 	PF_sound(self, CHAN_BODY, "player/tornoff2.wav", 1, ATTN_NONE);
 	set_suicide_frame(self);
 }
@@ -1212,10 +1212,10 @@ void ClientObituary(edict_t* self, edict_t* targ, edict_t* attacker)
 	{
 		if (!strcmp(attacker->v.classname, "teledeath"))
 		{
-			bprint(targ->v.netname);
-			bprint(" was telefragged by ");
-			bprint(attacker->v.owner->v.netname);
-			bprint("\n");
+			PF_bprint(targ->v.netname);
+			PF_bprint(" was telefragged by ");
+			PF_bprint(attacker->v.owner->v.netname);
+			PF_bprint("\n");
 
 			attacker->v.owner->v.frags = attacker->v.owner->v.frags + 1;
 			return;
@@ -1223,9 +1223,9 @@ void ClientObituary(edict_t* self, edict_t* targ, edict_t* attacker)
 
 		if (!strcmp(attacker->v.classname, "teledeath2"))
 		{
-			bprint("Satan's power deflects ");
-			bprint(targ->v.netname);
-			bprint("'s telefrag\n");
+			PF_bprint("Satan's power deflects ");
+			PF_bprint(targ->v.netname);
+			PF_bprint("'s telefrag\n");
 
 			targ->v.frags = targ->v.frags - 1;
 			return;
@@ -1237,19 +1237,19 @@ void ClientObituary(edict_t* self, edict_t* targ, edict_t* attacker)
 			{
 				// killed self
 				attacker->v.frags = attacker->v.frags - 1;
-				bprint(targ->v.netname);
+				PF_bprint(targ->v.netname);
 
 				if (targ->v.weapon == 64 && targ->v.waterlevel > 1)
 				{
-					bprint(" discharges into the water.\n");
+					PF_bprint(" discharges into the water.\n");
 					return;
 				}
 				if (targ->v.weapon == 16)
-					bprint(" tries to put the pin back in\n");
+					PF_bprint(" tries to put the pin back in\n");
 				else if (rnum)
-					bprint(" becomes bored with life\n");
+					PF_bprint(" becomes bored with life\n");
 				else
-					bprint(" checks if his weapon is loaded\n");
+					PF_bprint(" checks if his weapon is loaded\n");
 				return;
 			}
 			else
@@ -1312,10 +1312,10 @@ void ClientObituary(edict_t* self, edict_t* targ, edict_t* attacker)
 					else
 						deathstring2 = "'s shaft\n";
 				}
-				bprint(targ->v.netname);
-				bprint(deathstring);
-				bprint(attacker->v.netname);
-				bprint(deathstring2);
+				PF_bprint(targ->v.netname);
+				PF_bprint(deathstring);
+				PF_bprint(attacker->v.netname);
+				PF_bprint(deathstring2);
 			}
 			return;
 		}
@@ -1324,107 +1324,107 @@ void ClientObituary(edict_t* self, edict_t* targ, edict_t* attacker)
 			targ->v.frags = targ->v.frags - 1;		// killed self
 			rnum = targ->v.watertype;
 
-			bprint(targ->v.netname);
+			PF_bprint(targ->v.netname);
 			if (rnum == -3)
 			{
 				if (PF_random() < 0.5)
-					bprint(" sleeps with the fishes\n");
+					PF_bprint(" sleeps with the fishes\n");
 				else
-					bprint(" sucks it down\n");
+					PF_bprint(" sucks it down\n");
 				return;
 			}
 			else if (rnum == -4)
 			{
 				if (PF_random() < 0.5)
-					bprint(" gulped a load of slime\n");
+					PF_bprint(" gulped a load of slime\n");
 				else
-					bprint(" can't exist on slime alone\n");
+					PF_bprint(" can't exist on slime alone\n");
 				return;
 			}
 			else if (rnum == -5)
 			{
 				if (targ->v.health < -15)
 				{
-					bprint(" burst into flames\n");
+					PF_bprint(" burst into flames\n");
 					return;
 				}
 				if (PF_random() < 0.5)
-					bprint(" turned into hot slag\n");
+					PF_bprint(" turned into hot slag\n");
 				else
-					bprint(" visits the Volcano God\n");
+					PF_bprint(" visits the Volcano God\n");
 				return;
 			}
 
 			if ((int)attacker->v.flags & FL_MONSTER)
 			{
 				if (!strcmp(attacker->v.classname, "monster_army"))
-					bprint(" was shot by a Grunt\n");
+					PF_bprint(" was shot by a Grunt\n");
 				if (!strcmp(attacker->v.classname, "monster_demon1"))
-					bprint(" was eviscerated by a Fiend\n");
+					PF_bprint(" was eviscerated by a Fiend\n");
 				if (!strcmp(attacker->v.classname, "monster_dog"))
-					bprint(" was mauled by a Rottweiler\n");
+					PF_bprint(" was mauled by a Rottweiler\n");
 				if (!strcmp(attacker->v.classname, "monster_dragon"))
-					bprint(" was fried by a Dragon\n");
+					PF_bprint(" was fried by a Dragon\n");
 				if (!strcmp(attacker->v.classname, "monster_enforcer"))
-					bprint(" was blasted by an Enforcer\n");
+					PF_bprint(" was blasted by an Enforcer\n");
 				if (!strcmp(attacker->v.classname, "monster_fish"))
-					bprint(" was fed to the Rotfish\n");
+					PF_bprint(" was fed to the Rotfish\n");
 				if (!strcmp(attacker->v.classname, "monster_hell_knight"))
-					bprint(" was slain by a Death Knight\n");
+					PF_bprint(" was slain by a Death Knight\n");
 				if (!strcmp(attacker->v.classname, "monster_knight"))
-					bprint(" was slashed by a Knight\n");
+					PF_bprint(" was slashed by a Knight\n");
 				if (!strcmp(attacker->v.classname, "monster_ogre"))
-					bprint(" was destroyed by an Ogre\n");
+					PF_bprint(" was destroyed by an Ogre\n");
 				if (!strcmp(attacker->v.classname, "monster_oldone"))
-					bprint(" became one with Shub-Niggurath\n");
+					PF_bprint(" became one with Shub-Niggurath\n");
 				if (!strcmp(attacker->v.classname, "monster_shalrath"))
-					bprint(" was exploded by a Vore\n");
+					PF_bprint(" was exploded by a Vore\n");
 				if (!strcmp(attacker->v.classname, "monster_shambler"))
-					bprint(" was smashed by a Shambler\n");
+					PF_bprint(" was smashed by a Shambler\n");
 				if (!strcmp(attacker->v.classname, "monster_tarbaby"))
-					bprint(" was slimed by a Spawn\n");
+					PF_bprint(" was slimed by a Spawn\n");
 				if (!strcmp(attacker->v.classname, "monster_vomit"))
-					bprint(" was vomited on by a Vomitus\n");
+					PF_bprint(" was vomited on by a Vomitus\n");
 				if (!strcmp(attacker->v.classname, "monster_wizard"))
-					bprint(" was scragged by a Scrag\n");
+					PF_bprint(" was scragged by a Scrag\n");
 				if (!strcmp(attacker->v.classname, "monster_zombie"))
-					bprint(" joins the Zombies\n");
+					PF_bprint(" joins the Zombies\n");
 
 				return;
 			}
 			if (!strcmp(attacker->v.classname, "explo_box"))
 			{
-				bprint(" blew up\n");
+				PF_bprint(" blew up\n");
 				return;
 			}
 			if (attacker->v.solid == SOLID_BSP && attacker != pr_global_struct->world)
 			{
-				bprint(" was squished\n");
+				PF_bprint(" was squished\n");
 				return;
 			}
 			if (!strcmp(targ->v.deathtype, "falling"))
 			{
 				targ->v.deathtype = "";
-				bprint(" fell to his death\n");
+				PF_bprint(" fell to his death\n");
 				return;
 			}
 			if (!strcmp(attacker->v.classname, "trap_shooter") || !strcmp(attacker->v.classname, "trap_spikeshooter"))
 			{
-				bprint(" was spiked\n");
+				PF_bprint(" was spiked\n");
 				return;
 			}
 			if (!strcmp(attacker->v.classname, "fireball"))
 			{
-				bprint(" ate a lavaball\n");
+				PF_bprint(" ate a lavaball\n");
 				return;
 			}
 			if (!strcmp(attacker->v.classname, "trigger_changelevel"))
 			{
-				bprint(" tried to leave\n");
+				PF_bprint(" tried to leave\n");
 				return;
 			}
 
-			bprint(" died\n");
+			PF_bprint(" died\n");
 		}
 	}
 }

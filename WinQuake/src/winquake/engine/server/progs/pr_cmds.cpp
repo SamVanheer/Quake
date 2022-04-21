@@ -66,7 +66,7 @@ Writes new values for v_forward, v_up, and v_right based on angles
 makevectors(vector)
 ==============
 */
-void PF_makevectors (float* angles)
+void PF_makevectors (const float* angles)
 {
 	AngleVectors (angles, pr_global_struct->v_forward, pr_global_struct->v_right, pr_global_struct->v_up);
 }
@@ -186,9 +186,9 @@ PF_setmodel
 setmodel(entity, model)
 =================
 */
-void PF_setmodel (edict_t* e, char* m)
+void PF_setmodel (edict_t* e, const char* m)
 {
-	char **check = sv.model_precache;
+	const char **check = sv.model_precache;
 	int i;
 
 // check to see if model was properly precached
@@ -219,7 +219,7 @@ broadcast print to everyone on server
 bprint(value)
 =================
 */
-void PF_bprint (char* s)
+void PF_bprint (const char* s)
 {
 	SV_BroadcastPrintf ("%s", s);
 }
@@ -283,7 +283,7 @@ PF_normalize
 vector normalize(vector)
 =================
 */
-void PF_normalize (float* value1, float* result)
+void PF_normalize (const float* value1, float* result)
 {
 	float flNew = sqrt(value1[0] * value1[0] + value1[1] * value1[1] + value1[2]*value1[2]);
 	
@@ -341,7 +341,7 @@ PF_vectoangles
 vector vectoangles(vector)
 =================
 */
-void PF_vectoangles (float* value1, float* result)
+void PF_vectoangles (const float* value1, float* result)
 {
 	float yaw, pitch;
 
@@ -391,7 +391,7 @@ PF_particle
 particle(origin, color, count)
 =================
 */
-void PF_particle (float* org, float* dir, float color, float count)
+void PF_particle (const float* org, const float* dir, float color, float count)
 {
 	SV_StartParticle (org, dir, color, count);
 }
@@ -402,9 +402,9 @@ PF_ambientsound
 
 =================
 */
-void PF_ambientsound (float* pos, char* samp, float vol, float attenuation)
+void PF_ambientsound (float* pos, const char* samp, float vol, float attenuation)
 {
-	char** check = sv.sound_precache;
+	const char** check = sv.sound_precache;
 	int soundnum;
 	
 // check to see if samp was properly precached
@@ -446,7 +446,7 @@ Larger attenuations will drop off.
 
 =================
 */
-void PF_sound (edict_t* entity, int channel, char* sample, float volumeFloat, float attenuation)
+void PF_sound (edict_t* entity, int channel, const char* sample, float volumeFloat, float attenuation)
 {
 	const int volume = volumeFloat * 255;
 	
@@ -473,7 +473,7 @@ if the tryents flag is set.
 traceline (vector1, vector2, tryents)
 =================
 */
-void PF_traceline (float* v1, float* v2, int nomonsters, edict_t* ent)
+void PF_traceline (const float* v1, const float* v2, int nomonsters, edict_t* ent)
 {
 	trace_t	trace = SV_Move (v1, vec3_origin, vec3_origin, v2, nomonsters, ent);
 
@@ -794,7 +794,7 @@ void PF_precache_file (const char* s)
 	// precache_file is only used to copy files with qcc, it does nothing
 }
 
-void PF_precache_sound (char* s)
+void PF_precache_sound (const char* s)
 {
 	if (sv.state != ss_loading)
 		Host_Error("PF_Precache_*: Precache can only be done in spawn functions");
@@ -814,7 +814,7 @@ void PF_precache_sound (char* s)
 	Host_Error("PF_precache_sound: overflow");
 }
 
-void PF_precache_model (char* s)
+void PF_precache_model (const char* s)
 {
 	if (sv.state != ss_loading)
 		Host_Error("PF_Precache_*: Precache can only be done in spawn functions");
@@ -895,7 +895,7 @@ PF_lightstyle
 void(float style, string value) lightstyle
 ===============
 */
-void PF_lightstyle (int style, char* val)
+void PF_lightstyle (int style, const char* val)
 {
 // change the string in sv
 	sv.lightstyles[style] = val;
@@ -949,7 +949,7 @@ bool PF_checkbottom (edict_t* ent)
 PF_pointcontents
 =============
 */
-float PF_pointcontents (float* v)
+float PF_pointcontents (const float* v)
 {
 	return SV_PointContents (v);	
 }

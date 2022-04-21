@@ -66,7 +66,7 @@ void FloorDivMod (double numer, double denom, int *quotient,
 fixed16_t Invert24To16(fixed16_t val);
 int GreatestCommonDivisor (int i1, int i2);
 
-void AngleVectors (vec3_t angles, vec3_t forward, vec3_t right, vec3_t up);
+void AngleVectors (const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up);
 void RotatePointAroundVector( vec3_t dst, const vec3_t dir, const vec3_t point, float degrees );
 float	anglemod(float a);
 

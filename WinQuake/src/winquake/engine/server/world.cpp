@@ -34,16 +34,16 @@ line of sight checks trace->crosscontent, but bullets don't
 typedef struct
 {
 	vec3_t		boxmins, boxmaxs;// enclose the test object along entire move
-	float		*mins, *maxs;	// size of the moving object
+	const float		*mins, *maxs;	// size of the moving object
 	vec3_t		mins2, maxs2;	// size when clipping against mosnters
-	float		*start, *end;
+	const float		*start, *end;
 	trace_t		trace;
 	int			type;
 	edict_t		*passedict;
 } moveclip_t;
 
 
-extern int SV_HullPointContents (hull_t *hull, int num, vec3_t p);
+extern int SV_HullPointContents (hull_t *hull, int num, const vec3_t p);
 
 /*
 ===============================================================================
@@ -127,7 +127,7 @@ Offset is filled in to contain the adjustment that must be added to the
 testing object's origin to get a point to use with the returned hull.
 ================
 */
-hull_t *SV_HullForEntity (edict_t *ent, vec3_t mins, vec3_t maxs, vec3_t offset)
+hull_t *SV_HullForEntity (edict_t *ent, const vec3_t mins, const vec3_t maxs, vec3_t offset)
 {
 	model_t		*model;
 	vec3_t		size;
@@ -478,7 +478,7 @@ SV_HullPointContents
 
 ==================
 */
-int SV_HullPointContents (hull_t *hull, int num, vec3_t p)
+int SV_HullPointContents (hull_t *hull, int num, const vec3_t p)
 {
 	float		d;
 	dclipnode_t	*node;
@@ -511,7 +511,7 @@ SV_PointContents
 
 ==================
 */
-int SV_PointContents (vec3_t p)
+int SV_PointContents (const vec3_t p)
 {
 	int		cont;
 
@@ -521,7 +521,7 @@ int SV_PointContents (vec3_t p)
 	return cont;
 }
 
-int SV_TruePointContents (vec3_t p)
+int SV_TruePointContents (const vec3_t p)
 {
 	return SV_HullPointContents (&sv.worldmodel->hulls[0], 0, p);
 }
@@ -706,7 +706,7 @@ Handles selection or creation of a clipping hull, and offseting (and
 eventually rotation) of the end points
 ==================
 */
-trace_t SV_ClipMoveToEntity (edict_t *ent, vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end)
+trace_t SV_ClipMoveToEntity (edict_t *ent, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end)
 {
 	trace_t		trace;
 	vec3_t		offset;
@@ -877,7 +877,7 @@ void SV_ClipToLinks ( areanode_t *node, moveclip_t *clip )
 SV_MoveBounds
 ==================
 */
-void SV_MoveBounds (vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, vec3_t boxmins, vec3_t boxmaxs)
+void SV_MoveBounds (const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, vec3_t boxmins, vec3_t boxmaxs)
 {
 #if 0
 // debug to test against everything
@@ -907,7 +907,7 @@ boxmaxs[0] = boxmaxs[1] = boxmaxs[2] = 9999;
 SV_Move
 ==================
 */
-trace_t SV_Move (vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, int type, edict_t *passedict)
+trace_t SV_Move (const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int type, edict_t *passedict)
 {
 	moveclip_t	clip;
 	int			i;

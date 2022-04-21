@@ -50,10 +50,10 @@ typedef struct
 #endif
 	char		modelname[64];		// maps/<name>.bsp, for model_precache[0]
 	struct model_s 	*worldmodel;
-	char		*model_precache[MAX_MODELS];	// NULL terminated
+	const char	*model_precache[MAX_MODELS];	// NULL terminated
 	struct model_s	*models[MAX_MODELS];
-	char		*sound_precache[MAX_SOUNDS];	// NULL terminated
-	char		*lightstyles[MAX_LIGHTSTYLES];
+	const char	*sound_precache[MAX_SOUNDS];	// NULL terminated
+	const char	*lightstyles[MAX_LIGHTSTYLES];
 	int			num_edicts;
 	int			max_edicts;
 	edict_t		*edicts;			// can NOT be array indexed, because
@@ -217,7 +217,7 @@ extern	edict_t		*sv_player;
 
 void SV_Init (void);
 
-void SV_StartParticle (vec3_t org, vec3_t dir, int color, int count);
+void SV_StartParticle (const vec3_t org, const  vec3_t dir, int color, int count);
 void SV_StartSound (edict_t *entity, int channel, const char *sample, int volume,
     float attenuation);
 

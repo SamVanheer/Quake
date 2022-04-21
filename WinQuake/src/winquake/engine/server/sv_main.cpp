@@ -78,7 +78,7 @@ SV_StartParticle
 Make sure the event gets sent to all clients
 ==================
 */
-void SV_StartParticle (vec3_t org, vec3_t dir, int color, int count)
+void SV_StartParticle (const vec3_t org, const vec3_t dir, int color, int count)
 {
 	int		i, v;
 
@@ -189,7 +189,7 @@ This will be sent on the initial connection and upon each server load.
 */
 void SV_SendServerinfo (client_t *client)
 {
-	char			**s;
+	const char			**s;
 	char			message[2048];
 
 	MSG_WriteByte (&client->message, svc_print);
