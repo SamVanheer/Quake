@@ -486,7 +486,7 @@ int EngineMain (int argc, const char* argv[])
 	//TODO: need to rework this so SDL2's setup code is used instead.
 	SDL_SetMainReady();
 
-	std::string cwd = std::filesystem::current_path().u8string();
+	std::string cwd = std::filesystem::current_path().string();
 
 	if (cwd.empty())
 		Sys_Error ("Couldn't determine current directory");
