@@ -1119,7 +1119,7 @@ void PR_VerifyFunctionsLinked()
 		{
 			if (field.Type == ev_function)
 			{
-				auto address = ED_GetValue<void*>(&e->v, field);
+				auto address = ED_GetValue<FunctionMap::Function>(&e->v, field);
 
 				if (address && !g_Game->FindFunctionName(address))
 				{
