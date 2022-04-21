@@ -216,7 +216,7 @@ void T_Damage(edict_t* self, edict_t* targ, edict_t* inflictor, edict_t* attacke
 	{
 		self->v.th_pain(self, attacker, take);
 		// nightmare mode monsters don't go into pain frames often
-		if (pr_global_struct->game_skill == 3)
+		if (pr_global_struct->skill == 3)
 			self->v.pain_finished = pr_global_struct->time + 5;
 	}
 

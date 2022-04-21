@@ -252,7 +252,7 @@ void boss_missile(edict_t* self, vec3_t p)
 	auto org = AsVector(self->v.origin) + p[0]* AsVector(pr_global_struct->v_forward) + p[1]* AsVector(pr_global_struct->v_right) + p[2] * Vector3D{0, 0, 1};
 	
 // lead the player on hard mode
-	if (pr_global_struct->game_skill > 1)
+	if (pr_global_struct->skill > 1)
 	{
 		const float t = PF_vlen(AsVector(self->v.enemy->v.origin) - org) / 300;
 		vec = AsVector(self->v.enemy->v.velocity);
@@ -289,7 +289,7 @@ void boss_awake(edict_t* self, edict_t* other)
 	PF_setmodel (self, "progs/boss.mdl");
 	PF_setsize (self, Vector3D{-128, -128, -24}, Vector3D{128, 128, 256});
 	
-	if (pr_global_struct->game_skill == 0)
+	if (pr_global_struct->skill == 0)
 		self->v.health = 1;
 	else
 		self->v.health = 3;

@@ -343,13 +343,13 @@ some monsters refire twice automatically
 void SUB_AttackFinished(edict_t* self, float normal)
 {
 	self->v.cnt = 0;		// refire count for nightmare
-	if (pr_global_struct->game_skill != 3)
+	if (pr_global_struct->skill != 3)
 		self->v.attack_finished = pr_global_struct->time + normal;
 }
 
 void SUB_CheckRefire(edict_t* self, void (*thinkst)(edict_t*))
 {
-	if (pr_global_struct->game_skill != 3)
+	if (pr_global_struct->skill != 3)
 		return;
 	if (self->v.cnt == 1)
 		return;

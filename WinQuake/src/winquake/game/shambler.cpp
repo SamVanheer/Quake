@@ -345,7 +345,7 @@ void shambler_magic_frame(edict_t* self, const Animation* animation, int frame)
 		break;
 
 	case 10:
-		if (pr_global_struct->game_skill == 3)
+		if (pr_global_struct->skill == 3)
 			CastLightning(self);
 		break;
 

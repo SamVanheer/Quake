@@ -78,7 +78,7 @@ typedef struct
 	edict_s* damage_attacker;	// set by T_Damage
 	float	framecount;
 
-	float	game_skill;
+	float	skill;
 
 	float	intermission_running;
 	float	intermission_exittime;

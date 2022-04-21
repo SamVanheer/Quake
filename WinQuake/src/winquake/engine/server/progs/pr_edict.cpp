@@ -225,7 +225,7 @@ const fielddescription GlobalvarsFields[] =
 	OBJ_FIELD(damage_attacker),
 	OBJ_FIELD(framecount),
 
-	OBJ_FIELD(game_skill),
+	OBJ_FIELD(skill),
 
 	OBJ_FIELD(intermission_running),
 	OBJ_FIELD(intermission_exittime),
