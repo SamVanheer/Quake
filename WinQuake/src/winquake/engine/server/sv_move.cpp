@@ -148,7 +148,7 @@ bool SV_movestep (edict_t *ent, vec3_t move, bool relink)
 				return true;
 			}
 			
-			if (enemy == sv.edicts)
+			if (!enemy)
 				break;
 		}
 		
@@ -400,7 +400,7 @@ void SV_MoveToGoal (edict_t* ent, float dist)
 	}
 
 // if the next step hits the enemy, return immediately
-	if ( ent->v.enemy != sv.edicts &&  SV_CloseEnough (ent, goal, dist) )
+	if ( ent->v.enemy &&  SV_CloseEnough (ent, goal, dist) )
 		return;
 
 // bump around...
