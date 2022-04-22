@@ -225,8 +225,6 @@ void S_Init()
 		fakedma = true;
 	}
 
-	SND_InitScaletable();
-
 	known_sfx = reinterpret_cast<sfx_t*>(Hunk_AllocName(MAX_SFX * sizeof(sfx_t), "sfx_t"));
 	num_sfx = 0;
 

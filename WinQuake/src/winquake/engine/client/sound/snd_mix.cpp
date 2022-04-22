@@ -19,11 +19,29 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // snd_mix.c -- portable code to mix sounds for snd_dma.c
 
+#include <array>
+
 #include "quakedef.h"
 
 constexpr int PAINTBUFFER_SIZE = 512;
 portable_samplepair_t paintbuffer[PAINTBUFFER_SIZE];
-int snd_scaletable[32][256];
+
+constexpr std::array<std::array<int, 256>, 32> snd_scaletable = 
+[]() constexpr
+{
+	std::array<std::array<int, 256>, 32> scaletable{};
+
+	for (int i = 0; i < 32; i++)
+	{
+		for (int j = 0; j < 256; j++)
+		{
+			scaletable[i][j] = ((signed char)j) * i * 8;
+		}
+	}
+
+	return scaletable;
+}();
+
 int* snd_p, snd_linear_count, snd_vol;
 short* snd_out;
 
@@ -208,17 +226,6 @@ void S_PaintChannels(int endtime)
 	}
 }
 
-void SND_InitScaletable()
-{
-	for (int i = 0; i < 32; i++)
-	{
-		for (int j = 0; j < 256; j++)
-		{
-			snd_scaletable[i][j] = ((signed char)j) * i * 8;
-		}
-	}
-}
-
 void SND_PaintChannelFrom8(channel_t* ch, sfxcache_t* sc, int count)
 {
 	if (ch->leftvol > 255)
@@ -226,8 +233,8 @@ void SND_PaintChannelFrom8(channel_t* ch, sfxcache_t* sc, int count)
 	if (ch->rightvol > 255)
 		ch->rightvol = 255;
 
-	int* lscale = snd_scaletable[ch->leftvol >> 3];
-	int* rscale = snd_scaletable[ch->rightvol >> 3];
+	const auto& lscale = snd_scaletable[ch->leftvol >> 3];
+	const auto& rscale = snd_scaletable[ch->rightvol >> 3];
 	auto sfx = (unsigned char*)sc->data + ch->pos;
 
 	for (int i = 0; i < count; i++)
