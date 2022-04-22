@@ -22,6 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef __SOUND__
 #define __SOUND__
 
+#include "ISoundSystem.h"
+
 #define DEFAULT_SOUND_PACKET_VOLUME 255
 #define DEFAULT_SOUND_PACKET_ATTENUATION 1.0
 
@@ -85,21 +87,6 @@ typedef struct
 	int samples;
 	int dataofs;		// chunk starts this many bytes from file start
 } wavinfo_t;
-
-struct ISoundSystem
-{
-	virtual bool IsBlocked() const = 0;
-
-	virtual void Block() = 0;
-	virtual void Unblock() = 0;
-
-	virtual int GetDMAPosition() const = 0;
-
-	/**
-	* @brief Send sound to device if buffer isn't really the dma buffer
-	*/
-	virtual void Submit() = 0;
-};
 
 extern ISoundSystem* g_SoundSystem;
 

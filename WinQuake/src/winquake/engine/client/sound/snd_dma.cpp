@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // snd_dma.c -- main control for any streaming sound output device
 
 #include "quakedef.h"
+#include "SoundSystem.h"
 
 void S_Play();
 void S_PlayVol();
@@ -27,6 +28,18 @@ void S_SoundList();
 void S_Update_();
 void S_StopAllSounds(bool clear);
 void S_StopAllSoundsC();
+
+struct DummySoundSystem final : public ISoundSystem
+{
+	bool IsBlocked() const override { return false; }
+
+	void Block() override {}
+	void Unblock() override {}
+
+	int GetDMAPosition() const override { return 0; }
+
+	void Submit() override {}
+};
 
 // =======================================================================
 // Internal sound data & structures
@@ -37,6 +50,13 @@ int total_channels;
 
 static bool	snd_ambient = true;
 bool snd_initialized = false;
+static bool snd_firsttime = true;
+
+static std::optional<OpenALAudio> openal_audio;
+
+static DummySoundSystem g_DummySoundSystem;
+
+ISoundSystem* g_SoundSystem = &g_DummySoundSystem;
 
 // pointer should go away
 volatile dma_t* shm = 0;
@@ -119,26 +139,38 @@ S_Startup
 */
 void S_Startup()
 {
-	int		rc;
-
 	if (!snd_initialized)
 		return;
 
-	if (!fakedma)
-	{
-		rc = SNDDMA_Init();
+	const bool wasFirstTime = snd_firsttime;
 
-		if (!rc)
+	if (snd_firsttime)
+	{
+		snd_firsttime = false;
+
+		if (!fakedma)
 		{
-#ifndef	_WIN32
-			Con_Printf("S_Startup: SNDDMA_Init failed.\n");
-#endif
-			sound_started = false;
-			return;
+			openal_audio = OpenALAudio::Create();
+
+			if (openal_audio.has_value())
+			{
+				g_SoundSystem = &openal_audio.value();
+
+				Con_SafePrintf("OpenAL sound initialized\n");
+			}
+			else
+			{
+				Con_SafePrintf("OpenAL sound failed to init\n");
+			}
 		}
+
+		sound_started = fakedma || openal_audio.has_value();
 	}
 
-	sound_started = true;
+	if (!sound_started && wasFirstTime)
+	{
+		Con_SafePrintf("No sound device initialized\n");
+	}
 }
 
 /*
@@ -233,7 +265,6 @@ void S_Init()
 // =======================================================================
 void S_Shutdown()
 {
-
 	if (!sound_started)
 		return;
 
@@ -245,7 +276,8 @@ void S_Shutdown()
 
 	if (!fakedma)
 	{
-		SNDDMA_Shutdown();
+		g_SoundSystem = &g_DummySoundSystem;
+		openal_audio.reset();
 	}
 }
 

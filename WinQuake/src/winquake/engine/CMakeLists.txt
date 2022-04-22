@@ -52,11 +52,13 @@ target_sources(winquake
 		client/renderer/screen.h
 		
 		client/sound/cdaudio.h
+		client/sound/ISoundSystem.h
 		client/sound/snd_dma.cpp
 		client/sound/snd_mem.cpp
 		client/sound/snd_mix.cpp
-		client/sound/sound.cpp
 		client/sound/sound.h
+		client/sound/SoundSystem.cpp
+		client/sound/SoundSystem.h
 		
 		client/ui/menu.cpp
 		client/ui/menu.h
