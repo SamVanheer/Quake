@@ -97,13 +97,6 @@ cvar_t _snd_mixahead = {"_snd_mixahead", "0.1", true};
 // User-setable variables
 // ====================================================================
 
-//
-// Fake dma is a synchronous faking of the DMA progress used for
-// isolating performance in the renderer.
-//
-
-bool fakedma = false;
-
 void S_AmbientOff()
 {
 	snd_ambient = false;
@@ -116,7 +109,7 @@ void S_AmbientOn()
 
 void S_SoundInfo_f()
 {
-	if (!sound_started || !shm)
+	if (!sound_started)
 	{
 		Con_Printf("sound system not started\n");
 		return;
@@ -148,23 +141,20 @@ void S_Startup()
 	{
 		snd_firsttime = false;
 
-		if (!fakedma)
+		openal_audio = OpenALAudio::Create();
+
+		if (openal_audio.has_value())
 		{
-			openal_audio = OpenALAudio::Create();
+			g_SoundSystem = &openal_audio.value();
 
-			if (openal_audio.has_value())
-			{
-				g_SoundSystem = &openal_audio.value();
-
-				Con_SafePrintf("OpenAL sound initialized\n");
-			}
-			else
-			{
-				Con_SafePrintf("OpenAL sound failed to init\n");
-			}
+			Con_SafePrintf("OpenAL sound initialized\n");
+		}
+		else
+		{
+			Con_SafePrintf("OpenAL sound failed to init\n");
 		}
 
-		sound_started = fakedma || openal_audio.has_value();
+		sound_started = openal_audio.has_value();
 	}
 
 	if (!sound_started && wasFirstTime)
@@ -185,9 +175,6 @@ void S_Init()
 
 	if (COM_CheckParm("-nosound"))
 		return;
-
-	if (COM_CheckParm("-simsound"))
-		fakedma = true;
 
 	Cmd_AddCommand("play", S_Play);
 	Cmd_AddCommand("playvol", S_PlayVol);
@@ -213,37 +200,26 @@ void S_Init()
 		Con_Printf("loading all sounds as 8bit\n");
 	}
 
-
-
 	snd_initialized = true;
 
 	S_Startup();
 
-	if (!shm)
+	if (sound_started && (!shm || !shm->buffer))
 	{
-		//If sound failed to initialize just use fake dma.
-		fakedma = true;
+		//In case the dma buffer was incorrecly initialized, treat this as though the sound system wasn't initialized at all.
+		Con_Printf("Error starting sound system\n");
+		S_Shutdown();
+		sound_started = false;
+	}
+
+	if (!sound_started)
+	{
+		//Can't play sounds, so just stop here.
+		return;
 	}
 
 	known_sfx = reinterpret_cast<sfx_t*>(Hunk_AllocName(MAX_SFX * sizeof(sfx_t), "sfx_t"));
 	num_sfx = 0;
-
-	// create a piece of DMA memory
-
-	if (fakedma)
-	{
-		shm = reinterpret_cast<dma_t*>(Hunk_AllocName(sizeof(*shm), "shm"));
-		shm->splitbuffer = false;
-		shm->samplebits = 16;
-		shm->speed = 22050;
-		shm->channels = 2;
-		shm->samples = 32768;
-		shm->samplepos = 0;
-		shm->soundalive = true;
-		shm->gamealive = true;
-		shm->submission_chunk = 1;
-		shm->buffer = reinterpret_cast<unsigned char*>(Hunk_AllocName(1 << 16, "shmbuf"));
-	}
 
 	Con_Printf("Sound sampling rate: %i\n", shm->speed);
 
@@ -272,11 +248,8 @@ void S_Shutdown()
 	shm = 0;
 	sound_started = false;
 
-	if (!fakedma)
-	{
-		g_SoundSystem = &g_DummySoundSystem;
-		openal_audio.reset();
-	}
+	g_SoundSystem = &g_DummySoundSystem;
+	openal_audio.reset();
 }
 
 // =======================================================================
@@ -543,7 +516,7 @@ void S_StopAllSoundsC()
 
 void S_ClearBuffer()
 {
-	if (!sound_started || !shm || !shm->buffer)
+	if (!sound_started)
 		return;
 
 	const int clear = shm->samplebits == 8 ? 0x80: 0;

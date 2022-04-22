@@ -131,12 +131,6 @@ extern channel_t channels[MAX_CHANNELS];
 
 extern int total_channels;
 
-//
-// Fake dma is a synchronous faking of the DMA progress used for
-// isolating performance in the renderer.
-//
-
-extern bool fakedma;
 extern int paintedtime;
 extern vec3_t listener_origin;
 extern vec3_t listener_forward;
