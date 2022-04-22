@@ -2466,7 +2466,6 @@ void M_Draw(void)
 		{
 			Draw_ConsoleBackground(vid.height);
 			VID_UnlockBuffer();
-			S_ExtraUpdate();
 			VID_LockBuffer();
 		}
 		else
@@ -2556,7 +2555,6 @@ void M_Draw(void)
 	}
 
 	VID_UnlockBuffer();
-	S_ExtraUpdate();
 	VID_LockBuffer();
 }
 

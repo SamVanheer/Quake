@@ -25,56 +25,16 @@ wavinfo_t GetWavinfo(const char* name, byte* wav, int wavlength);
 
 /*
 ================
-ResampleSfx
+ConvertPCMData
 ================
 */
-void ResampleSfx(sfx_t* sfx, int inrate, int inwidth, byte* data)
+void ConvertPCMData(sfx_t* sfx, const wavinfo_t& info, byte* data)
 {
-	auto sc = reinterpret_cast<sfxcache_t*>(Cache_Check(&sfx->cache));
-	if (!sc)
-		return;
-
-	const float stepscale = (float)inrate / shm->speed;	// this is usually 0.5, 1, or 2
-
-	const int outcount = sc->length / stepscale;
-	sc->length = outcount;
-	if (sc->loopstart != -1)
-		sc->loopstart = sc->loopstart / stepscale;
-
-	sc->speed = shm->speed;
-	sc->width = inwidth;
-	sc->stereo = 0;
-
-	// resample / decimate to the current source rate
-
-	if (stepscale == 1 && inwidth == 1 && sc->width == 1)
+	if (info.width == 2)
 	{
-		// fast special case
-		for (int i = 0; i < outcount; i++)
-			((signed char*)sc->data)[i]
-			= (int)((unsigned char)(data[i]) - 128);
-	}
-	else
-	{
-		// general case
-		int samplefrac = 0;
-		const int fracstep = stepscale * 256;
-		for (int i = 0; i < outcount; i++)
+		for (int i = 0; i < info.samples; i++)
 		{
-			const int srcsample = samplefrac >> 8;
-			samplefrac += fracstep;
-
-			int sample;
-
-			if (inwidth == 2)
-				sample = LittleShort(((short*)data)[srcsample]);
-			else
-				sample = (int)((unsigned char)(data[srcsample]) - 128) << 8;
-
-			if (sc->width == 2)
-				((short*)sc->data)[i] = sample;
-			else
-				((signed char*)sc->data)[i] = sample >> 8;
+			((short*)data)[i] = LittleShort(((short*)data)[i]);
 		}
 	}
 }
@@ -86,12 +46,11 @@ void ResampleSfx(sfx_t* sfx, int inrate, int inwidth, byte* data)
 S_LoadSound
 ==============
 */
-sfxcache_t* S_LoadSound(sfx_t* s)
+sfx_t* S_LoadSound(sfx_t* s)
 {
 // see if still in memory
-	auto sc = reinterpret_cast<sfxcache_t*>(Cache_Check(&s->cache));
-	if (sc)
-		return sc;
+	if (s->buffer)
+		return s;
 
 	//Con_Printf ("S_LoadSound: %x\n", (int)stackbuf);
 	// load it in
@@ -110,31 +69,74 @@ sfxcache_t* S_LoadSound(sfx_t* s)
 		return NULL;
 	}
 
-	wavinfo_t info = GetWavinfo(s->name, data, com_filesize);
+	const wavinfo_t info = GetWavinfo(s->name, data, com_filesize);
+
 	if (info.channels != 1)
 	{
 		Con_Printf("%s is a stereo sample\n", s->name);
 		return NULL;
 	}
 
-	const float stepscale = (float)info.rate / shm->speed;
-	int len = info.samples / stepscale;
+	const ALenum format = [&]()
+	{
+		switch (info.channels)
+		{
+		case 1:
+			switch (info.width)
+			{
+			case 1: return AL_FORMAT_MONO8;
+			case 2: return AL_FORMAT_MONO16;
+			}
+			break;
+		case 2:
+			switch (info.width)
+			{
+			case 1: return AL_FORMAT_STEREO8;
+			case 2: return AL_FORMAT_STEREO16;
+			}
+			break;
+		}
 
-	len = len * info.width * info.channels;
+		Con_Printf("%s has invalid format (channels: %d, sample bits: %d)\n", s->name, info.channels, info.width * 8);
+		return 0;
+	}();
 
-	sc = reinterpret_cast<sfxcache_t*>(Cache_Alloc(&s->cache, len + sizeof(sfxcache_t), s->name));
-	if (!sc)
+	if (format == 0)
+	{
+		return NULL;
+	}
+
+	s->buffer = OpenALBuffer::Create();
+
+	if (!s->buffer)
 		return NULL;
 
-	sc->length = info.samples;
-	sc->loopstart = info.loopstart;
-	sc->speed = info.rate;
-	sc->width = info.width;
-	sc->stereo = info.channels;
+	if (info.loopstart >= 0)
+	{
+		s->loopingBuffer = OpenALBuffer::Create();
 
-	ResampleSfx(s, sc->speed, sc->width, data + info.dataofs);
+		if (!s->loopingBuffer)
+		{
+			s->buffer.Delete();
+			return NULL;
+		}
+	}
 
-	return sc;
+	byte* samples = data + info.dataofs;
+
+	ConvertPCMData(s, info, samples);
+
+	if (info.loopstart >= 0)
+	{
+		alBufferData(s->buffer.Id, format, samples, info.loopstart * info.width * info.channels, info.rate);
+		alBufferData(s->loopingBuffer.Id, format, samples + info.loopstart, (info.samples - info.loopstart) * info.width * info.channels, info.rate);
+	}
+	else
+	{
+		alBufferData(s->buffer.Id, format, samples, info.samples * info.width * info.channels, info.rate);
+	}
+
+	return s;
 }
 
 /*

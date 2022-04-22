@@ -39,6 +39,9 @@ struct DeleterWrapper final
 	}
 };
 
+constexpr ALuint NullBuffer = 0;
+constexpr ALuint NullSource = 0;
+
 struct OpenALBuffer final
 {
 	constexpr OpenALBuffer() noexcept = default;
@@ -49,7 +52,7 @@ struct OpenALBuffer final
 	constexpr OpenALBuffer(OpenALBuffer&& other) noexcept
 		: Id(other.Id)
 	{
-		other.Id = 0;
+		other.Id = NullBuffer;
 	}
 
 	constexpr OpenALBuffer& operator=(OpenALBuffer&& other) noexcept
@@ -57,7 +60,7 @@ struct OpenALBuffer final
 		if (this != &other)
 		{
 			Id = other.Id;
-			other.Id = 0;
+			other.Id = NullBuffer;
 		}
 
 		return *this;
@@ -65,10 +68,7 @@ struct OpenALBuffer final
 
 	~OpenALBuffer()
 	{
-		if (Id != 0)
-		{
-			alDeleteBuffers(1, &Id);
-		}
+		Delete();
 	}
 
 	static OpenALBuffer Create()
@@ -78,7 +78,17 @@ struct OpenALBuffer final
 		return buffer;
 	}
 
-	ALuint Id = 0;
+	constexpr operator bool() const { return Id != NullBuffer; }
+
+	void Delete()
+	{
+		if (Id != NullBuffer)
+		{
+			alDeleteBuffers(1, &Id);
+		}
+	}
+
+	ALuint Id = NullBuffer;
 };
 
 struct OpenALSource final
@@ -91,7 +101,7 @@ struct OpenALSource final
 	constexpr OpenALSource(OpenALSource&& other) noexcept
 		: Id(other.Id)
 	{
-		other.Id = 0;
+		other.Id = NullSource;
 	}
 
 	constexpr OpenALSource& operator=(OpenALSource&& other) noexcept
@@ -99,7 +109,7 @@ struct OpenALSource final
 		if (this != &other)
 		{
 			Id = other.Id;
-			other.Id = 0;
+			other.Id = NullSource;
 		}
 
 		return *this;
@@ -107,10 +117,7 @@ struct OpenALSource final
 
 	~OpenALSource()
 	{
-		if (Id != 0)
-		{
-			alDeleteSources(1, &Id);
-		}
+		Delete();
 	}
 
 	static OpenALSource Create()
@@ -120,7 +127,17 @@ struct OpenALSource final
 		return source;
 	}
 
-	ALuint Id = 0;
+	constexpr operator bool() const { return Id != NullSource; }
+
+	void Delete()
+	{
+		if (Id != NullSource)
+		{
+			alDeleteSources(1, &Id);
+		}
+	}
+
+	ALuint Id = NullSource;
 };
 
 /**
@@ -155,10 +172,6 @@ public:
 	void Block() override;
 	void Unblock() override;
 
-	int GetDMAPosition() const override;
-
-	void Submit();
-
 private:
 	bool CreateCore();
 
@@ -166,16 +179,5 @@ private:
 	std::unique_ptr<ALCdevice, DeleterWrapper<alcCloseDevice>> m_Device;
 	std::unique_ptr<ALCcontext, DeleterWrapper<alcDestroyContext>> m_Context;
 
-	int m_Sent = 0;
-	int m_Completed = 0;
-
-	int m_Sample16 = 0;
-
 	bool m_Blocked = false;
-
-	std::vector<byte> m_Data;
-	std::vector<OpenALBuffer> m_Buffers;
-	OpenALSource m_Source;
-
-	ALenum m_Format = 0;
 };

@@ -650,7 +650,7 @@ SCR_BeginLoadingPlaque
 */
 void SCR_BeginLoadingPlaque(void)
 {
-	S_StopAllSounds(true);
+	S_StopAllSounds();
 
 	if (cls.state != ca_connected)
 		return;
@@ -743,8 +743,6 @@ int SCR_ModalMessage(const char* text)
 	scr_drawdialog = true;
 	SCR_UpdateScreen();
 	scr_drawdialog = false;
-
-	S_ClearBuffer();		// so dma doesn't loop current sound
 
 	do
 	{

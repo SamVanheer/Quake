@@ -26,11 +26,4 @@ struct ISoundSystem
 
 	virtual void Block() = 0;
 	virtual void Unblock() = 0;
-
-	virtual int GetDMAPosition() const = 0;
-
-	/**
-	* @brief Send sound to device if buffer isn't really the dma buffer
-	*/
-	virtual void Submit() = 0;
 };

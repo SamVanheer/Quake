@@ -701,7 +701,6 @@ void R_ScanEdges (void)
 		if (span_p >= max_span_p)
 		{
 			VID_UnlockBuffer ();
-			S_ExtraUpdate ();	// don't let sound get messed up if going slow
 			VID_LockBuffer ();
 		
 			if (r_drawculledpolys)
