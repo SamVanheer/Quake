@@ -328,6 +328,7 @@ sfx_t* S_PrecacheSound(const char* name)
 /*
 =================
 SND_PickChannel
+picks a channel based on priorities, empty slots, number of channels
 =================
 */
 channel_t* SND_PickChannel(int entnum, int entchannel)
@@ -368,6 +369,7 @@ channel_t* SND_PickChannel(int entnum, int entchannel)
 /*
 =================
 SND_Spatialize
+spatializes a channel
 =================
 */
 void SND_Spatialize(channel_t* ch)
@@ -382,7 +384,6 @@ void SND_Spatialize(channel_t* ch)
 
 	// calculate stereo seperation and distance attenuation
 
-	auto snd = ch->sfx;
 	vec3_t source_vec;
 	VectorSubtract(ch->origin, listener_origin, source_vec);
 

@@ -91,7 +91,6 @@ typedef struct
 extern ISoundSystem* g_SoundSystem;
 
 void S_Init();
-void S_Startup();
 void S_Shutdown();
 void S_StartSound(int entnum, int entchannel, sfx_t* sfx, vec3_t origin, float fvol, float attenuation);
 void S_StaticSound(sfx_t* sfx, vec3_t origin, float vol, float attenuation);
@@ -104,18 +103,6 @@ void S_ExtraUpdate();
 sfx_t* S_PrecacheSound(const char* sample);
 void S_TouchSound(const char* sample);
 void S_PaintChannels(int endtime);
-
-// picks a channel based on priorities, empty slots, number of channels
-channel_t* SND_PickChannel(int entnum, int entchannel);
-
-// spatializes a channel
-void SND_Spatialize(channel_t* ch);
-
-// initializes cycling through a DMA buffer and returns information on it
-bool SNDDMA_Init();
-
-// shutdown the DMA xfer.
-void SNDDMA_Shutdown();
 
 // ====================================================================
 // User-setable variables
@@ -148,8 +135,6 @@ extern bool	snd_initialized;
 
 void S_LocalSound(const char* s);
 sfxcache_t* S_LoadSound(sfx_t* s);
-
-wavinfo_t GetWavinfo(const char* name, byte* wav, int wavlength);
 
 void S_AmbientOff();
 void S_AmbientOn();
