@@ -1125,7 +1125,7 @@ void PR_VerifyFunctionsLinked()
 				{
 					//Set a breakpoint here to find out which functions don't have LINK_FUNCTION_TO_NAME defined for them.
 					//The Visual Studio debugger can show function names for addresses when compiled with debug symbols.
-					int x = 10;
+					//int x = 10;
 				}
 			}
 		}
