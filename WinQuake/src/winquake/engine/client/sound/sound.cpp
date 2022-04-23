@@ -63,11 +63,6 @@ static DummySoundSystem g_DummySoundSystem;
 
 ISoundSystem* g_SoundSystem = &g_DummySoundSystem;
 
-vec3_t listener_origin;
-vec3_t listener_forward;
-vec3_t listener_right;
-vec3_t listener_up;
-
 cvar_t bgmvolume = {"bgmvolume", "1", true};
 cvar_t volume = {"volume", "0.7", true};
 

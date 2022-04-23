@@ -109,6 +109,8 @@ private:
 
 	float m_LastKnownVolume = -1;
 
+	vec3_t m_ListenerOrigin{};
+
 	sfx_t* known_sfx = nullptr;		// hunk allocated [MAX_SFX]
 	int num_sfx = 0;
 

@@ -297,7 +297,7 @@ void SoundSystem::StopAllSounds()
 
 void SoundSystem::Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
 {
-	VectorCopy(origin, listener_origin);
+	VectorCopy(origin, m_ListenerOrigin);
 
 	const ALfloat orientation[6] =
 	{
@@ -475,7 +475,7 @@ void SoundSystem::UpdateAmbientSounds()
 	if (!cl.worldmodel)
 		return;
 
-	auto l = Mod_PointInLeaf(listener_origin, cl.worldmodel);
+	auto l = Mod_PointInLeaf(m_ListenerOrigin, cl.worldmodel);
 	if (!l || !ambient_level.value)
 	{
 		for (int ambient_channel = 0; ambient_channel < NUM_AMBIENTS; ambient_channel++)
