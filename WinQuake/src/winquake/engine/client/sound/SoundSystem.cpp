@@ -119,7 +119,9 @@ bool SoundSystem::CreateCore()
 
 		if (auto sfx = ambient_sfx[ambient_channel]; sfx)
 		{
-			SetupChannel(*chan, sfx, vec3_origin, 1, 0, true);
+			//Set up the channel but don't assign sfx to it yet, that's done in UpdateAmbientSounds.
+			//Volume starts at zero so ambient sounds wind up based on user settings.
+			SetupChannel(*chan, sfx, vec3_origin, 0, 0, true);
 		}
 	}
 
