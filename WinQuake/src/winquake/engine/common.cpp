@@ -1057,7 +1057,7 @@ void COM_Path_f(void);
 COM_InitArgv
 ================
 */
-void COM_InitArgv(int argc, const char** argv)
+void COM_InitArgv(int argc, const char* const* argv)
 {
 	bool        safe;
 	int             i, j, n;

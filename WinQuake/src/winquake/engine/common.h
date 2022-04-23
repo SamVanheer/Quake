@@ -146,7 +146,7 @@ extern	const char** com_argv;
 
 int COM_CheckParm(const char* parm);
 void COM_Init(const char* path);
-void COM_InitArgv(int argc, const char** argv);
+void COM_InitArgv(int argc, const char* const* argv);
 
 const char* COM_SkipPath(const char* pathname);
 void COM_StripExtension(const char* in, char* out);

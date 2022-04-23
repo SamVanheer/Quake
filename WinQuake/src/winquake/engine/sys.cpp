@@ -481,7 +481,7 @@ WinMain
 ==================
 */
 
-int EngineMain(int argc, const char* argv[])
+int EngineMain(int argc, const char* const* argv)
 {
 	//TODO: need to rework this so SDL2's setup code is used instead.
 	SDL_SetMainReady();
