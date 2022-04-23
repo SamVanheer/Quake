@@ -132,14 +132,6 @@ typedef struct sfx_s
 	OpenALBuffer loopingBuffer;
 } sfx_t;
 
-typedef struct
-{
-	sfx_t* sfx;			// sfx number
-	int entnum;			// to allow overriding a specific sound
-	int entchannel;		//
-	OpenALSource source;
-} channel_t;
-
 struct ISoundSystem
 {
 	virtual ~ISoundSystem() {}

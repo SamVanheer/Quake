@@ -108,6 +108,8 @@ bool SoundSystem::CreateCore()
 	ambient_sfx[AMBIENT_WATER] = PrecacheSound("ambience/water1.wav");
 	ambient_sfx[AMBIENT_SKY] = PrecacheSound("ambience/wind2.wav");
 
+	channels.resize(MAX_CHANNELS);
+
 	for (auto& channel : channels)
 	{
 		channel.source = OpenALSource::Create();
@@ -325,7 +327,7 @@ void SoundSystem::Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
 	if (snd_show.value)
 	{
 		int total = 0;
-		channel_t* ch = channels;
+		Channel* ch = channels.data();
 		for (int i = 0; i < total_channels; i++, ch++)
 		{
 			if (ch->sfx)
@@ -393,7 +395,7 @@ sfx_t* SoundSystem::FindName(const char* name)
 	return sfx;
 }
 
-channel_t* SoundSystem::PickChannel(int entnum, int entchannel)
+SoundSystem::Channel* SoundSystem::PickChannel(int entnum, int entchannel)
 {
 	// Check for replacement sound, or find the best one to replace
 	int first_to_die = -1;
@@ -444,7 +446,7 @@ channel_t* SoundSystem::PickChannel(int entnum, int entchannel)
 	return &channels[first_to_die];
 }
 
-void SoundSystem::SetupChannel(channel_t& chan, sfx_t* sfx, vec3_t origin, float vol, float attenuation, bool isRelative)
+void SoundSystem::SetupChannel(Channel& chan, sfx_t* sfx, vec3_t origin, float vol, float attenuation, bool isRelative)
 {
 	alSourcefv(chan.source.Id, AL_POSITION, origin);
 	alSourcef(chan.source.Id, AL_GAIN, vol);

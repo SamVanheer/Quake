@@ -42,6 +42,14 @@ struct DeleterWrapper final
 class SoundSystem final : public ISoundSystem
 {
 private:
+	struct Channel
+	{
+		sfx_t* sfx = nullptr;	// sfx number
+		int entnum = 0;			// to allow overriding a specific sound
+		int entchannel = 0;
+		OpenALSource source;
+	};
+
 	static constexpr int MAX_SFX = 512;
 
 	// 0 to MAX_DYNAMIC_CHANNELS-1	= normal entity sounds
@@ -94,8 +102,8 @@ private:
 	/**
 	*	@brief picks a channel based on priorities, empty slots, number of channels
 	*/
-	channel_t* PickChannel(int entnum, int entchannel);
-	void SetupChannel(channel_t& chan, sfx_t* sfx, vec3_t origin, float vol, float attenuation, bool isRelative);
+	Channel* PickChannel(int entnum, int entchannel);
+	void SetupChannel(Channel& chan, sfx_t* sfx, vec3_t origin, float vol, float attenuation, bool isRelative);
 
 	void UpdateAmbientSounds();
 	void UpdateSounds();
@@ -116,7 +124,7 @@ private:
 
 	sfx_t* ambient_sfx[NUM_AMBIENTS]{};
 
-	channel_t channels[MAX_CHANNELS]{};
+	std::vector<Channel> channels;
 	int total_channels = 0;
 };
 
