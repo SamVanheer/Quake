@@ -207,7 +207,7 @@ typedef struct
 // information that is static for the entire time connected to a server
 //
 	struct model_s* model_precache[MAX_MODELS];
-	struct sfx_s* sound_precache[MAX_SOUNDS];
+	SoundIndex sound_precache[MAX_SOUNDS];
 
 	char		levelname[40];	// for display on solo scoreboard
 	int			viewentity;		// cl_entitites[cl.viewentity] = player

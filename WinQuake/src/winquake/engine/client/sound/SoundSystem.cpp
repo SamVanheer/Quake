@@ -94,7 +94,7 @@ bool SoundSystem::CreateCore()
 	{
 		auto chan = &m_Channels[ambient_channel];
 
-		if (auto sfx = m_AmbientSFX[ambient_channel]; sfx)
+		if (auto sfx = GetSFX(m_AmbientSFX[ambient_channel]); sfx)
 		{
 			//Set up the channel but don't assign sfx to it yet, that's done in UpdateAmbientSounds.
 			//Volume starts at zero so ambient sounds wind up based on user settings.
@@ -120,10 +120,10 @@ void SoundSystem::Unblock()
 	alListenerf(AL_GAIN, volume.value);
 }
 
-sfx_t* SoundSystem::PrecacheSound(const char* name)
+SoundIndex SoundSystem::PrecacheSound(const char* name)
 {
 	if (nosound.value)
-		return NULL;
+		return {};
 
 	auto sfx = FindName(name);
 
@@ -131,11 +131,14 @@ sfx_t* SoundSystem::PrecacheSound(const char* name)
 	if (precache.value)
 		S_LoadSound(sfx);
 
-	return sfx;
+	//Sound indices are 1-based.
+	return SoundIndex{(sfx - m_KnownSFX.data()) + 1};
 }
 
-void SoundSystem::StartSound(int entnum, int entchannel, sfx_t* sfx, vec3_t origin, float fvol, float attenuation)
+void SoundSystem::StartSound(int entnum, int entchannel, SoundIndex index, vec3_t origin, float fvol, float attenuation)
 {
+	auto sfx = GetSFX(index);
+
 	if (!sfx)
 		return;
 
@@ -198,8 +201,9 @@ void SoundSystem::StartSound(int entnum, int entchannel, sfx_t* sfx, vec3_t orig
 	alSourcePlay(target_chan->source.Id);
 }
 
-void SoundSystem::StaticSound(sfx_t* sfx, vec3_t origin, float vol, float attenuation)
+void SoundSystem::StaticSound(SoundIndex index, vec3_t origin, float vol, float attenuation)
 {
+	auto sfx = GetSFX(index);
 	if (!sfx)
 		return;
 
@@ -368,6 +372,18 @@ sfx_t* SoundSystem::FindName(const char* name)
 	return &sfx;
 }
 
+sfx_t* SoundSystem::GetSFX(SoundIndex index)
+{
+	const int i = index.Index - 1;
+
+	if (i < 0 || static_cast<std::size_t>(i) >= m_KnownSFX.size())
+	{
+		return nullptr;
+	}
+
+	return &m_KnownSFX[i];
+}
+
 SoundSystem::Channel* SoundSystem::PickChannel(int entnum, int entchannel)
 {
 	// Check for replacement sound, or find the best one to replace
@@ -464,7 +480,7 @@ void SoundSystem::UpdateAmbientSounds()
 	for (int ambient_channel = 0; ambient_channel < NUM_AMBIENTS; ambient_channel++)
 	{
 		auto chan = &m_Channels[ambient_channel];
-		chan->sfx = m_AmbientSFX[ambient_channel];
+		chan->sfx = GetSFX(m_AmbientSFX[ambient_channel]);
 
 		if (!chan->sfx)
 		{

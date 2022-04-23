@@ -20,117 +20,27 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-//TODO: move openal stuff out of this header
-#include <AL/al.h>
-#include <AL/alc.h>
-
-constexpr ALuint NullBuffer = 0;
-constexpr ALuint NullSource = 0;
-
-struct OpenALBuffer final
+/**
+*	@brief Strongly typed sound index, for disambiguating overloads between <tt>const char*</tt> and <tt>int</tt>.
+*/
+struct SoundIndex final
 {
-	constexpr OpenALBuffer() noexcept = default;
+	static constexpr int InvalidIndex = 0;
 
-	OpenALBuffer(const OpenALBuffer&) = delete;
-	OpenALBuffer& operator=(const OpenALBuffer&) = delete;
+	constexpr SoundIndex() noexcept = default;
 
-	constexpr OpenALBuffer(OpenALBuffer&& other) noexcept
-		: Id(other.Id)
+	explicit constexpr SoundIndex(int index) noexcept
+		: Index(index)
 	{
-		other.Id = NullBuffer;
 	}
 
-	constexpr OpenALBuffer& operator=(OpenALBuffer&& other) noexcept
+	constexpr operator bool() const
 	{
-		if (this != &other)
-		{
-			Id = other.Id;
-			other.Id = NullBuffer;
-		}
-
-		return *this;
+		return Index != InvalidIndex;
 	}
 
-	~OpenALBuffer()
-	{
-		Delete();
-	}
-
-	static OpenALBuffer Create()
-	{
-		OpenALBuffer buffer;
-		alGenBuffers(1, &buffer.Id);
-		return buffer;
-	}
-
-	constexpr operator bool() const { return Id != NullBuffer; }
-
-	void Delete()
-	{
-		if (Id != NullBuffer)
-		{
-			alDeleteBuffers(1, &Id);
-		}
-	}
-
-	ALuint Id = NullBuffer;
+	int Index = InvalidIndex;
 };
-
-struct OpenALSource final
-{
-	constexpr OpenALSource() noexcept = default;
-
-	OpenALSource(const OpenALSource&) = delete;
-	OpenALSource& operator=(const OpenALSource&) = delete;
-
-	constexpr OpenALSource(OpenALSource&& other) noexcept
-		: Id(other.Id)
-	{
-		other.Id = NullSource;
-	}
-
-	constexpr OpenALSource& operator=(OpenALSource&& other) noexcept
-	{
-		if (this != &other)
-		{
-			Id = other.Id;
-			other.Id = NullSource;
-		}
-
-		return *this;
-	}
-
-	~OpenALSource()
-	{
-		Delete();
-	}
-
-	static OpenALSource Create()
-	{
-		OpenALSource source;
-		alGenSources(1, &source.Id);
-		return source;
-	}
-
-	constexpr operator bool() const { return Id != NullSource; }
-
-	void Delete()
-	{
-		if (Id != NullSource)
-		{
-			alDeleteSources(1, &Id);
-		}
-	}
-
-	ALuint Id = NullSource;
-};
-
-typedef struct sfx_s
-{
-	char name[MAX_QPATH];
-	OpenALBuffer buffer;
-	OpenALBuffer loopingBuffer;
-} sfx_t;
 
 struct ISoundSystem
 {
@@ -151,13 +61,13 @@ struct ISoundSystem
 	/**
 	*	@brief Load a sound
 	*/
-	virtual sfx_t* PrecacheSound(const char* name) = 0;
+	virtual SoundIndex PrecacheSound(const char* name) = 0;
 
 	/**
 	*	@brief Start a sound effect
 	*/
-	virtual void StartSound(int entnum, int entchannel, sfx_t* sfx, vec3_t origin, float fvol, float attenuation) = 0;
-	virtual void StaticSound(sfx_t* sfx, vec3_t origin, float vol, float attenuation) = 0;
+	virtual void StartSound(int entnum, int entchannel, SoundIndex index, vec3_t origin, float fvol, float attenuation) = 0;
+	virtual void StaticSound(SoundIndex index, vec3_t origin, float vol, float attenuation) = 0;
 	virtual void LocalSound(const char* sound, float vol = 1.f) = 0;
 
 	virtual void StopSound(int entnum, int entchannel) = 0;

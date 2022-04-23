@@ -25,16 +25,16 @@ int			num_temp_entities;
 entity_t	cl_temp_entities[MAX_TEMP_ENTITIES];
 beam_t		cl_beams[MAX_BEAMS];
 
-sfx_t* cl_sfx_wizhit;
-sfx_t* cl_sfx_knighthit;
-sfx_t* cl_sfx_tink1;
-sfx_t* cl_sfx_ric1;
-sfx_t* cl_sfx_ric2;
-sfx_t* cl_sfx_ric3;
-sfx_t* cl_sfx_r_exp3;
+SoundIndex cl_sfx_wizhit;
+SoundIndex cl_sfx_knighthit;
+SoundIndex cl_sfx_tink1;
+SoundIndex cl_sfx_ric1;
+SoundIndex cl_sfx_ric2;
+SoundIndex cl_sfx_ric3;
+SoundIndex cl_sfx_r_exp3;
 #ifdef QUAKE2
-sfx_t* cl_sfx_imp;
-sfx_t* cl_sfx_rail;
+SoundIndex cl_sfx_imp;
+SoundIndex cl_sfx_rail;
 #endif
 
 /*

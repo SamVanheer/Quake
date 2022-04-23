@@ -20,9 +20,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
+#include <array>
 #include <memory>
 #include <optional>
 #include <vector>
+
+#include <AL/al.h>
+#include <AL/alc.h>
 
 #include "ISoundSystem.h"
 
@@ -34,6 +38,114 @@ struct DeleterWrapper final
 	{
 		Function(object);
 	}
+};
+
+constexpr ALuint NullBuffer = 0;
+constexpr ALuint NullSource = 0;
+
+struct OpenALBuffer final
+{
+	constexpr OpenALBuffer() noexcept = default;
+
+	OpenALBuffer(const OpenALBuffer&) = delete;
+	OpenALBuffer& operator=(const OpenALBuffer&) = delete;
+
+	constexpr OpenALBuffer(OpenALBuffer&& other) noexcept
+		: Id(other.Id)
+	{
+		other.Id = NullBuffer;
+	}
+
+	constexpr OpenALBuffer& operator=(OpenALBuffer&& other) noexcept
+	{
+		if (this != &other)
+		{
+			Id = other.Id;
+			other.Id = NullBuffer;
+		}
+
+		return *this;
+	}
+
+	~OpenALBuffer()
+	{
+		Delete();
+	}
+
+	static OpenALBuffer Create()
+	{
+		OpenALBuffer buffer;
+		alGenBuffers(1, &buffer.Id);
+		return buffer;
+	}
+
+	constexpr operator bool() const { return Id != NullBuffer; }
+
+	void Delete()
+	{
+		if (Id != NullBuffer)
+		{
+			alDeleteBuffers(1, &Id);
+		}
+	}
+
+	ALuint Id = NullBuffer;
+};
+
+struct OpenALSource final
+{
+	constexpr OpenALSource() noexcept = default;
+
+	OpenALSource(const OpenALSource&) = delete;
+	OpenALSource& operator=(const OpenALSource&) = delete;
+
+	constexpr OpenALSource(OpenALSource&& other) noexcept
+		: Id(other.Id)
+	{
+		other.Id = NullSource;
+	}
+
+	constexpr OpenALSource& operator=(OpenALSource&& other) noexcept
+	{
+		if (this != &other)
+		{
+			Id = other.Id;
+			other.Id = NullSource;
+		}
+
+		return *this;
+	}
+
+	~OpenALSource()
+	{
+		Delete();
+	}
+
+	static OpenALSource Create()
+	{
+		OpenALSource source;
+		alGenSources(1, &source.Id);
+		return source;
+	}
+
+	constexpr operator bool() const { return Id != NullSource; }
+
+	void Delete()
+	{
+		if (Id != NullSource)
+		{
+			alDeleteSources(1, &Id);
+		}
+	}
+
+	ALuint Id = NullSource;
+};
+
+struct sfx_t
+{
+	char name[MAX_QPATH];
+	OpenALBuffer buffer;
+	OpenALBuffer loopingBuffer;
 };
 
 /**
@@ -76,10 +188,10 @@ public:
 
 	int GetTotalChannelCount() const override { return m_TotalChannels; }
 
-	sfx_t* PrecacheSound(const char* name) override;
+	SoundIndex PrecacheSound(const char* name) override;
 
-	void StartSound(int entnum, int entchannel, sfx_t* sfx, vec3_t origin, float fvol, float attenuation) override;
-	void StaticSound(sfx_t* sfx, vec3_t origin, float vol, float attenuation) override;
+	void StartSound(int entnum, int entchannel, SoundIndex index, vec3_t origin, float fvol, float attenuation) override;
+	void StaticSound(SoundIndex index, vec3_t origin, float vol, float attenuation) override;
 	void LocalSound(const char* sound, float vol = 1.f) override;
 
 	void StopSound(int entnum, int entchannel) override;
@@ -93,6 +205,8 @@ private:
 	bool CreateCore();
 
 	sfx_t* FindName(const char* name);
+
+	sfx_t* GetSFX(SoundIndex index);
 
 	/**
 	*	@brief picks a channel based on priorities, empty slots, number of channels
@@ -116,7 +230,7 @@ private:
 
 	std::vector<sfx_t> m_KnownSFX; // [MAX_SFX]	
 
-	sfx_t* m_AmbientSFX[NUM_AMBIENTS]{};
+	std::array<SoundIndex, NUM_AMBIENTS> m_AmbientSFX;
 
 	std::vector<Channel> m_Channels;
 	int m_TotalChannels = 0;

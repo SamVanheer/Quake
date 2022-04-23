@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // snd_mem.cpp: sound caching
 
 #include "quakedef.h"
+#include "SoundSystem.h"
 #include "WaveSoundLoader.h"
 
 bool S_LoadSound(sfx_t* s)

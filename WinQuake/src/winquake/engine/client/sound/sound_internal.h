@@ -20,6 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
+struct sfx_t;
+
 extern cvar_t nosound;
 extern cvar_t precache;
 extern cvar_t bgmbuffer;

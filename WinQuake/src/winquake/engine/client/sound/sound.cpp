@@ -36,10 +36,10 @@ struct DummySoundSystem final : public ISoundSystem
 
 	int GetTotalChannelCount() const override { return 0; }
 
-	sfx_t* PrecacheSound(const char* name) override { return nullptr; }
+	SoundIndex PrecacheSound(const char* name) override { return {}; }
 
-	void StartSound(int entnum, int entchannel, sfx_t* sfx, vec3_t origin, float fvol, float attenuation) override {}
-	void StaticSound(sfx_t* sfx, vec3_t origin, float vol, float attenuation) override {}
+	void StartSound(int entnum, int entchannel, SoundIndex index, vec3_t origin, float fvol, float attenuation) override {}
+	void StaticSound(SoundIndex index, vec3_t origin, float vol, float attenuation) override {}
 	void LocalSound(const char* sound, float vol = 1.f) override {}
 
 	void StopSound(int entnum, int entchannel) override {}
