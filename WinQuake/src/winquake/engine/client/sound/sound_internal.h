@@ -26,3 +26,5 @@ extern cvar_t bgmbuffer;
 extern cvar_t ambient_level;
 extern cvar_t ambient_fade;
 extern cvar_t snd_show;
+
+bool S_LoadSound(sfx_t* s);

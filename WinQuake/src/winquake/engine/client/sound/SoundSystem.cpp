@@ -174,8 +174,7 @@ void SoundSystem::StartSound(int entnum, int entchannel, sfx_t* sfx, vec3_t orig
 	target_chan->entchannel = entchannel;
 
 	// new channel
-	auto sc = S_LoadSound(sfx);
-	if (!sc)
+	if (!S_LoadSound(sfx))
 	{
 		return;		// couldn't load the sound's data
 	}
@@ -236,11 +235,10 @@ void SoundSystem::StaticSound(sfx_t* sfx, vec3_t origin, float vol, float attenu
 	auto ss = &channels[total_channels];
 	total_channels++;
 
-	auto sc = S_LoadSound(sfx);
-	if (!sc)
+	if (!S_LoadSound(sfx))
 		return;
 
-	if (!sc->loopingBuffer)
+	if (!sfx->loopingBuffer)
 	{
 		Con_Printf("Sound %s not looped\n", sfx->name);
 		return;

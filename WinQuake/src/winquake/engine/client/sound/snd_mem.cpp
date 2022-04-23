@@ -17,39 +17,16 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-// snd_mem.c: sound caching
+// snd_mem.cpp: sound caching
 
 #include "quakedef.h"
 #include "WaveSoundLoader.h"
 
-/*
-================
-ConvertPCMData
-================
-*/
-void ConvertPCMData(sfx_t* sfx, const wavinfo_t& info, byte* data)
-{
-	if (info.width == 2)
-	{
-		for (int i = 0; i < info.samples; i++)
-		{
-			((short*)data)[i] = LittleShort(((short*)data)[i]);
-		}
-	}
-}
-
-//=============================================================================
-
-/*
-==============
-S_LoadSound
-==============
-*/
-sfx_t* S_LoadSound(sfx_t* s)
+bool S_LoadSound(sfx_t* s)
 {
 // see if still in memory
 	if (s->buffer)
-		return s;
+		return true;
 
 	//Con_Printf ("S_LoadSound: %x\n", (int)stackbuf);
 	// load it in
@@ -65,7 +42,7 @@ sfx_t* S_LoadSound(sfx_t* s)
 	if (!data)
 	{
 		Con_Printf("Couldn't load %s\n", namebuffer);
-		return NULL;
+		return false;
 	}
 
 	const wavinfo_t info = GetWavinfo(s->name, data, com_filesize);
@@ -73,7 +50,7 @@ sfx_t* S_LoadSound(sfx_t* s)
 	if (info.channels != 1)
 	{
 		Con_Printf("%s is a stereo sample\n", s->name);
-		return NULL;
+		return false;
 	}
 
 	const ALenum format = [&]()
@@ -102,13 +79,13 @@ sfx_t* S_LoadSound(sfx_t* s)
 
 	if (format == 0)
 	{
-		return NULL;
+		return false;
 	}
 
 	s->buffer = OpenALBuffer::Create();
 
 	if (!s->buffer)
-		return NULL;
+		return false;
 
 	if (info.loopstart >= 0)
 	{
@@ -117,13 +94,19 @@ sfx_t* S_LoadSound(sfx_t* s)
 		if (!s->loopingBuffer)
 		{
 			s->buffer.Delete();
-			return NULL;
+			return false;
 		}
 	}
 
 	byte* samples = data + info.dataofs;
 
-	ConvertPCMData(s, info, samples);
+	if (info.width == 2)
+	{
+		for (int i = 0; i < info.samples; i++)
+		{
+			((short*)samples)[i] = LittleShort(((short*)samples)[i]);
+		}
+	}
 
 	if (info.loopstart >= 0)
 	{
@@ -135,5 +118,5 @@ sfx_t* S_LoadSound(sfx_t* s)
 		alBufferData(s->buffer.Id, format, samples, info.samples * info.width * info.channels, info.rate);
 	}
 
-	return s;
+	return true;
 }

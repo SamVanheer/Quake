@@ -42,5 +42,3 @@ void S_Shutdown();
 
 extern cvar_t bgmvolume;
 extern cvar_t volume;
-
-sfx_t* S_LoadSound(sfx_t* s);
