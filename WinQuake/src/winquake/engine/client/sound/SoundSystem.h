@@ -77,7 +77,7 @@ public:
 
 	void StartSound(int entnum, int entchannel, sfx_t* sfx, vec3_t origin, float fvol, float attenuation) override;
 	void StaticSound(sfx_t* sfx, vec3_t origin, float vol, float attenuation) override;
-	void LocalSound(const char* sound) override;
+	void LocalSound(const char* sound, float vol = 1.f) override;
 
 	void StopSound(int entnum, int entchannel) override;
 	void StopAllSounds() override;

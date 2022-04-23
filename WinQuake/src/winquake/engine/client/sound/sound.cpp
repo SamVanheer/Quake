@@ -40,7 +40,7 @@ struct DummySoundSystem final : public ISoundSystem
 
 	void StartSound(int entnum, int entchannel, sfx_t* sfx, vec3_t origin, float fvol, float attenuation) override {}
 	void StaticSound(sfx_t* sfx, vec3_t origin, float vol, float attenuation) override {}
-	void LocalSound(const char* sound) override {}
+	void LocalSound(const char* sound, float vol = 1.f) override {}
 
 	void StopSound(int entnum, int entchannel) override {}
 	void StopAllSounds() override {}
@@ -84,7 +84,6 @@ cvar_t snd_show = {"snd_show", "0"};
 
 void S_Play()
 {
-	static int hash = 345;
 	char name[256];
 
 	for (int i = 1; i < Cmd_Argc(); ++i)
@@ -96,14 +95,12 @@ void S_Play()
 		}
 		else
 			Q_strcpy(name, Cmd_Argv(i));
-		auto sfx = g_SoundSystem->PrecacheSound(name);
-		g_SoundSystem->StartSound(hash++, 0, sfx, listener_origin, 1.0, 1.0);
+		g_SoundSystem->LocalSound(name);
 	}
 }
 
 void S_PlayVol()
 {
-	static int hash = 543;
 	char name[256];
 
 	for (int i = 1; i < Cmd_Argc(); i += 2)
@@ -115,9 +112,8 @@ void S_PlayVol()
 		}
 		else
 			Q_strcpy(name, Cmd_Argv(i));
-		auto sfx = g_SoundSystem->PrecacheSound(name);
 		auto vol = Q_atof(Cmd_Argv(i + 1));
-		g_SoundSystem->StartSound(hash++, 0, sfx, listener_origin, vol, 1.0);
+		g_SoundSystem->LocalSound(name, vol);
 	}
 }
 

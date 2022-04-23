@@ -250,7 +250,7 @@ void SoundSystem::StaticSound(sfx_t* sfx, vec3_t origin, float vol, float attenu
 	alSourcePlay(ss->source.Id);
 }
 
-void SoundSystem::LocalSound(const char* sound)
+void SoundSystem::LocalSound(const char* sound, float vol)
 {
 	if (nosound.value)
 		return;
@@ -261,7 +261,7 @@ void SoundSystem::LocalSound(const char* sound)
 		Con_Printf("LocalSound: can't cache %s\n", sound);
 		return;
 	}
-	StartSound(cl.viewentity, -1, sfx, vec3_origin, 1, 1);
+	StartSound(cl.viewentity, -1, sfx, vec3_origin, vol, 1);
 }
 
 void SoundSystem::StopSound(int entnum, int entchannel)
@@ -298,9 +298,6 @@ void SoundSystem::StopAllSounds()
 void SoundSystem::Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
 {
 	VectorCopy(origin, listener_origin);
-	VectorCopy(forward, listener_forward);
-	VectorCopy(right, listener_right);
-	VectorCopy(up, listener_up);
 
 	const ALfloat orientation[6] =
 	{

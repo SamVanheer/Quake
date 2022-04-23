@@ -166,7 +166,7 @@ struct ISoundSystem
 	*/
 	virtual void StartSound(int entnum, int entchannel, sfx_t* sfx, vec3_t origin, float fvol, float attenuation) = 0;
 	virtual void StaticSound(sfx_t* sfx, vec3_t origin, float vol, float attenuation) = 0;
-	virtual void LocalSound(const char* sound) = 0;
+	virtual void LocalSound(const char* sound, float vol = 1.f) = 0;
 
 	virtual void StopSound(int entnum, int entchannel) = 0;
 	virtual void StopAllSounds() = 0;
