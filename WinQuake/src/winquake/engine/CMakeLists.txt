@@ -51,8 +51,12 @@ target_sources(winquake
 		client/renderer/render.h
 		client/renderer/screen.h
 		
-		client/sound/cdaudio.h
+		client/sound/CDAudio.cpp
+		client/sound/CDAudio.h
+		client/sound/ICDAudio.h
 		client/sound/ISoundSystem.h
+		client/sound/OggSoundLoader.cpp
+		client/sound/OggSoundLoader.h
 		client/sound/snd_mem.cpp
 		client/sound/sound.cpp
 		client/sound/sound.h
@@ -95,7 +99,6 @@ if (MSVC)
 			net/net_win.cpp
 			net/net_wins.cpp
 			net/net_wins.h
-			plat/windows/cd_win.cpp
 			server/conproc.cpp
 			server/conproc.h)
 endif()
@@ -105,8 +108,7 @@ if (UNIX)
 		PRIVATE
 			net/net_bsd.cpp
 			net/net_udp.cpp
-			net/net_udp.h
-			plat/linux/cd_linux.cpp)
+			net/net_udp.h)
 endif()
 
 if(RENDERER_IS_SOFTWARE)

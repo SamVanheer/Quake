@@ -17,6 +17,25 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-// winquake.h: Win32-specific Quake header file
 
-#include <windows.h>
+#pragma once
+
+#include <memory>
+
+struct ICDAudio
+{
+	virtual ~ICDAudio() = default;
+
+	virtual void Play(byte track, bool looping) = 0;
+	virtual void Stop() = 0;
+	virtual void Pause() = 0;
+	virtual void Resume() = 0;
+	virtual void Update() = 0;
+
+	virtual void CD_Command() = 0;
+};
+
+extern std::unique_ptr<ICDAudio> g_CDAudio;
+
+bool CDAudio_Init();
+void CDAudio_Shutdown();

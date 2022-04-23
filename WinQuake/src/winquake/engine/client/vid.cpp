@@ -23,10 +23,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 
-#ifdef WIN32
-#include "winquake.h"
-#endif
-
 #ifndef GLQUAKE
 #include "renderer/software/d_local.h"
 #endif
@@ -151,17 +147,6 @@ cvar_t		_windowed_mouse = {"_windowed_mouse","1", true};
 
 int			window_center_x, window_center_y, window_x, window_y, window_width, window_height;
 Rect		window_rect;
-
-#ifdef WIN32
-HWND VID_GetWindowHandle()
-{
-	SDL_SysWMinfo wmInfo{};
-	SDL_VERSION(&wmInfo.version);
-	SDL_GetWindowWMInfo(mainwindow, &wmInfo);
-
-	return wmInfo.info.win.window;
-}
-#endif
 
 // direct draw software compatability stuff
 
@@ -574,7 +559,10 @@ int VID_SetMode(int modenum, unsigned char* palette)
 	const bool temp = scr_disabled_for_loading;
 	scr_disabled_for_loading = true;
 
-	CDAudio_Pause();
+	if (g_CDAudio)
+	{
+		g_CDAudio->Pause();
+	}
 
 	bool stat;
 
@@ -609,7 +597,10 @@ int VID_SetMode(int modenum, unsigned char* palette)
 	window_height = DIBHeight;
 	VID_UpdateWindowStatus();
 
-	CDAudio_Resume();
+	if (g_CDAudio)
+	{
+		g_CDAudio->Resume();
+	}
 	scr_disabled_for_loading = temp;
 
 	if (!stat)

@@ -250,7 +250,7 @@ typedef struct
 #include "client/view.h"
 #include "client/ui/menu.h"
 #include "crc.h"
-#include "client/sound/cdaudio.h"
+#include "client/sound/ICDAudio.h"
 
 //GL stuff begin
 

@@ -201,6 +201,10 @@ public:
 
 	void PrintSoundList() override;
 
+	std::unique_ptr<ICDAudio> CreateCDAudio() override;
+
+	ALCdevice* GetDevice() { return m_Device.get(); }
+
 private:
 	bool CreateCore();
 
@@ -240,3 +244,5 @@ inline void SoundSystem::SetAmbientEnabled(bool enable)
 {
 	m_AmbientEnabled = enable;
 }
+
+void CheckALErrors();

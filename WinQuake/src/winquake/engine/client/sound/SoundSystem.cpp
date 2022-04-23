@@ -19,10 +19,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "quakedef.h"
+#include "CDAudio.h"
 #include "sound_internal.h"
 #include "SoundSystem.h"
 
-static void CheckALErrors()
+void CheckALErrors()
 {
 	GLenum error = AL_NO_ERROR;
 
@@ -278,6 +279,12 @@ void SoundSystem::StopAllSounds()
 
 void SoundSystem::Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
 {
+	if (ALC_FALSE == alcMakeContextCurrent(m_Context.get()))
+	{
+		Con_SafePrintf("Couldn't make OpenAL context current\n");
+		return;
+	}
+
 	VectorCopy(origin, m_ListenerOrigin);
 
 	const ALfloat orientation[6] =
@@ -344,6 +351,16 @@ void SoundSystem::PrintSoundList()
 		Con_Printf("(%2db) %6d : %s\n", static_cast<int>(bits), static_cast<int>(size), sfx.name);
 	}
 	Con_Printf("Total resident: %u\n", total);
+}
+
+std::unique_ptr<ICDAudio> SoundSystem::CreateCDAudio()
+{
+	if (auto cdaudio = std::make_unique<CDAudio>(); cdaudio->Create(*this))
+	{
+		return cdaudio;
+	}
+
+	return {};
 }
 
 sfx_t* SoundSystem::FindName(const char* name)

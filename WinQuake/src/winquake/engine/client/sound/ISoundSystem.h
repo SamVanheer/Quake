@@ -20,6 +20,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
+#include <memory>
+
+struct ICDAudio;
+
 /**
 *	@brief Strongly typed sound index, for disambiguating overloads between <tt>const char*</tt> and <tt>int</tt>.
 */
@@ -79,4 +83,6 @@ struct ISoundSystem
 	virtual void Update(vec3_t origin, vec3_t v_forward, vec3_t v_right, vec3_t v_up) = 0;
 
 	virtual void PrintSoundList() = 0;
+
+	virtual std::unique_ptr<ICDAudio> CreateCDAudio() = 0;
 };

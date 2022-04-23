@@ -51,6 +51,8 @@ struct DummySoundSystem final : public ISoundSystem
 	{
 		Con_Printf("Total resident: 0\n");
 	}
+
+	std::unique_ptr<ICDAudio> CreateCDAudio() override { return {}; }
 };
 
 /*
