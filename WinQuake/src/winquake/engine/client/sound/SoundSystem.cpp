@@ -99,6 +99,9 @@ bool SoundSystem::CreateCore()
 
 	alDistanceModel(AL_LINEAR_DISTANCE);
 
+	//So volume is correct.
+	Unblock();
+
 	known_sfx = reinterpret_cast<sfx_t*>(Hunk_AllocName(MAX_SFX * sizeof(sfx_t), "sfx_t"));
 	num_sfx = 0;
 
@@ -134,7 +137,8 @@ void SoundSystem::Block()
 void SoundSystem::Unblock()
 {
 	m_Blocked = false;
-	alListenerf(AL_GAIN, 1);
+	//Unblock to user-set volume immediately.
+	alListenerf(AL_GAIN, volume.value);
 }
 
 sfx_t* SoundSystem::PrecacheSound(const char* name)
@@ -306,6 +310,13 @@ void SoundSystem::Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
 
 	alListenerfv(AL_POSITION, origin);
 	alListenerfv(AL_ORIENTATION, orientation);
+
+	//Update volume if changed. If we're currently blocked then volume is 0, so don't update it.
+	if (!m_Blocked && m_LastKnownVolume != volume.value)
+	{
+		m_LastKnownVolume = volume.value;
+		alListenerf(AL_GAIN, volume.value);
+	}
 
 	// update general area ambient sound sources
 	UpdateAmbientSounds();

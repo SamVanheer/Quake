@@ -107,6 +107,8 @@ private:
 	bool m_Blocked = false;
 	bool m_AmbientEnabled = true;
 
+	float m_LastKnownVolume = -1;
+
 	sfx_t* known_sfx = nullptr;		// hunk allocated [MAX_SFX]
 	int num_sfx = 0;
 
