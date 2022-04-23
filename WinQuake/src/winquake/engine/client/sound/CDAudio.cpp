@@ -136,7 +136,7 @@ void CDAudio::Play(byte track, bool looping)
 		return;
 	}
 
-	if (m_Playing)
+	if (m_Playing || m_Paused)
 	{
 		if (m_Track == track)
 			return;
@@ -189,7 +189,7 @@ void CDAudio::Stop()
 	if (!m_Enabled)
 		return;
 
-	if (!m_Playing)
+	if (!m_Playing && !m_Paused)
 		return;
 
 	const ContextSwitcher switcher{m_Context.get()};
