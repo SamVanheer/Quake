@@ -22,11 +22,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "sound_internal.h"
 #include "SoundSystem.h"
 
-void S_Play();
-void S_PlayVol();
-void S_StopAllSounds();
-void S_SoundList();
-
 struct DummySoundSystem final : public ISoundSystem
 {
 	bool IsActive() const override { return false; }
@@ -58,11 +53,9 @@ struct DummySoundSystem final : public ISoundSystem
 	}
 };
 
-// =======================================================================
-// Internal sound data & structures
-// =======================================================================
-
-static bool snd_firsttime = true;
+/*
+*	Internal sound data & structures
+*/
 
 static std::optional<SoundSystem> openal_audio;
 
@@ -85,100 +78,8 @@ cvar_t ambient_level = {"ambient_level", "0.3"};
 cvar_t ambient_fade = {"ambient_fade", "100"};
 cvar_t snd_show = {"snd_show", "0"};
 
-// ====================================================================
-// User-setable variables
-// ====================================================================
-
-void S_SoundInfo_f()
-{
-	if (!g_SoundSystem->IsActive())
-	{
-		Con_Printf("sound system not started\n");
-		return;
-	}
-
-	Con_Printf("%5d total_channels\n", g_SoundSystem->GetTotalChannelCount());
-}
-
 /*
-================
-S_Startup
-================
-*/
-void S_Startup()
-{
-	const bool wasFirstTime = snd_firsttime;
-
-	if (snd_firsttime)
-	{
-		snd_firsttime = false;
-
-		openal_audio = SoundSystem::Create();
-
-		if (openal_audio.has_value())
-		{
-			g_SoundSystem = &openal_audio.value();
-
-			Con_SafePrintf("OpenAL sound initialized\n");
-		}
-		else
-		{
-			Con_SafePrintf("OpenAL sound failed to init\n");
-		}
-	}
-
-	if (!openal_audio.has_value() && wasFirstTime)
-	{
-		Con_SafePrintf("No sound device initialized\n");
-	}
-}
-
-/*
-================
-S_Init
-================
-*/
-void S_Init()
-{
-
-	Con_Printf("\nSound Initialization\n");
-
-	if (COM_CheckParm("-nosound"))
-		return;
-
-	Cmd_AddCommand("play", S_Play);
-	Cmd_AddCommand("playvol", S_PlayVol);
-	Cmd_AddCommand("stopsound", S_StopAllSounds);
-	Cmd_AddCommand("soundlist", S_SoundList);
-	Cmd_AddCommand("soundinfo", S_SoundInfo_f);
-
-	Cvar_RegisterVariable(&nosound);
-	Cvar_RegisterVariable(&volume);
-	Cvar_RegisterVariable(&precache);
-	Cvar_RegisterVariable(&bgmvolume);
-	Cvar_RegisterVariable(&bgmbuffer);
-	Cvar_RegisterVariable(&ambient_level);
-	Cvar_RegisterVariable(&ambient_fade);
-	Cvar_RegisterVariable(&snd_show);
-
-	S_Startup();
-}
-
-// =======================================================================
-// Shutdown sound engine
-// =======================================================================
-void S_Shutdown()
-{
-	g_SoundSystem = &g_DummySoundSystem;
-	openal_audio.reset();
-}
-
-/*
-===============================================================================
-
-console functions
-
-===============================================================================
+*	console functions
 */
 
 void S_Play()
@@ -228,4 +129,54 @@ void S_StopAllSounds()
 void S_SoundList()
 {
 	g_SoundSystem->PrintSoundList();
+}
+
+void S_SoundInfo_f()
+{
+	if (!g_SoundSystem->IsActive())
+	{
+		Con_Printf("sound system not started\n");
+		return;
+	}
+
+	Con_Printf("%5d total_channels\n", g_SoundSystem->GetTotalChannelCount());
+}
+
+void S_Init()
+{
+	Con_Printf("\nSound Initialization\n");
+
+	if (COM_CheckParm("-nosound"))
+		return;
+
+	Cmd_AddCommand("play", S_Play);
+	Cmd_AddCommand("playvol", S_PlayVol);
+	Cmd_AddCommand("stopsound", S_StopAllSounds);
+	Cmd_AddCommand("soundlist", S_SoundList);
+	Cmd_AddCommand("soundinfo", S_SoundInfo_f);
+
+	Cvar_RegisterVariable(&nosound);
+	Cvar_RegisterVariable(&volume);
+	Cvar_RegisterVariable(&precache);
+	Cvar_RegisterVariable(&bgmvolume);
+	Cvar_RegisterVariable(&bgmbuffer);
+	Cvar_RegisterVariable(&ambient_level);
+	Cvar_RegisterVariable(&ambient_fade);
+	Cvar_RegisterVariable(&snd_show);
+
+	if (openal_audio = SoundSystem::Create(); openal_audio.has_value())
+	{
+		g_SoundSystem = &openal_audio.value();
+		Con_SafePrintf("OpenAL sound initialized\n");
+	}
+	else
+	{
+		Con_SafePrintf("No sound device initialized\n");
+	}
+}
+
+void S_Shutdown()
+{
+	g_SoundSystem = &g_DummySoundSystem;
+	openal_audio.reset();
 }

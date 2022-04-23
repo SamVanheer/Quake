@@ -40,6 +40,10 @@ typedef struct
 extern ISoundSystem* g_SoundSystem;
 
 void S_Init();
+
+/**
+*	@brief Shutdown sound engine
+*/
 void S_Shutdown();
 
 // ====================================================================
