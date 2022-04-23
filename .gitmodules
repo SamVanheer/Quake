@@ -7,3 +7,6 @@
 [submodule "WinQuake/external/ogg"]
 	path = WinQuake/external/ogg
 	url = https://github.com/xiph/ogg.git
+[submodule "WinQuake/external/vorbis"]
+	path = WinQuake/external/vorbis
+	url = https://github.com/xiph/vorbis.git
