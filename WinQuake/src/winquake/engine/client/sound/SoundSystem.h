@@ -74,7 +74,7 @@ public:
 	bool IsAmbientEnabled() const override { return m_AmbientEnabled; }
 	void SetAmbientEnabled(bool enable) override;
 
-	int GetTotalChannelCount() const override { return total_channels; }
+	int GetTotalChannelCount() const override { return m_TotalChannels; }
 
 	sfx_t* PrecacheSound(const char* name) override;
 
@@ -114,12 +114,12 @@ private:
 
 	vec3_t m_ListenerOrigin{};
 
-	std::vector<sfx_t> known_sfx; // [MAX_SFX]	
+	std::vector<sfx_t> m_KnownSFX; // [MAX_SFX]	
 
-	sfx_t* ambient_sfx[NUM_AMBIENTS]{};
+	sfx_t* m_AmbientSFX[NUM_AMBIENTS]{};
 
-	std::vector<Channel> channels;
-	int total_channels = 0;
+	std::vector<Channel> m_Channels;
+	int m_TotalChannels = 0;
 };
 
 inline void SoundSystem::SetAmbientEnabled(bool enable)

@@ -78,23 +78,23 @@ bool SoundSystem::CreateCore()
 	//So volume is correct.
 	Unblock();
 
-	known_sfx.reserve(MAX_SFX);
+	m_KnownSFX.reserve(MAX_SFX);
 
-	ambient_sfx[AMBIENT_WATER] = PrecacheSound("ambience/water1.wav");
-	ambient_sfx[AMBIENT_SKY] = PrecacheSound("ambience/wind2.wav");
+	m_AmbientSFX[AMBIENT_WATER] = PrecacheSound("ambience/water1.wav");
+	m_AmbientSFX[AMBIENT_SKY] = PrecacheSound("ambience/wind2.wav");
 
-	channels.resize(MAX_CHANNELS);
+	m_Channels.resize(MAX_CHANNELS);
 
-	for (auto& channel : channels)
+	for (auto& channel : m_Channels)
 	{
 		channel.source = OpenALSource::Create();
 	}
 
 	for (int ambient_channel = 0; ambient_channel < NUM_AMBIENTS; ambient_channel++)
 	{
-		auto chan = &channels[ambient_channel];
+		auto chan = &m_Channels[ambient_channel];
 
-		if (auto sfx = ambient_sfx[ambient_channel]; sfx)
+		if (auto sfx = m_AmbientSFX[ambient_channel]; sfx)
 		{
 			//Set up the channel but don't assign sfx to it yet, that's done in UpdateAmbientSounds.
 			//Volume starts at zero so ambient sounds wind up based on user settings.
@@ -166,7 +166,7 @@ void SoundSystem::StartSound(int entnum, int entchannel, sfx_t* sfx, vec3_t orig
 
 	// if an identical sound has also been started this frame, offset the pos
 	// a bit to keep it from just making the first one louder
-	auto check = &channels[NUM_AMBIENTS];
+	auto check = &m_Channels[NUM_AMBIENTS];
 	for (int ch_idx = NUM_AMBIENTS; ch_idx < NUM_AMBIENTS + MAX_DYNAMIC_CHANNELS; ch_idx++, check++)
 	{
 		if (check == target_chan)
@@ -203,14 +203,14 @@ void SoundSystem::StaticSound(sfx_t* sfx, vec3_t origin, float vol, float attenu
 	if (!sfx)
 		return;
 
-	if (total_channels == MAX_CHANNELS)
+	if (m_TotalChannels == MAX_CHANNELS)
 	{
 		Con_Printf("total_channels == MAX_CHANNELS\n");
 		return;
 	}
 
-	auto ss = &channels[total_channels];
-	total_channels++;
+	auto ss = &m_Channels[m_TotalChannels];
+	m_TotalChannels++;
 
 	if (!S_LoadSound(sfx))
 		return;
@@ -245,11 +245,11 @@ void SoundSystem::StopSound(int entnum, int entchannel)
 {
 	for (int i = 0; i < MAX_DYNAMIC_CHANNELS; i++)
 	{
-		if (channels[i].entnum == entnum
-			&& channels[i].entchannel == entchannel)
+		if (m_Channels[i].entnum == entnum
+			&& m_Channels[i].entchannel == entchannel)
 		{
-			alSourceStop(channels[i].source.Id);
-			channels[i].sfx = NULL;
+			alSourceStop(m_Channels[i].source.Id);
+			m_Channels[i].sfx = NULL;
 			return;
 		}
 	}
@@ -257,9 +257,9 @@ void SoundSystem::StopSound(int entnum, int entchannel)
 
 void SoundSystem::StopAllSounds()
 {
-	total_channels = MAX_DYNAMIC_CHANNELS + NUM_AMBIENTS;	// no statics
+	m_TotalChannels = MAX_DYNAMIC_CHANNELS + NUM_AMBIENTS;	// no statics
 
-	for (auto& channel : channels)
+	for (auto& channel : m_Channels)
 	{
 		if (channel.sfx)
 		{
@@ -302,8 +302,8 @@ void SoundSystem::Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
 	if (snd_show.value)
 	{
 		int total = 0;
-		Channel* ch = channels.data();
-		for (int i = 0; i < total_channels; i++, ch++)
+		Channel* ch = m_Channels.data();
+		for (int i = 0; i < m_TotalChannels; i++, ch++)
 		{
 			if (ch->sfx)
 			{
@@ -320,7 +320,7 @@ void SoundSystem::PrintSoundList()
 {
 	unsigned int total = 0;
 
-	for (const auto& sfx : known_sfx)
+	for (const auto& sfx : m_KnownSFX)
 	{
 		if (!sfx.buffer)
 			continue;
@@ -351,7 +351,7 @@ sfx_t* SoundSystem::FindName(const char* name)
 		Sys_Error("Sound name too long: %s", name);
 
 	// see if already loaded
-	for (auto& sfx : known_sfx)
+	for (auto& sfx : m_KnownSFX)
 	{
 		if (!Q_strcmp(sfx.name, name))
 		{
@@ -359,10 +359,10 @@ sfx_t* SoundSystem::FindName(const char* name)
 		}
 	}
 
-	if (known_sfx.size() == MAX_SFX)
+	if (m_KnownSFX.size() == MAX_SFX)
 		Sys_Error("FindName: out of sfx_t");
 
-	auto& sfx = known_sfx.emplace_back();
+	auto& sfx = m_KnownSFX.emplace_back();
 	strcpy(sfx.name, name);
 
 	return &sfx;
@@ -376,18 +376,18 @@ SoundSystem::Channel* SoundSystem::PickChannel(int entnum, int entchannel)
 	for (int ch_idx = NUM_AMBIENTS; ch_idx < NUM_AMBIENTS + MAX_DYNAMIC_CHANNELS; ch_idx++)
 	{
 		if (entchannel != 0		// channel 0 never overrides
-			&& channels[ch_idx].entnum == entnum
-			&& (channels[ch_idx].entchannel == entchannel || entchannel == -1))
+			&& m_Channels[ch_idx].entnum == entnum
+			&& (m_Channels[ch_idx].entchannel == entchannel || entchannel == -1))
 		{	// allways override sound from same entity
 			first_to_die = ch_idx;
 			break;
 		}
 
 		// don't let monster sounds override player sounds
-		if (channels[ch_idx].entnum == cl.viewentity && entnum != cl.viewentity && channels[ch_idx].sfx)
+		if (m_Channels[ch_idx].entnum == cl.viewentity && entnum != cl.viewentity && m_Channels[ch_idx].sfx)
 			continue;
 
-		if (!channels[ch_idx].sfx)
+		if (!m_Channels[ch_idx].sfx)
 		{
 			first_to_die = ch_idx;
 			life_left = -1;
@@ -395,10 +395,10 @@ SoundSystem::Channel* SoundSystem::PickChannel(int entnum, int entchannel)
 		}
 
 		ALint size;
-		alGetBufferi(channels[ch_idx].sfx->buffer.Id, AL_SIZE, &size);
+		alGetBufferi(m_Channels[ch_idx].sfx->buffer.Id, AL_SIZE, &size);
 
 		ALint offset;
-		alGetSourcei(channels[ch_idx].source.Id, AL_BYTE_OFFSET, &offset);
+		alGetSourcei(m_Channels[ch_idx].source.Id, AL_BYTE_OFFSET, &offset);
 
 		if (size - offset < life_left)
 		{
@@ -411,12 +411,12 @@ SoundSystem::Channel* SoundSystem::PickChannel(int entnum, int entchannel)
 		return NULL;
 
 	//Stop sound if it's playing.
-	alSourceStop(channels[first_to_die].source.Id);
+	alSourceStop(m_Channels[first_to_die].source.Id);
 
-	if (channels[first_to_die].sfx)
-		channels[first_to_die].sfx = NULL;
+	if (m_Channels[first_to_die].sfx)
+		m_Channels[first_to_die].sfx = NULL;
 
-	return &channels[first_to_die];
+	return &m_Channels[first_to_die];
 }
 
 void SoundSystem::SetupChannel(Channel& chan, sfx_t* sfx, vec3_t origin, float vol, float attenuation, bool isRelative)
@@ -455,16 +455,16 @@ void SoundSystem::UpdateAmbientSounds()
 	{
 		for (int ambient_channel = 0; ambient_channel < NUM_AMBIENTS; ambient_channel++)
 		{
-			alSourceStop(channels[ambient_channel].source.Id);
-			channels[ambient_channel].sfx = NULL;
+			alSourceStop(m_Channels[ambient_channel].source.Id);
+			m_Channels[ambient_channel].sfx = NULL;
 		}
 		return;
 	}
 
 	for (int ambient_channel = 0; ambient_channel < NUM_AMBIENTS; ambient_channel++)
 	{
-		auto chan = &channels[ambient_channel];
-		chan->sfx = ambient_sfx[ambient_channel];
+		auto chan = &m_Channels[ambient_channel];
+		chan->sfx = m_AmbientSFX[ambient_channel];
 
 		if (!chan->sfx)
 		{
@@ -511,9 +511,9 @@ void SoundSystem::UpdateAmbientSounds()
 void SoundSystem::UpdateSounds()
 {
 	//Update all sounds that are looping, clear finished sounds.
-	for (int i = 0; i < total_channels; ++i)
+	for (int i = 0; i < m_TotalChannels; ++i)
 	{
-		auto& chan = channels[i];
+		auto& chan = m_Channels[i];
 
 		if (!chan.sfx)
 		{
