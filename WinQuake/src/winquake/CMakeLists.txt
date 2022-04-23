@@ -6,6 +6,8 @@ find_package(OpenGL REQUIRED)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+option(BUILD_TESTING "" OFF)
+
 add_subdirectory(../../external/SDL2
 	SDL2-binary-dir
 	EXCLUDE_FROM_ALL)
@@ -15,11 +17,22 @@ add_subdirectory(../../external/OpenAL
 	OpenAL-binary-dir
 	EXCLUDE_FROM_ALL)
 
+add_subdirectory(../../external/ogg
+	ogg-binary-dir
+	EXCLUDE_FROM_ALL)
+
+add_subdirectory(../../external/vorbis
+	vorbis-binary-dir
+	EXCLUDE_FROM_ALL)
+	
 set_target_properties(
 	SDL2
 	build_version
 	common
 	OpenAL
+	ogg
+	vorbis
+	vorbisfile
 	PROPERTIES
 		FOLDER "Dependencies")
 
@@ -76,7 +89,10 @@ target_link_libraries(winquake PRIVATE
 	SDL2::SDL2
 	OpenGL::GLU
 	OpenGL::GL
-	OpenAL)
+	OpenAL
+	Ogg::ogg
+	Vorbis::vorbis
+	Vorbis::vorbisfile)
 
 target_compile_options(winquake
 	PRIVATE
