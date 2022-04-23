@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-typedef struct
+struct wavinfo_t
 {
 	int rate;
 	int width;
@@ -28,6 +28,6 @@ typedef struct
 	int loopstart;
 	int samples;
 	int dataofs;		// chunk starts this many bytes from file start
-} wavinfo_t;
+};
 
 wavinfo_t GetWavinfo(const char* name, byte* wav, int wavlength);
