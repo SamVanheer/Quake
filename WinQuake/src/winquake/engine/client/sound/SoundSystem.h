@@ -39,7 +39,7 @@ struct DeleterWrapper final
 /**
 *	@brief OpenAL-based sound system.
 */
-class OpenALAudio final : public ISoundSystem
+class SoundSystem final : public ISoundSystem
 {
 private:
 	static constexpr int MAX_SFX = 512;
@@ -54,12 +54,12 @@ private:
 
 public:
 
-	static std::optional<OpenALAudio> Create();
+	static std::optional<SoundSystem> Create();
 
-	OpenALAudio() = default;
-	OpenALAudio(OpenALAudio&&) = default;
-	OpenALAudio& operator=(OpenALAudio&&) = default;
-	~OpenALAudio() override;
+	SoundSystem() = default;
+	SoundSystem(SoundSystem&&) = default;
+	SoundSystem& operator=(SoundSystem&&) = default;
+	~SoundSystem() override;
 
 	bool IsActive() const override { return true; }
 
@@ -116,7 +116,7 @@ private:
 	int total_channels = 0;
 };
 
-inline void OpenALAudio::SetAmbientEnabled(bool enable)
+inline void SoundSystem::SetAmbientEnabled(bool enable)
 {
 	m_AmbientEnabled = enable;
 }

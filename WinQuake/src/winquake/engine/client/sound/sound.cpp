@@ -64,7 +64,7 @@ struct DummySoundSystem final : public ISoundSystem
 
 static bool snd_firsttime = true;
 
-static std::optional<OpenALAudio> openal_audio;
+static std::optional<SoundSystem> openal_audio;
 
 static DummySoundSystem g_DummySoundSystem;
 
@@ -113,7 +113,7 @@ void S_Startup()
 	{
 		snd_firsttime = false;
 
-		openal_audio = OpenALAudio::Create();
+		openal_audio = SoundSystem::Create();
 
 		if (openal_audio.has_value())
 		{

@@ -37,9 +37,9 @@ static void CheckALErrors()
 	} while (error != AL_NO_ERROR);
 }
 
-std::optional<OpenALAudio> OpenALAudio::Create()
+std::optional<SoundSystem> SoundSystem::Create()
 {
-	if (OpenALAudio audio; audio.CreateCore())
+	if (SoundSystem audio; audio.CreateCore())
 	{
 		return audio;
 	}
@@ -47,7 +47,7 @@ std::optional<OpenALAudio> OpenALAudio::Create()
 	return {};
 }
 
-OpenALAudio::~OpenALAudio()
+SoundSystem::~SoundSystem()
 {
 	for (auto& channel : channels)
 	{
@@ -71,7 +71,7 @@ OpenALAudio::~OpenALAudio()
 	}
 }
 
-bool OpenALAudio::CreateCore()
+bool SoundSystem::CreateCore()
 {
 	m_Device.reset(alcOpenDevice(nullptr));
 
@@ -125,19 +125,19 @@ bool OpenALAudio::CreateCore()
 	return true;
 }
 
-void OpenALAudio::Block()
+void SoundSystem::Block()
 {
 	m_Blocked = true;
 	alListenerf(AL_GAIN, 0);
 }
 
-void OpenALAudio::Unblock()
+void SoundSystem::Unblock()
 {
 	m_Blocked = false;
 	alListenerf(AL_GAIN, 1);
 }
 
-sfx_t* OpenALAudio::PrecacheSound(const char* name)
+sfx_t* SoundSystem::PrecacheSound(const char* name)
 {
 	if (nosound.value)
 		return NULL;
@@ -151,7 +151,7 @@ sfx_t* OpenALAudio::PrecacheSound(const char* name)
 	return sfx;
 }
 
-void OpenALAudio::StartSound(int entnum, int entchannel, sfx_t* sfx, vec3_t origin, float fvol, float attenuation)
+void SoundSystem::StartSound(int entnum, int entchannel, sfx_t* sfx, vec3_t origin, float fvol, float attenuation)
 {
 	if (!sfx)
 		return;
@@ -216,7 +216,7 @@ void OpenALAudio::StartSound(int entnum, int entchannel, sfx_t* sfx, vec3_t orig
 	alSourcePlay(target_chan->source.Id);
 }
 
-void OpenALAudio::StaticSound(sfx_t* sfx, vec3_t origin, float vol, float attenuation)
+void SoundSystem::StaticSound(sfx_t* sfx, vec3_t origin, float vol, float attenuation)
 {
 	if (!sfx)
 		return;
@@ -246,7 +246,7 @@ void OpenALAudio::StaticSound(sfx_t* sfx, vec3_t origin, float vol, float attenu
 	alSourcePlay(ss->source.Id);
 }
 
-void OpenALAudio::LocalSound(const char* sound)
+void SoundSystem::LocalSound(const char* sound)
 {
 	if (nosound.value)
 		return;
@@ -260,7 +260,7 @@ void OpenALAudio::LocalSound(const char* sound)
 	StartSound(cl.viewentity, -1, sfx, vec3_origin, 1, 1);
 }
 
-void OpenALAudio::StopSound(int entnum, int entchannel)
+void SoundSystem::StopSound(int entnum, int entchannel)
 {
 	for (int i = 0; i < MAX_DYNAMIC_CHANNELS; i++)
 	{
@@ -274,7 +274,7 @@ void OpenALAudio::StopSound(int entnum, int entchannel)
 	}
 }
 
-void OpenALAudio::StopAllSounds()
+void SoundSystem::StopAllSounds()
 {
 	total_channels = MAX_DYNAMIC_CHANNELS + NUM_AMBIENTS;	// no statics
 
@@ -291,7 +291,7 @@ void OpenALAudio::StopAllSounds()
 	}
 }
 
-void OpenALAudio::Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
+void SoundSystem::Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
 {
 	VectorCopy(origin, listener_origin);
 	VectorCopy(forward, listener_forward);
@@ -331,7 +331,7 @@ void OpenALAudio::Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
 	}
 }
 
-void OpenALAudio::PrintSoundList()
+void SoundSystem::PrintSoundList()
 {
 	unsigned int total = 0;
 
@@ -359,7 +359,7 @@ void OpenALAudio::PrintSoundList()
 	Con_Printf("Total resident: %u\n", total);
 }
 
-sfx_t* OpenALAudio::FindName(const char* name)
+sfx_t* SoundSystem::FindName(const char* name)
 {
 	if (!name)
 		Sys_Error("FindName: NULL\n");
@@ -385,7 +385,7 @@ sfx_t* OpenALAudio::FindName(const char* name)
 	return sfx;
 }
 
-channel_t* OpenALAudio::PickChannel(int entnum, int entchannel)
+channel_t* SoundSystem::PickChannel(int entnum, int entchannel)
 {
 	// Check for replacement sound, or find the best one to replace
 	int first_to_die = -1;
@@ -436,7 +436,7 @@ channel_t* OpenALAudio::PickChannel(int entnum, int entchannel)
 	return &channels[first_to_die];
 }
 
-void OpenALAudio::SetupChannel(channel_t& chan, sfx_t* sfx, vec3_t origin, float vol, float attenuation, bool isRelative)
+void SoundSystem::SetupChannel(channel_t& chan, sfx_t* sfx, vec3_t origin, float vol, float attenuation, bool isRelative)
 {
 	alSourcefv(chan.source.Id, AL_POSITION, origin);
 	alSourcef(chan.source.Id, AL_GAIN, vol);
@@ -458,7 +458,7 @@ void OpenALAudio::SetupChannel(channel_t& chan, sfx_t* sfx, vec3_t origin, float
 	}
 }
 
-void OpenALAudio::UpdateAmbientSounds()
+void SoundSystem::UpdateAmbientSounds()
 {
 	if (!m_AmbientEnabled)
 		return;
@@ -525,7 +525,7 @@ void OpenALAudio::UpdateAmbientSounds()
 	}
 }
 
-void OpenALAudio::UpdateSounds()
+void SoundSystem::UpdateSounds()
 {
 	//Update all sounds that are looping, clear finished sounds.
 	for (int i = 0; i < total_channels; ++i)
