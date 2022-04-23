@@ -4,3 +4,6 @@
 [submodule "WinQuake/external/OpenAL"]
 	path = WinQuake/external/OpenAL
 	url = https://github.com/kcat/openal-soft.git
+[submodule "WinQuake/external/ogg"]
+	path = WinQuake/external/ogg
+	url = https://github.com/xiph/ogg.git
