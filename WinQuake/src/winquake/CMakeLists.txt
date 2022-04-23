@@ -84,7 +84,6 @@ if(RENDERER_IS_OPENGL)
 endif()
 
 target_link_libraries(winquake PRIVATE
-	$<$<CXX_COMPILER_ID:MSVC>:winmm>
 	$<$<CXX_COMPILER_ID:MSVC>:Ws2_32>
 	SDL2::SDL2
 	OpenGL::GLU
