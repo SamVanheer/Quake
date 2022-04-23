@@ -119,8 +119,7 @@ private:
 
 	vec3_t m_ListenerOrigin{};
 
-	sfx_t* known_sfx = nullptr;		// hunk allocated [MAX_SFX]
-	int num_sfx = 0;
+	std::vector<sfx_t> known_sfx; // [MAX_SFX]	
 
 	sfx_t* ambient_sfx[NUM_AMBIENTS]{};
 

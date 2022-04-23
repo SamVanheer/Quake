@@ -54,21 +54,6 @@ SoundSystem::~SoundSystem()
 		alDeleteSources(1, &channel.source.Id);
 		channel.source.Id = NullSource;
 	}
-
-	for (int i = 0; i < num_sfx; ++i)
-	{
-		if (known_sfx[i].loopingBuffer)
-		{
-			alDeleteBuffers(1, &known_sfx[i].loopingBuffer.Id);
-			known_sfx[i].loopingBuffer.Id = NullBuffer;
-		}
-
-		if (known_sfx[i].buffer)
-		{
-			alDeleteBuffers(1, &known_sfx[i].buffer.Id);
-			known_sfx[i].buffer.Id = NullBuffer;
-		}
-	}
 }
 
 bool SoundSystem::CreateCore()
@@ -102,8 +87,7 @@ bool SoundSystem::CreateCore()
 	//So volume is correct.
 	Unblock();
 
-	known_sfx = reinterpret_cast<sfx_t*>(Hunk_AllocName(MAX_SFX * sizeof(sfx_t), "sfx_t"));
-	num_sfx = 0;
+	known_sfx.reserve(MAX_SFX);
 
 	ambient_sfx[AMBIENT_WATER] = PrecacheSound("ambience/water1.wav");
 	ambient_sfx[AMBIENT_SKY] = PrecacheSound("ambience/wind2.wav");
@@ -345,26 +329,24 @@ void SoundSystem::PrintSoundList()
 {
 	unsigned int total = 0;
 
-	sfx_t* sfx = known_sfx;
-
-	for (int i = 0; i < num_sfx; i++, sfx++)
+	for (const auto& sfx : known_sfx)
 	{
-		if (!sfx->buffer)
+		if (!sfx.buffer)
 			continue;
 
 		ALint size;
-		alGetBufferi(sfx->buffer.Id, AL_SIZE, &size);
+		alGetBufferi(sfx.buffer.Id, AL_SIZE, &size);
 		total += size;
 
-		if (sfx->loopingBuffer)
+		if (sfx.loopingBuffer)
 			Con_Printf("L");
 		else
 			Con_Printf(" ");
 
 		ALint bits;
-		alGetBufferi(sfx->buffer.Id, AL_BITS, &bits);
+		alGetBufferi(sfx.buffer.Id, AL_BITS, &bits);
 
-		Con_Printf("(%2db) %6d : %s\n", static_cast<int>(bits), static_cast<int>(size), sfx->name);
+		Con_Printf("(%2db) %6d : %s\n", static_cast<int>(bits), static_cast<int>(size), sfx.name);
 	}
 	Con_Printf("Total resident: %u\n", total);
 }
@@ -378,21 +360,21 @@ sfx_t* SoundSystem::FindName(const char* name)
 		Sys_Error("Sound name too long: %s", name);
 
 	// see if already loaded
-	for (int i = 0; i < num_sfx; i++)
+	for (auto& sfx : known_sfx)
 	{
-		if (!Q_strcmp(known_sfx[i].name, name))
+		if (!Q_strcmp(sfx.name, name))
 		{
-			return &known_sfx[i];
+			return &sfx;
 		}
 	}
 
-	if (num_sfx == MAX_SFX)
+	if (known_sfx.size() == MAX_SFX)
 		Sys_Error("FindName: out of sfx_t");
 
-	auto sfx = &known_sfx[num_sfx++];
-	strcpy(sfx->name, name);
+	auto& sfx = known_sfx.emplace_back();
+	strcpy(sfx.name, name);
 
-	return sfx;
+	return &sfx;
 }
 
 SoundSystem::Channel* SoundSystem::PickChannel(int entnum, int entchannel)
