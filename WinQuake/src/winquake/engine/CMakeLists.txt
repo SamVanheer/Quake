@@ -53,9 +53,10 @@ target_sources(winquake
 		
 		client/sound/cdaudio.h
 		client/sound/ISoundSystem.h
-		client/sound/snd_dma.cpp
 		client/sound/snd_mem.cpp
+		client/sound/sound.cpp
 		client/sound/sound.h
+		client/sound/sound_internal.h
 		client/sound/SoundSystem.cpp
 		client/sound/SoundSystem.h
 		

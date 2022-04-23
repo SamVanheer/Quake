@@ -132,7 +132,7 @@ void CL_ParseStartSoundPacket(void)
 	for (i = 0; i < 3; i++)
 		pos[i] = MSG_ReadCoord();
 
-	S_StartSound(ent, channel, cl.sound_precache[sound_num], pos, volume / 255.0, attenuation);
+	g_SoundSystem->StartSound(ent, channel, cl.sound_precache[sound_num], pos, volume / 255.0, attenuation);
 }
 
 /*
@@ -297,7 +297,7 @@ void CL_ParseServerInfo(void)
 
 	for (i = 1; i < numsounds; i++)
 	{
-		cl.sound_precache[i] = S_PrecacheSound(sound_precache[i]);
+		cl.sound_precache[i] = g_SoundSystem->PrecacheSound(sound_precache[i]);
 		CL_KeepaliveMessage();
 	}
 
@@ -701,7 +701,7 @@ void CL_ParseStaticSound(void)
 	vol = MSG_ReadByte();
 	atten = MSG_ReadByte();
 
-	S_StaticSound(cl.sound_precache[sound_num], org, vol, atten);
+	g_SoundSystem->StaticSound(cl.sound_precache[sound_num], org, vol, atten);
 }
 
 
@@ -828,7 +828,7 @@ void CL_ParseServerMessage(void)
 
 		case svc_stopsound:
 			i = MSG_ReadShort();
-			S_StopSound(i >> 3, i & 7);
+			g_SoundSystem->StopSound(i >> 3, i & 7);
 			break;
 
 		case svc_updatename:

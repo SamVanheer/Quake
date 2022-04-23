@@ -24,9 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <optional>
 #include <vector>
 
-#include <AL/al.h>
-#include <AL/alc.h>
-
 #include "ISoundSystem.h"
 
 template<auto Function>
@@ -39,127 +36,87 @@ struct DeleterWrapper final
 	}
 };
 
-constexpr ALuint NullBuffer = 0;
-constexpr ALuint NullSource = 0;
-
-struct OpenALBuffer final
-{
-	constexpr OpenALBuffer() noexcept = default;
-
-	OpenALBuffer(const OpenALBuffer&) = delete;
-	OpenALBuffer& operator=(const OpenALBuffer&) = delete;
-
-	constexpr OpenALBuffer(OpenALBuffer&& other) noexcept
-		: Id(other.Id)
-	{
-		other.Id = NullBuffer;
-	}
-
-	constexpr OpenALBuffer& operator=(OpenALBuffer&& other) noexcept
-	{
-		if (this != &other)
-		{
-			Id = other.Id;
-			other.Id = NullBuffer;
-		}
-
-		return *this;
-	}
-
-	~OpenALBuffer()
-	{
-		Delete();
-	}
-
-	static OpenALBuffer Create()
-	{
-		OpenALBuffer buffer;
-		alGenBuffers(1, &buffer.Id);
-		return buffer;
-	}
-
-	constexpr operator bool() const { return Id != NullBuffer; }
-
-	void Delete()
-	{
-		if (Id != NullBuffer)
-		{
-			alDeleteBuffers(1, &Id);
-		}
-	}
-
-	ALuint Id = NullBuffer;
-};
-
-struct OpenALSource final
-{
-	constexpr OpenALSource() noexcept = default;
-
-	OpenALSource(const OpenALSource&) = delete;
-	OpenALSource& operator=(const OpenALSource&) = delete;
-
-	constexpr OpenALSource(OpenALSource&& other) noexcept
-		: Id(other.Id)
-	{
-		other.Id = NullSource;
-	}
-
-	constexpr OpenALSource& operator=(OpenALSource&& other) noexcept
-	{
-		if (this != &other)
-		{
-			Id = other.Id;
-			other.Id = NullSource;
-		}
-
-		return *this;
-	}
-
-	~OpenALSource()
-	{
-		Delete();
-	}
-
-	static OpenALSource Create()
-	{
-		OpenALSource source;
-		alGenSources(1, &source.Id);
-		return source;
-	}
-
-	constexpr operator bool() const { return Id != NullSource; }
-
-	void Delete()
-	{
-		if (Id != NullSource)
-		{
-			alDeleteSources(1, &Id);
-		}
-	}
-
-	ALuint Id = NullSource;
-};
-
 /**
 *	@brief OpenAL-based sound system.
 */
 class OpenALAudio final : public ISoundSystem
 {
+private:
+	static constexpr int MAX_SFX = 512;
+
+	// 0 to MAX_DYNAMIC_CHANNELS-1	= normal entity sounds
+	// MAX_DYNAMIC_CHANNELS to MAX_DYNAMIC_CHANNELS + NUM_AMBIENTS -1 = water, etc
+	// MAX_DYNAMIC_CHANNELS + NUM_AMBIENTS to total_channels = static sounds
+	static constexpr int MAX_CHANNELS = 128;
+	static constexpr int MAX_DYNAMIC_CHANNELS = 8;
+
+	static constexpr vec_t sound_nominal_clip_dist = 1000.0;
+
 public:
 
 	static std::optional<OpenALAudio> Create();
+
+	OpenALAudio() = default;
+	OpenALAudio(OpenALAudio&&) = default;
+	OpenALAudio& operator=(OpenALAudio&&) = default;
+	~OpenALAudio() override;
+
+	bool IsActive() const override { return true; }
 
 	bool IsBlocked() const override { return m_Blocked; }
 
 	void Block() override;
 	void Unblock() override;
 
+	bool IsAmbientEnabled() const override { return m_AmbientEnabled; }
+	void SetAmbientEnabled(bool enable) override;
+
+	int GetTotalChannelCount() const override { return total_channels; }
+
+	sfx_t* PrecacheSound(const char* name) override;
+
+	void StartSound(int entnum, int entchannel, sfx_t* sfx, vec3_t origin, float fvol, float attenuation) override;
+	void StaticSound(sfx_t* sfx, vec3_t origin, float vol, float attenuation) override;
+	void LocalSound(const char* sound) override;
+
+	void StopSound(int entnum, int entchannel) override;
+	void StopAllSounds() override;
+
+	void Update(vec3_t origin, vec3_t v_forward, vec3_t v_right, vec3_t v_up) override;
+
+	void PrintSoundList() override;
+
 private:
 	bool CreateCore();
+
+	sfx_t* FindName(const char* name);
+
+	/**
+	*	@brief picks a channel based on priorities, empty slots, number of channels
+	*/
+	channel_t* PickChannel(int entnum, int entchannel);
+	void SetupChannel(channel_t& chan, sfx_t* sfx, vec3_t origin, float vol, float attenuation, bool isRelative);
+
+	void UpdateAmbientSounds();
+	void UpdateSounds();
 
 private:
 	std::unique_ptr<ALCdevice, DeleterWrapper<alcCloseDevice>> m_Device;
 	std::unique_ptr<ALCcontext, DeleterWrapper<alcDestroyContext>> m_Context;
 
 	bool m_Blocked = false;
+	bool m_AmbientEnabled = true;
+
+	sfx_t* known_sfx = nullptr;		// hunk allocated [MAX_SFX]
+	int num_sfx = 0;
+
+	sfx_t* ambient_sfx[NUM_AMBIENTS]{};
+
+	channel_t channels[MAX_CHANNELS]{};
+	int total_channels = 0;
 };
+
+inline void OpenALAudio::SetAmbientEnabled(bool enable)
+{
+	m_AmbientEnabled = enable;
+}

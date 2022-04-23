@@ -1859,7 +1859,7 @@ void VID_MenuKey(int key)
 	switch (key)
 	{
 	case K_ESCAPE:
-		S_LocalSound("misc/menu1.wav");
+		g_SoundSystem->LocalSound("misc/menu1.wav");
 		M_Menu_Options_f();
 		break;
 

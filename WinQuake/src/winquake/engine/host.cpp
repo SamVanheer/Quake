@@ -701,11 +701,11 @@ void _Host_Frame(float time)
 	// update audio
 	if (cls.signon == SIGNONS)
 	{
-		S_Update(r_origin, vpn, vright, vup);
+		g_SoundSystem->Update(r_origin, vpn, vright, vup);
 		CL_DecayLights();
 	}
 	else
-		S_Update(vec3_origin, vec3_origin, vec3_origin, vec3_origin);
+		g_SoundSystem->Update(vec3_origin, vec3_origin, vec3_origin, vec3_origin);
 
 	CDAudio_Update();
 

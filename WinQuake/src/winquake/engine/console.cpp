@@ -280,7 +280,7 @@ void Con_Print(const char* txt)
 	if (txt[0] == 1)
 	{
 		mask = 128;		// go to colored text
-		S_LocalSound("misc/talk.wav");
+		g_SoundSystem->LocalSound("misc/talk.wav");
 		// play talk wav
 		txt++;
 	}
