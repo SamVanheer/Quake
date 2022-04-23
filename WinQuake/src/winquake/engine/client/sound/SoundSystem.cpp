@@ -47,15 +47,6 @@ std::optional<SoundSystem> SoundSystem::Create()
 	return {};
 }
 
-SoundSystem::~SoundSystem()
-{
-	for (auto& channel : channels)
-	{
-		alDeleteSources(1, &channel.source.Id);
-		channel.source.Id = NullSource;
-	}
-}
-
 bool SoundSystem::CreateCore()
 {
 	m_Device.reset(alcOpenDevice(nullptr));

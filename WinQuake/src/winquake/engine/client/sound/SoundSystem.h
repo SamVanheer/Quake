@@ -64,11 +64,6 @@ public:
 
 	static std::optional<SoundSystem> Create();
 
-	SoundSystem() = default;
-	SoundSystem(SoundSystem&&) = default;
-	SoundSystem& operator=(SoundSystem&&) = default;
-	~SoundSystem() override;
-
 	bool IsActive() const override { return true; }
 
 	bool IsBlocked() const override { return m_Blocked; }
