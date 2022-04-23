@@ -49,21 +49,13 @@ The loading disc image is rendered on top of that when it is active.
 This allows Software mode to work without depending on the MegaGraph Graphics Library, which is a precompiled static library exclusive to Windows.
 This ensures all code is compiled with the same compiler and allows Software mode to work on Linux.
 
-## The audio playback code has been updated to fall back to the fake direct memory access implementation if no audio system was able to initialize.
-
-This is needed on Linux because its audio code relies on the obsolete `/dev/dsp` API.
-
-## The engine has been updated to work better when run as a 64 bit program.
-
-It is not possible to play games as-is because the precompiled QuakeC code uses 32 bit structure layouts and offsets, but it is possible to launch the game and interact with the main menu.
-
 ## Improved networking driver code on Windows.
 
 The Winsock2 API is now used directly and the IPX driver has been removed (no longer supported by Windows).
 
 ## Replaced DirectSound, Wave and /dev/dsp sound APIs with OpenAL.
 
-OpenAL provides a cross-platform sound API. This implementation is based on the Wave sound system implementation so there is a small amount of latency.
+OpenAL provides a cross-platform sound API. This implementation makes direct use of OpenAL's 3D audio APIs to allow latency-free sound playback.
 
 ## Converted QuakeC game code to C++.
 
