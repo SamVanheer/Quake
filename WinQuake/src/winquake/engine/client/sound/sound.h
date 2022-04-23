@@ -22,18 +22,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #pragma once
 
 #include "ISoundSystem.h"
-#include "SoundSystem.h"
 
-#define DEFAULT_SOUND_PACKET_VOLUME 255
-#define DEFAULT_SOUND_PACKET_ATTENUATION 1.0
+constexpr int DEFAULT_SOUND_PACKET_VOLUME = 255;
+constexpr float DEFAULT_SOUND_PACKET_ATTENUATION = 1.0f;
 
 extern ISoundSystem* g_SoundSystem;
 
 void S_Init();
-
-/**
-*	@brief Shutdown sound engine
-*/
 void S_Shutdown();
 
 // ====================================================================
