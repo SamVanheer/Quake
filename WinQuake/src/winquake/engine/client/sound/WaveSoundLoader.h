@@ -17,30 +17,17 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-// sound.h -- client sound i/o functions
 
 #pragma once
 
-#include "ISoundSystem.h"
-#include "SoundSystem.h"
+typedef struct
+{
+	int rate;
+	int width;
+	int channels;
+	int loopstart;
+	int samples;
+	int dataofs;		// chunk starts this many bytes from file start
+} wavinfo_t;
 
-#define DEFAULT_SOUND_PACKET_VOLUME 255
-#define DEFAULT_SOUND_PACKET_ATTENUATION 1.0
-
-extern ISoundSystem* g_SoundSystem;
-
-void S_Init();
-
-/**
-*	@brief Shutdown sound engine
-*/
-void S_Shutdown();
-
-// ====================================================================
-// User-setable variables
-// ====================================================================
-
-extern cvar_t bgmvolume;
-extern cvar_t volume;
-
-sfx_t* S_LoadSound(sfx_t* s);
+wavinfo_t GetWavinfo(const char* name, byte* wav, int wavlength);

@@ -59,6 +59,8 @@ target_sources(winquake
 		client/sound/sound_internal.h
 		client/sound/SoundSystem.cpp
 		client/sound/SoundSystem.h
+		client/sound/WaveSoundLoader.cpp
+		client/sound/WaveSoundLoader.h
 		
 		client/ui/menu.cpp
 		client/ui/menu.h
