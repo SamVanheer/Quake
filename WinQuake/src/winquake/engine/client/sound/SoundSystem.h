@@ -145,24 +145,6 @@ struct OpenALSource final
 */
 class OpenALAudio final : public ISoundSystem
 {
-private:
-	// 64K is > 1 second at 16-bit, 22050 Hz
-	static constexpr int BUFFER_MASK = 0x3F;
-	static constexpr int NUM_BUFFERS = BUFFER_MASK + 1;
-	static constexpr int BUFFER_SIZE = 0x0400;
-
-	//The higher this is the more latency there is. Originally 4 in the wave implementation.
-	//There is likely a problem with this implementation
-	//because the sound painting code can paint ahead further than the amount of buffers we're queueing.
-	//
-	//The DirectSound version wrote directly to the buffer which allowed it to stay in sync.
-	//
-	//There is no perfect solution for this as-is; the sound playback code needs to use OpenAL more directly
-	//so sounds are played in real-time instead of writing to a single buffer that gets queueud in chunks.
-	//
-	//In effect: S_StartSound => alSourcePlay
-	static constexpr int MAX_BUFFERS_AHEAD = 2;
-
 public:
 
 	static std::optional<OpenALAudio> Create();
