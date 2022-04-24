@@ -414,6 +414,16 @@ void CDAudio::Update()
 			alBufferData(bufferId, m_Loader->GetFormat(), dataBuffer, bytesRead, m_Loader->GetRate());
 
 			alSourceQueueBuffers(m_Source.Id, 1, &bufferId);
+
+			ALint state;
+			alGetSourcei(m_Source.Id, AL_SOURCE_STATE, &state);
+
+			if (state != AL_PLAYING)
+			{
+				//If we're really slow to load samples then playback might have ended already.
+				//Restart it so we at least play it chunk by chunk.
+				alSourcePlay(m_Source.Id);
+			}
 		}
 	}
 
