@@ -60,6 +60,7 @@ struct OpenALBuffer final
 	{
 		if (this != &other)
 		{
+			Delete();
 			Id = other.Id;
 			other.Id = NullBuffer;
 		}
@@ -86,6 +87,7 @@ struct OpenALBuffer final
 		if (Id != NullBuffer)
 		{
 			alDeleteBuffers(1, &Id);
+			Id = NullBuffer;
 		}
 	}
 
@@ -109,6 +111,7 @@ struct OpenALSource final
 	{
 		if (this != &other)
 		{
+			Delete();
 			Id = other.Id;
 			other.Id = NullSource;
 		}
@@ -135,6 +138,7 @@ struct OpenALSource final
 		if (Id != NullSource)
 		{
 			alDeleteSources(1, &Id);
+			Id = NullSource;
 		}
 	}
 
