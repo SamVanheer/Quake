@@ -2,6 +2,7 @@
 # WinQuake game
 #
 
+find_package(Threads REQUIRED)
 find_package(OpenGL REQUIRED)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -85,6 +86,7 @@ endif()
 
 target_link_libraries(winquake PRIVATE
 	$<$<CXX_COMPILER_ID:MSVC>:Ws2_32>
+	Threads::Threads
 	SDL2::SDL2
 	OpenGL::GLU
 	OpenGL::GL
