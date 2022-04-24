@@ -707,11 +707,6 @@ void _Host_Frame(float time)
 	else
 		g_SoundSystem->Update(vec3_origin, vec3_origin, vec3_origin, vec3_origin);
 
-	if (g_CDAudio)
-	{
-		g_CDAudio->Update();
-	}
-
 	if (host_speeds.value)
 	{
 		pass1 = (time1 - time3) * 1000;

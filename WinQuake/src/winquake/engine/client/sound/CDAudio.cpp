@@ -19,6 +19,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "quakedef.h"
+
+#define AL_ALEXT_PROTOTYPES
+#include <AL/alext.h>
+
 #include "CDAudio.h"
 #include "OggSoundLoader.h"
 #include "sound_internal.h"
@@ -67,6 +71,14 @@ constexpr std::array MusicFileNames
 
 CDAudio::~CDAudio()
 {
+	//Stop worker thread and wait until it finishes.
+	m_Quit = true;
+
+	if (m_Thread.joinable())
+	{
+		m_Thread.join();
+	}
+
 	//Since we switch to this context on-demand we can't rely on the default destructor to clean up.
 	if (const ContextSwitcher switcher{m_Context.get()}; switcher)
 	{
@@ -81,6 +93,12 @@ CDAudio::~CDAudio()
 
 bool CDAudio::Create(SoundSystem& soundSystem)
 {
+	if (ALC_FALSE == alcIsExtensionPresent(soundSystem.GetDevice(), "ALC_EXT_thread_local_context"))
+	{
+		Con_SafePrintf("OpenAL does not provide extension \"ALC_EXT_thread_local_context\", required for music playback\n");
+		return false;
+	}
+
 	m_Context.reset(alcCreateContext(soundSystem.GetDevice(), nullptr));
 
 	if (!m_Context)
@@ -115,26 +133,39 @@ bool CDAudio::Create(SoundSystem& soundSystem)
 		return false;
 	}
 
+	//Start the worker thread.
+	m_Thread = std::thread{&CDAudio::Run, this};
+
 	return true;
 }
 
 void CDAudio::Play(byte track, bool looping)
 {
-	if (!m_Enabled)
-		return;
-
-	const ContextSwitcher switcher{m_Context.get()};
-
-	if (!switcher)
-	{
-		return;
-	}
-
+	//Do this first to allow for console output.
 	if (track < 2 || track > MusicFileNames.size())
 	{
 		Con_DPrintf("CDAudio: Bad track number %u.\n", track);
 		return;
 	}
+
+	FILE* file;
+
+	if (COM_FOpenFile(MusicFileNames[track], &file) < 0)
+	{
+		Con_DPrintf("CDAudio: Track %u (\"%s\") does not exist.\n", track, MusicFileNames[track]);
+		return;
+	}
+
+	if (RunOnWorkerThread(&CDAudio::Play, track, looping))
+	{
+		fclose(file);
+		return;
+	}
+
+	if (!m_Enabled)
+		return;
+
+	//TODO: don't print to console from worker thread.
 
 	if (m_Playing || m_Paused)
 	{
@@ -143,11 +174,11 @@ void CDAudio::Play(byte track, bool looping)
 		Stop();
 	}
 
-	m_Loader = OggSoundLoader::TryOpenFile(MusicFileNames[track]);
+	m_Loader = OggSoundLoader::TryOpenFile(file);
 
 	if (!m_Loader)
 	{
-		Con_DPrintf("CDAudio: Track %u (\"%s\") does not exist.\n", track, MusicFileNames[track]);
+		//Can happen if the file was deleted or otherwise rendered inaccessible since queueing this.
 		return;
 	}
 
@@ -186,18 +217,16 @@ void CDAudio::Play(byte track, bool looping)
 
 void CDAudio::Stop()
 {
+	if (RunOnWorkerThread(&CDAudio::Stop))
+	{
+		return;
+	}
+
 	if (!m_Enabled)
 		return;
 
 	if (!m_Playing && !m_Paused)
 		return;
-
-	const ContextSwitcher switcher{m_Context.get()};
-
-	if (!switcher)
-	{
-		return;
-	}
 
 	alSourceStop(m_Source.Id);
 
@@ -212,126 +241,45 @@ void CDAudio::Stop()
 
 void CDAudio::Pause()
 {
+	if (RunOnWorkerThread(&CDAudio::Pause))
+	{
+		return;
+	}
+
 	if (!m_Enabled)
 		return;
 
 	if (!m_Playing)
 		return;
 
-	const ContextSwitcher switcher{m_Context.get()};
-
-	if (!switcher)
-	{
-		return;
-	}
-
 	alSourcePause(m_Source.Id);
 
-	m_Paused = m_Playing;
+	m_Paused = m_Playing.load();
 	m_Playing = false;
 }
 
 void CDAudio::Resume()
 {
+	if (RunOnWorkerThread(&CDAudio::Resume))
+	{
+		return;
+	}
+
 	if (!m_Enabled)
 		return;
 
 	if (!m_Paused)
 		return;
 
-	const ContextSwitcher switcher{m_Context.get()};
-
-	if (!switcher)
-	{
-		return;
-	}
-
 	alSourcePlay(m_Source.Id);
 
 	m_Playing = true;
-}
-
-void CDAudio::Update()
-{
-	if (!m_Enabled)
-		return;
-
-	const ContextSwitcher switcher{m_Context.get()};
-
-	if (!switcher)
-	{
-		return;
-	}
-
-	if (m_Playing)
-	{
-		//Fill processed buffers with new data if needed.
-		ALint processed;
-		alGetSourcei(m_Source.Id, AL_BUFFERS_PROCESSED, &processed);
-
-		ALuint bufferId;
-
-		byte dataBuffer[BufferSize];
-
-		while (processed-- > 0)
-		{
-			alSourceUnqueueBuffers(m_Source.Id, 1, &bufferId);
-
-			long bytesRead = m_Loader->Read(dataBuffer, sizeof(dataBuffer));
-
-			if (bytesRead <= 0)
-			{
-				if (!m_Looping)
-				{
-					break;
-				}
-
-				m_Loader->Reset();
-
-				bytesRead = m_Loader->Read(dataBuffer, sizeof(dataBuffer));
-			}
-
-			if (bytesRead <= 0)
-			{
-				break;
-			}
-
-			alBufferData(bufferId, m_Loader->GetFormat(), dataBuffer, bytesRead, m_Loader->GetRate());
-
-			alSourceQueueBuffers(m_Source.Id, 1, &bufferId);
-		}
-	}
-
-	if (bgmvolume.value != m_Volume)
-	{
-		if (m_Volume)
-		{
-			Cvar_SetValue("bgmvolume", 0.0);
-			alSourcei(m_Source.Id, AL_GAIN, 0);
-			m_Volume = bgmvolume.value;
-			Pause();
-		}
-		else
-		{
-			Cvar_SetValue("bgmvolume", 1.0);
-			alSourcei(m_Source.Id, AL_GAIN, 1);
-			m_Volume = bgmvolume.value;
-			Resume();
-		}
-	}
 }
 
 void CDAudio::CD_Command()
 {
 	if (Cmd_Argc() < 2)
 		return;
-
-	const ContextSwitcher switcher{m_Context.get()};
-
-	if (!switcher)
-	{
-		return;
-	}
 
 	auto command = Cmd_Argv(1);
 
@@ -377,10 +325,119 @@ void CDAudio::CD_Command()
 	{
 		Con_Printf("%u tracks\n", MusicFileNames.size());
 		if (m_Playing)
-			Con_Printf("Currently %s track %u\n", m_Looping ? "looping" : "playing", m_Track);
+			Con_Printf("Currently %s track %u\n", m_Looping ? "looping" : "playing", m_Track.load());
 		else if (m_Paused)
-			Con_Printf("Paused %s track %u\n", m_Looping ? "looping" : "playing", m_Track);
-		Con_Printf("Volume is %f\n", m_Volume);
+			Con_Printf("Paused %s track %u\n", m_Looping ? "looping" : "playing", m_Track.load());
+		Con_Printf("Volume is %f\n", m_Volume.load());
+	}
+}
+
+template<typename Func, typename... Args>
+bool CDAudio::RunOnWorkerThread(Func func, Args&&... args)
+{
+	if (std::this_thread::get_id() == m_Thread.get_id())
+	{
+		return false;
+	}
+
+	//Queue up for execution on the worker thread.
+	const std::lock_guard guard{m_JobMutex};
+
+	m_Jobs.emplace_back([=]() { (this->*func)(args...); });
+
+	return true;
+}
+
+void CDAudio::Run()
+{
+	//Use our context on our own thread only.
+	alcSetThreadContext(m_Context.get());
+
+	while (!m_Quit)
+	{
+		//Run pending jobs, if any.
+		{
+			const std::lock_guard guard{m_JobMutex};
+
+			for (auto& job : m_Jobs)
+			{
+				job();
+			}
+
+			m_Jobs.clear();
+		}
+
+		Update();
+	}
+
+	alcSetThreadContext(nullptr);
+}
+
+void CDAudio::Update()
+{
+	if (!m_Enabled)
+		return;
+
+	if (m_Playing)
+	{
+		//Fill processed buffers with new data if needed.
+		ALint processed;
+		alGetSourcei(m_Source.Id, AL_BUFFERS_PROCESSED, &processed);
+
+		ALuint bufferId;
+
+		byte dataBuffer[BufferSize];
+
+		while (processed-- > 0)
+		{
+			alSourceUnqueueBuffers(m_Source.Id, 1, &bufferId);
+
+			long bytesRead = m_Loader->Read(dataBuffer, sizeof(dataBuffer));
+
+			if (bytesRead <= 0)
+			{
+				if (!m_Looping)
+				{
+					break;
+				}
+
+				m_Loader->Reset();
+
+				bytesRead = m_Loader->Read(dataBuffer, sizeof(dataBuffer));
+			}
+
+			if (bytesRead <= 0)
+			{
+				break;
+			}
+
+			alBufferData(bufferId, m_Loader->GetFormat(), dataBuffer, bytesRead, m_Loader->GetRate());
+
+			alSourceQueueBuffers(m_Source.Id, 1, &bufferId);
+		}
+	}
+
+	//TODO: value can potentially change while being read.
+	if (float setting = bgmvolume.value; setting != m_Volume)
+	{
+		//Force value to be either 0 or 1.
+		if (setting != 0)
+		{
+			setting = 1;
+		}
+
+		alSourcei(m_Source.Id, AL_GAIN, setting);
+
+		if (m_Volume)
+		{
+			Pause();
+		}
+		else
+		{
+			Resume();
+		}
+
+		m_Volume = setting;
 	}
 }
 

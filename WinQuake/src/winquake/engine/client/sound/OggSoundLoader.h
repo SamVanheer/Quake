@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
+#include <cstdio>
 #include <memory>
 
 #include <AL/al.h>
@@ -45,7 +46,7 @@ public:
 		ov_clear(&m_File);
 	}
 
-	static std::unique_ptr<OggSoundLoader> TryOpenFile(const char* fileName);
+	static std::unique_ptr<OggSoundLoader> TryOpenFile(FILE* file);
 
 	std::size_t GetSize() const { return m_Size; }
 

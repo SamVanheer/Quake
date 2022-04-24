@@ -22,6 +22,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <memory>
 
+/**
+*	@brief Interface for music playback. Does not support CD playback.
+*	@details Music playback is done on a separate thread to avoid starving the audio buffer.
+*/
 struct ICDAudio
 {
 	virtual ~ICDAudio() = default;
@@ -30,7 +34,6 @@ struct ICDAudio
 	virtual void Stop() = 0;
 	virtual void Pause() = 0;
 	virtual void Resume() = 0;
-	virtual void Update() = 0;
 
 	virtual void CD_Command() = 0;
 };

@@ -21,24 +21,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "quakedef.h"
 #include "OggSoundLoader.h"
 
-std::unique_ptr<OggSoundLoader> OggSoundLoader::TryOpenFile(const char* fileName)
+std::unique_ptr<OggSoundLoader> OggSoundLoader::TryOpenFile(FILE* file)
 {
-	FILE* handle;
-
-	if (COM_FOpenFile(fileName, &handle) < 0)
+	if (!file)
 	{
 		return {};
 	}
 
-	OggVorbis_File file;
+	OggVorbis_File vorbisFile;
 
 	//NOTE: if vorbisfile is not using the same runtime as winquake this will need to use ov_open_callbacks instead on Windows.
 	//See https://xiph.org/vorbis/doc/vorbisfile/ov_open.html
-	if (ov_open(handle, &file, nullptr, 0))
+	if (ov_open(file, &vorbisFile, nullptr, 0))
 	{
-		Con_Printf("Couldn't load file \"%s\"\n", fileName);
 		return {};
 	}
 
-	return std::make_unique<OggSoundLoader>(file);
+	return std::make_unique<OggSoundLoader>(vorbisFile);
 }
