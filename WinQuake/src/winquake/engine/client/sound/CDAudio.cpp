@@ -204,6 +204,8 @@ void CDAudio::Stop()
 	//Unqueue all buffers as well to free them up.
 	alSourcei(m_Source.Id, AL_BUFFER, NullBuffer);
 
+	m_Loader.reset();
+
 	m_Paused = false;
 	m_Playing = false;
 }
