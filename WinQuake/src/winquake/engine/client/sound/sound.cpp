@@ -45,7 +45,7 @@ struct DummySoundSystem final : public ISoundSystem
 	void StopSound(int entnum, int entchannel) override {}
 	void StopAllSounds() override {}
 
-	void Update(vec3_t origin, vec3_t v_forward, vec3_t v_right, vec3_t v_up) override {}
+	void Update(const vec3_t origin, const vec3_t v_forward, const vec3_t v_right, const vec3_t v_up) override {}
 
 	void PrintSoundList() override
 	{

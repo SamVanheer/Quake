@@ -36,6 +36,10 @@ struct mplane_s;
 extern vec3_t vec3_origin;
 extern	int nanmask;
 
+constexpr vec3_t vec3_forward{1, 0, 0};
+constexpr vec3_t vec3_right{0, 1, 0};
+constexpr vec3_t vec3_up{0, 0, 1};
+
 #define	IS_NAN(x) (((*(int *)&x)&nanmask)==nanmask)
 
 #define DotProduct(x,y) (x[0]*y[0]+x[1]*y[1]+x[2]*y[2])

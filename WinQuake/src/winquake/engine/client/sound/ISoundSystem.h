@@ -80,7 +80,7 @@ struct ISoundSystem
 	/**
 	*	@brief Called once each time through the main loop
 	*/
-	virtual void Update(vec3_t origin, vec3_t v_forward, vec3_t v_right, vec3_t v_up) = 0;
+	virtual void Update(const vec3_t origin, const vec3_t v_forward, const vec3_t v_right, const vec3_t v_up) = 0;
 
 	virtual void PrintSoundList() = 0;
 

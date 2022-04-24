@@ -277,7 +277,7 @@ void SoundSystem::StopAllSounds()
 	}
 }
 
-void SoundSystem::Update(vec3_t origin, vec3_t forward, vec3_t right, vec3_t up)
+void SoundSystem::Update(const vec3_t origin, const vec3_t forward, const vec3_t right, const vec3_t up)
 {
 	if (ALC_FALSE == alcMakeContextCurrent(m_Context.get()))
 	{

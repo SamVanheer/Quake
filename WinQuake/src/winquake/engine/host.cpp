@@ -705,7 +705,7 @@ void _Host_Frame(float time)
 		CL_DecayLights();
 	}
 	else
-		g_SoundSystem->Update(vec3_origin, vec3_origin, vec3_origin, vec3_origin);
+		g_SoundSystem->Update(vec3_origin, vec3_forward, vec3_right, vec3_up);
 
 	if (host_speeds.value)
 	{
