@@ -83,4 +83,5 @@ private:
 	std::mutex m_JobMutex;
 
 	std::vector<std::function<void()>> m_Jobs;
+	std::vector<std::function<void()>> m_JobsToExecute;
 };

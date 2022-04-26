@@ -356,16 +356,17 @@ void CDAudio::Run()
 	while (!m_Quit)
 	{
 		//Run pending jobs, if any.
+		if (const std::unique_lock guard{m_JobMutex, std::try_to_lock}; guard)
 		{
-			const std::lock_guard guard{m_JobMutex};
-
-			for (auto& job : m_Jobs)
-			{
-				job();
-			}
-
-			m_Jobs.clear();
+			m_Jobs.swap(m_JobsToExecute);	
 		}
+
+		for (auto& job : m_JobsToExecute)
+		{
+			job();
+		}
+
+		m_JobsToExecute.clear();
 
 		Update();
 	}
