@@ -142,7 +142,7 @@ bool CDAudio::Create(SoundSystem& soundSystem)
 void CDAudio::Play(byte track, bool looping)
 {
 	//Do this first to allow for console output.
-	if (track < 2 || track > MusicFileNames.size())
+	if (track < 2 || track >= MusicFileNames.size())
 	{
 		Con_DPrintf("CDAudio: Bad track number %u.\n", track);
 		return;
