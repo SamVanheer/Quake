@@ -156,12 +156,13 @@ void CDAudio::Play(byte track, bool looping)
 		return;
 	}
 
-	if (RunOnWorkerThread(&CDAudio::Play, track, looping))
-	{
-		fclose(file);
-		return;
-	}
+	FileWrapper deleter{file};
 
+	RunOnWorkerThread(&CDAudio::StartPlaying, track, looping, std::move(deleter));
+}
+
+void CDAudio::StartPlaying(byte track, bool looping, FileWrapper file)
+{
 	if (!m_Enabled)
 		return;
 
@@ -174,13 +175,16 @@ void CDAudio::Play(byte track, bool looping)
 		Stop();
 	}
 
-	m_Loader = OggSoundLoader::TryOpenFile(file);
+	m_Loader = OggSoundLoader::TryOpenFile(file.get());
 
 	if (!m_Loader)
 	{
 		//Can happen if the file was deleted or otherwise rendered inaccessible since queueing this.
 		return;
 	}
+
+	//Loader now holds ownership through OggVorbis_File.
+	file.release();
 
 	//Fill all buffers with data.
 	byte dataBuffer[BufferSize];

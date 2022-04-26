@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <array>
 #include <atomic>
+#include <cstdio>
 #include <functional>
 #include <mutex>
 #include <thread>
@@ -37,6 +38,80 @@ private:
 	//This is tuned to work pretty well with the original Quake soundtrack, but needs testing to make sure it's good for any input.
 	static constexpr std::size_t NumBuffers = 8;
 	static constexpr std::size_t BufferSize = 1024 * 4;
+
+	//Wrapper around FILE* that implements copy behavior as move behavior.
+	//This is needed because std::function is copyable, and std::unique_ptr captured by lambda disables the lambda's copy constructor.
+	//C++23 has std::move_only_function which solves this problem, but it's not available yet.
+	struct FileWrapper
+	{
+		mutable FILE* File = nullptr;
+
+		FileWrapper(FILE* file) noexcept
+			: File(file)
+		{
+		}
+
+		FileWrapper(FileWrapper&& other) noexcept
+			: File(other.File)
+		{
+			other.File = nullptr;
+		}
+
+		FileWrapper& operator=(FileWrapper&& other) noexcept
+		{
+			if (this != &other)
+			{
+				Close();
+				File = other.File;
+				other.File = nullptr;
+			}
+
+			return *this;
+		}
+
+		FileWrapper(const FileWrapper& other) noexcept
+			: File(other.File)
+		{
+			other.File = nullptr;
+		}
+
+		FileWrapper& operator=(const FileWrapper& other) noexcept
+		{
+			if (this != &other)
+			{
+				Close();
+				File = other.File;
+				other.File = nullptr;
+			}
+
+			return *this;
+		}
+
+		~FileWrapper() noexcept
+		{
+			Close();
+		}
+
+		FILE* get() noexcept
+		{
+			return File;
+		}
+
+		void release() noexcept
+		{
+			File = nullptr;
+		}
+
+	private:
+		void Close()
+		{
+			if (File)
+			{
+				fclose(File);
+				File = nullptr;
+			}
+		}
+	};
 
 public:
 	~CDAudio() override;
@@ -56,6 +131,8 @@ private:
 	*/
 	template<typename Func, typename... Args>
 	bool RunOnWorkerThread(Func func, Args&&... args);
+
+	void StartPlaying(byte track, bool looping, FileWrapper file);
 
 	void Run();
 	void Update();
