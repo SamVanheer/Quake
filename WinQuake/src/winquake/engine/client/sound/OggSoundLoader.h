@@ -36,7 +36,8 @@ public:
 		const auto sampleCount = ov_pcm_total(&m_File, -1);
 		const auto info = ov_info(&m_File, -1);
 
-		m_Size = sampleCount * info->channels * 2;
+		m_SampleSizeInBytes = info->channels * 2;
+		m_Size = sampleCount * m_SampleSizeInBytes;
 		m_Format = info->channels == 1 ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
 		m_Rate = info->rate;
 	}
@@ -47,6 +48,8 @@ public:
 	}
 
 	static std::unique_ptr<OggSoundLoader> TryOpenFile(FILE* file);
+
+	std::size_t GetSampleSizeInBytes() const { return m_SampleSizeInBytes; }
 
 	std::size_t GetSize() const { return m_Size; }
 
@@ -67,6 +70,7 @@ public:
 
 private:
 	OggVorbis_File m_File;
+	std::size_t m_SampleSizeInBytes;
 	std::size_t m_Size;
 	ALenum m_Format;
 	long m_Rate;

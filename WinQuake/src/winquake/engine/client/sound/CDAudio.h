@@ -20,7 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #pragma once
 
-#include <array>
 #include <atomic>
 #include <cstdio>
 #include <functional>
@@ -36,7 +35,6 @@ class CDAudio final : public ICDAudio
 {
 private:
 	//This is tuned to work pretty well with the original Quake soundtrack, but needs testing to make sure it's good for any input.
-	static constexpr std::size_t NumBuffers = 8;
 	static constexpr std::size_t BufferSize = 1024 * 4;
 
 	//Wrapper around FILE* that implements copy behavior as move behavior.
@@ -148,7 +146,7 @@ private:
 
 	std::unique_ptr<ALCcontext, DeleterWrapper<alcDestroyContext>> m_Context;
 
-	std::array<OpenALBuffer, NumBuffers> m_Buffers;
+	std::vector<OpenALBuffer> m_Buffers;
 	OpenALSource m_Source;
 
 	std::unique_ptr<OggSoundLoader> m_Loader;

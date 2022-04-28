@@ -20,6 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "quakedef.h"
 
+#include <array>
+
 #define AL_ALEXT_PROTOTYPES
 #include <AL/alext.h>
 
@@ -83,11 +85,7 @@ CDAudio::~CDAudio()
 	if (const ContextSwitcher switcher{m_Context.get()}; switcher)
 	{
 		m_Source.Delete();
-
-		for (auto& buffer : m_Buffers)
-		{
-			buffer.Delete();
-		}
+		m_Buffers.clear();
 	}
 }
 
@@ -112,17 +110,6 @@ bool CDAudio::Create(SoundSystem& soundSystem)
 	if (!switcher)
 	{
 		return false;
-	}
-
-	for (auto& buffer : m_Buffers)
-	{
-		buffer = OpenALBuffer::Create();
-
-		if (!buffer)
-		{
-			Con_SafePrintf("Couldn't create OpenAL buffer\n");
-			return false;
-		}
 	}
 
 	m_Source = OpenALSource::Create();
@@ -186,8 +173,23 @@ void CDAudio::StartPlaying(byte track, bool looping, FileWrapper file)
 	//Loader now holds ownership through OggVorbis_File.
 	file.release();
 
+	//Allocate enough buffers to hold around a second's worth of data.
+	//TODO: what if file has bogus rate or channels?
+	const std::size_t bytesInASecond = m_Loader->GetRate() * m_Loader->GetSampleSizeInBytes();
+
+	const auto numberOfBuffers = static_cast<std::size_t>(std::ceil(static_cast<float>(bytesInASecond) / BufferSize));
+
+	m_Buffers.reserve(numberOfBuffers);
+
+	for (std::size_t i = m_Buffers.size(); i < numberOfBuffers; ++i)
+	{
+		m_Buffers.push_back(OpenALBuffer::Create());
+	}
+
 	//Fill all buffers with data.
 	byte dataBuffer[BufferSize];
+
+	ALsizei buffersFilled = 0;
 
 	for (auto& buffer : m_Buffers)
 	{
@@ -197,17 +199,13 @@ void CDAudio::StartPlaying(byte track, bool looping, FileWrapper file)
 			break;
 
 		alBufferData(buffer.Id, m_Loader->GetFormat(), dataBuffer, bytesRead, m_Loader->GetRate());
+
+		++buffersFilled;
 	}
 
 	//Attach all buffers and play.
-	ALuint buffers[NumBuffers]{};
-
-	for (std::size_t i = 0; i < m_Buffers.size(); ++i)
-	{
-		buffers[i] = m_Buffers[i].Id;
-	}
-
-	alSourceQueueBuffers(m_Source.Id, m_Buffers.size(), buffers);
+	static_assert(sizeof(ALuint) == sizeof(OpenALBuffer), "Must create an array to hold buffer ids");
+	alSourceQueueBuffers(m_Source.Id, buffersFilled, reinterpret_cast<const ALuint*>(m_Buffers.data()));
 
 	alSourcePlay(m_Source.Id);
 
