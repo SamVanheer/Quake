@@ -19,6 +19,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "quakedef.h"
+
+#include <limits>
+
 #include "CDAudio.h"
 #include "sound_internal.h"
 #include "SoundSystem.h"
@@ -133,7 +136,8 @@ SoundIndex SoundSystem::PrecacheSound(const char* name)
 		S_LoadSound(sfx);
 
 	//Sound indices are 1-based.
-	return SoundIndex{(sfx - m_KnownSFX.data()) + 1};
+	static_assert(MAX_SFX <= (std::numeric_limits<int>::max)(), "SoundIndex needs to be a 64 bit datatype to reference all sound effects");
+	return SoundIndex{static_cast<int>(sfx - m_KnownSFX.data()) + 1};
 }
 
 void SoundSystem::StartSound(int entnum, int entchannel, SoundIndex index, vec3_t origin, float fvol, float attenuation)

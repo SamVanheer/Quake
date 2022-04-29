@@ -166,7 +166,7 @@ private:
 		OpenALSource source;
 	};
 
-	static constexpr int MAX_SFX = 512;
+	static constexpr std::size_t MAX_SFX = 512;
 
 	// 0 to MAX_DYNAMIC_CHANNELS-1	= normal entity sounds
 	// MAX_DYNAMIC_CHANNELS to MAX_DYNAMIC_CHANNELS + NUM_AMBIENTS -1 = water, etc
