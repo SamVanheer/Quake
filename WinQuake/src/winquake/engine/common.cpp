@@ -1017,14 +1017,14 @@ being registered.
 */
 void COM_CheckRegistered(void)
 {
-	int             h;
+	FILE* f;
 	unsigned short  check[128];
 	int                     i;
 
-	COM_OpenFile("gfx/pop.lmp", &h);
+	COM_FOpenFile("gfx/pop.lmp", &f);
 	static_registered = false;
 
-	if (h == -1)
+	if (!f)
 	{
 #if WINDED
 		Sys_Error("This dedicated server requires a full registered copy of Quake");
@@ -1035,8 +1035,8 @@ void COM_CheckRegistered(void)
 		return;
 	}
 
-	Sys_FileRead(h, check, sizeof(check));
-	COM_CloseFile(h);
+	fread(check, 1, sizeof(check), f);
+	fclose(f);
 
 	for (i = 0; i < 128; i++)
 		if (pop[i] != (unsigned short)BigShort(check[i]))
@@ -1362,10 +1362,10 @@ void COM_CopyFile(const char* netpath, char* cachepath)
 COM_FindFile
 
 Finds the file in the search path.
-Sets com_filesize and one of handle or file
+Sets com_filesize and file
 ===========
 */
-int COM_FindFile(const char* filename, int* handle, FILE** file)
+int COM_FindFile(const char* filename, FILE** file)
 {
 	searchpath_t* search;
 	char            netpath[MAX_OSPATH];
@@ -1373,11 +1373,6 @@ int COM_FindFile(const char* filename, int* handle, FILE** file)
 	pack_t* pak;
 	int                     i;
 	time_t                     findtime, cachetime;
-
-	if (file && handle)
-		Sys_Error("COM_FindFile: both handle and file set");
-	if (!file && !handle)
-		Sys_Error("COM_FindFile: neither handle or file set");
 
 	//
 	// search through the path, one element at a time
@@ -1400,17 +1395,10 @@ int COM_FindFile(const char* filename, int* handle, FILE** file)
 				if (!strcmp(pak->files[i].name, filename))
 				{       // found it!
 					Sys_Printf("PackFile: %s : %s\n", pak->filename, filename);
-					if (handle)
-					{
-						*handle = pak->handle;
-						Sys_FileSeek(pak->handle, pak->files[i].filepos);
-					}
-					else
-					{       // open a new file on the pakfile
-						*file = fopen(pak->filename, "rb");
-						if (*file)
-							fseek(*file, pak->files[i].filepos, SEEK_SET);
-					}
+					// open a new file on the pakfile
+					*file = fopen(pak->filename, "rb");
+					if (*file)
+						fseek(*file, pak->files[i].filepos, SEEK_SET);
 					com_filesize = pak->files[i].filelen;
 					return com_filesize;
 				}
@@ -1453,13 +1441,8 @@ int COM_FindFile(const char* filename, int* handle, FILE** file)
 
 			Sys_Printf("FindFile: %s\n", netpath);
 			com_filesize = Sys_FileOpenRead(netpath, &i);
-			if (handle)
-				*handle = i;
-			else
-			{
-				Sys_FileClose(i);
-				*file = fopen(netpath, "rb");
-			}
+			Sys_FileClose(i);
+			*file = fopen(netpath, "rb");
 			return com_filesize;
 		}
 
@@ -1467,40 +1450,24 @@ int COM_FindFile(const char* filename, int* handle, FILE** file)
 
 	Sys_Printf("FindFile: can't find %s\n", filename);
 
-	if (handle)
-		*handle = -1;
-	else
-		*file = NULL;
+	*file = NULL;
 	com_filesize = -1;
 	return -1;
-}
-
-
-/*
-===========
-COM_OpenFile
-
-filename never has a leading slash, but may contain directory walks
-returns a handle and a length
-it may actually be inside a pak file
-===========
-*/
-int COM_OpenFile(const char* filename, int* handle)
-{
-	return COM_FindFile(filename, handle, NULL);
 }
 
 /*
 ===========
 COM_FOpenFile
 
+filename never has a leading slash, but may contain directory walks
+returns a length
 If the requested file is inside a packfile, a new FILE * will be opened
 into the file.
 ===========
 */
 int COM_FOpenFile(const char* filename, FILE** file)
 {
-	return COM_FindFile(filename, NULL, file);
+	return COM_FindFile(filename, file);
 }
 
 /*
@@ -1535,7 +1502,7 @@ byte* loadbuf;
 int             loadsize;
 byte* COM_LoadFile(const char* path, int usehunk)
 {
-	int             h;
+	FILE* f;
 	byte* buf;
 	char    base[32];
 	int             len;
@@ -1543,8 +1510,8 @@ byte* COM_LoadFile(const char* path, int usehunk)
 	buf = NULL;     // quiet compiler warning
 
 // look for it in the filesystem or pack files
-	len = COM_OpenFile(path, &h);
-	if (h == -1)
+	len = COM_FOpenFile(path, &f);
+	if (!f)
 		return NULL;
 
 	// extract the filename base name for hunk tag
@@ -1574,8 +1541,8 @@ byte* COM_LoadFile(const char* path, int usehunk)
 	((byte*)buf)[len] = 0;
 
 	Draw_BeginDisc();
-	Sys_FileRead(h, buf, len);
-	COM_CloseFile(h);
+	fread(buf, 1, len, f);
+	fclose(f);
 	Draw_EndDisc();
 
 	return buf;
