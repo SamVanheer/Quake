@@ -26,13 +26,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // returns the file size
 // return -1 if file is not present
 // the file should be in BINARY mode for stupid OSs that care
-long Sys_FileOpenRead(const char* path, int* hndl);
+long Sys_FileOpenRead(const char* path, FILE** hndl);
 
-int Sys_FileOpenWrite(const char* path);
-void Sys_FileClose(int handle);
-void Sys_FileSeek(int handle, int position);
-int Sys_FileRead(int handle, void* dest, int count);
-int Sys_FileWrite(int handle, const void* data, int count);
+FILE* Sys_FileOpenWrite(const char* path);
 time_t Sys_FileTime(const char* path);
 void Sys_mkdir(const char* path);
 

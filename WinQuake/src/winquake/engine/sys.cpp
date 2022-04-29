@@ -78,19 +78,6 @@ FILE IO
 ===============================================================================
 */
 
-#define	MAX_HANDLES		10
-FILE* sys_handles[MAX_HANDLES];
-
-int		findhandle(void)
-{
-	int		i;
-
-	for (i = 1; i < MAX_HANDLES; i++)
-		if (!sys_handles[i])
-			return i;
-	Sys_Error("out of handles");
-}
-
 /*
 ================
 filelength
@@ -106,52 +93,24 @@ long filelength(FILE* f)
 	return end;
 }
 
-long Sys_FileOpenRead(const char* path, int* hndl)
+long Sys_FileOpenRead(const char* path, FILE** hndl)
 {
-	const int i = findhandle();
-
 	if (auto f = fopen(path, "rb"); f)
 	{
-		sys_handles[i] = f;
-		*hndl = i;
+		*hndl = f;
 		return filelength(f);
 	}
 
-	*hndl = -1;
+	*hndl = nullptr;
 	return -1;
 }
 
-int Sys_FileOpenWrite(const char* path)
+FILE* Sys_FileOpenWrite(const char* path)
 {
-	const int i = findhandle();
-
 	auto f = fopen(path, "wb");
 	if (!f)
 		Sys_Error("Error opening %s: %s", path, strerror(errno));
-	sys_handles[i] = f;
-
-	return i;
-}
-
-void Sys_FileClose(int handle)
-{
-	fclose(sys_handles[handle]);
-	sys_handles[handle] = NULL;
-}
-
-void Sys_FileSeek(int handle, int position)
-{
-	fseek(sys_handles[handle], position, SEEK_SET);
-}
-
-int Sys_FileRead(int handle, void* dest, int count)
-{
-	return fread(dest, 1, count, sys_handles[handle]);
-}
-
-int Sys_FileWrite(int handle, const void* data, int count)
-{
-	return fwrite(data, 1, count, sys_handles[handle]);
+	return f;
 }
 
 time_t Sys_FileTime(const char* path)
@@ -580,10 +539,10 @@ int EngineMain(int argc, const char* const* argv)
 			newtime = Sys_FloatTime();
 			time = newtime - oldtime;
 
-			extern int vcrFile;
+			extern FILE* vcrFile;
 			extern bool recording;
 
-			while (time < sys_ticrate.value && (vcrFile == -1 || recording))
+			while (time < sys_ticrate.value && (vcrFile == nullptr || recording))
 			{
 				Sys_Sleep();
 				newtime = Sys_FloatTime();

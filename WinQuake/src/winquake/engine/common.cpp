@@ -1217,7 +1217,7 @@ typedef struct
 typedef struct pack_s
 {
 	char    filename[MAX_OSPATH];
-	int             handle;
+	FILE*           handle;
 	int             numfiles;
 	packfile_t* files;
 } pack_t;
@@ -1283,21 +1283,20 @@ The filename will be prefixed by the current game directory
 */
 void COM_WriteFile(const char* filename, const void* data, int len)
 {
-	int             handle;
 	char    name[MAX_OSPATH];
 
 	sprintf(name, "%s/%s", com_gamedir, filename);
 
-	handle = Sys_FileOpenWrite(name);
-	if (handle == -1)
+	auto handle = Sys_FileOpenWrite(name);
+	if (handle == nullptr)
 	{
 		Sys_Printf("COM_WriteFile: failed on %s\n", name);
 		return;
 	}
 
 	Sys_Printf("COM_WriteFile: %s\n", name);
-	Sys_FileWrite(handle, data, len);
-	Sys_FileClose(handle);
+	fwrite(data, 1, len, handle);
+	fclose(handle);
 }
 
 
@@ -1334,13 +1333,13 @@ needed.  This is for the convenience of developers using ISDN from home.
 */
 void COM_CopyFile(const char* netpath, char* cachepath)
 {
-	int             in, out;
+	FILE* in;
 	int             remaining, count;
 	char    buf[4096];
 
 	remaining = Sys_FileOpenRead(netpath, &in);
 	COM_CreatePath(cachepath);     // create directories up to the cache file
-	out = Sys_FileOpenWrite(cachepath);
+	auto out = Sys_FileOpenWrite(cachepath);
 
 	while (remaining)
 	{
@@ -1348,13 +1347,13 @@ void COM_CopyFile(const char* netpath, char* cachepath)
 			count = remaining;
 		else
 			count = sizeof(buf);
-		Sys_FileRead(in, buf, count);
-		Sys_FileWrite(out, buf, count);
+		fread(buf, 1, count, in);
+		fwrite(buf, 1, count, out);
 		remaining -= count;
 	}
 
-	Sys_FileClose(in);
-	Sys_FileClose(out);
+	fclose(in);
+	fclose(out);
 }
 
 /*
@@ -1371,7 +1370,6 @@ int COM_FindFile(const char* filename, FILE** file)
 	char            netpath[MAX_OSPATH];
 	char            cachepath[MAX_OSPATH];
 	pack_t* pak;
-	int                     i;
 	time_t                     findtime, cachetime;
 
 	//
@@ -1391,7 +1389,7 @@ int COM_FindFile(const char* filename, FILE** file)
 		{
 			// look through all the pak file elements
 			pak = search->pack;
-			for (i = 0; i < pak->numfiles; i++)
+			for (int i = 0; i < pak->numfiles; i++)
 				if (!strcmp(pak->files[i].name, filename))
 				{       // found it!
 					Sys_Printf("PackFile: %s : %s\n", pak->filename, filename);
@@ -1440,9 +1438,9 @@ int COM_FindFile(const char* filename, FILE** file)
 			}
 
 			Sys_Printf("FindFile: %s\n", netpath);
+			FILE* i;
 			com_filesize = Sys_FileOpenRead(netpath, &i);
-			Sys_FileClose(i);
-			*file = fopen(netpath, "rb");
+			*file = i;
 			return com_filesize;
 		}
 
@@ -1469,25 +1467,6 @@ int COM_FOpenFile(const char* filename, FILE** file)
 {
 	return COM_FindFile(filename, file);
 }
-
-/*
-============
-COM_CloseFile
-
-If it is a pak file handle, don't really close it
-============
-*/
-void COM_CloseFile(int h)
-{
-	searchpath_t* s;
-
-	for (s = com_searchpaths; s; s = s->next)
-		if (s->pack && s->pack->handle == h)
-			return;
-
-	Sys_FileClose(h);
-}
-
 
 /*
 ============
@@ -1593,7 +1572,7 @@ pack_t* COM_LoadPackFile(const char* packfile)
 	packfile_t* newfiles;
 	int                             numpackfiles;
 	pack_t* pack;
-	int                             packhandle;
+	FILE* packhandle;
 	dpackfile_t             info[MAX_FILES_IN_PACK];
 	unsigned short          crc;
 
@@ -1602,7 +1581,7 @@ pack_t* COM_LoadPackFile(const char* packfile)
 		//              Con_Printf ("Couldn't open %s\n", packfile);
 		return NULL;
 	}
-	Sys_FileRead(packhandle, (void*)&header, sizeof(header));
+	fread(&header, 1, sizeof(header), packhandle);
 	if (header.id[0] != 'P' || header.id[1] != 'A'
 		|| header.id[2] != 'C' || header.id[3] != 'K')
 		Sys_Error("%s is not a packfile", packfile);
@@ -1619,8 +1598,8 @@ pack_t* COM_LoadPackFile(const char* packfile)
 
 	newfiles = reinterpret_cast<packfile_t*>(Hunk_AllocName(numpackfiles * sizeof(packfile_t), "packfile"));
 
-	Sys_FileSeek(packhandle, header.dirofs);
-	Sys_FileRead(packhandle, (void*)info, header.dirlen);
+	fseek(packhandle, header.dirofs, SEEK_SET);
+	fread(info, 1, header.dirlen, packhandle);
 
 	// crc the directory to check for modifications
 	CRC_Init(&crc);

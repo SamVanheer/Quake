@@ -62,7 +62,7 @@ cvar_t	hostname = {"hostname", "UNNAMED"};
 cvar_t	idgods = {"idgods", "0"};
 #endif
 
-int	vcrFile = -1;
+FILE*	vcrFile = nullptr;
 bool recording = false;
 
 // these two macros are to make the code more readable
@@ -456,8 +456,8 @@ qsocket_t* NET_CheckNewConnections(void)
 				vcrConnect.time = host_time;
 				vcrConnect.op = VCR_OP_CONNECT;
 				vcrConnect.session = (long)ret;
-				Sys_FileWrite(vcrFile, &vcrConnect, sizeof(vcrConnect));
-				Sys_FileWrite(vcrFile, ret->address, NET_NAMELEN);
+				fwrite(&vcrConnect, 1, sizeof(vcrConnect), vcrFile);
+				fwrite(ret->address, 1, NET_NAMELEN, vcrFile);
 			}
 			return ret;
 		}
@@ -468,7 +468,7 @@ qsocket_t* NET_CheckNewConnections(void)
 		vcrConnect.time = host_time;
 		vcrConnect.op = VCR_OP_CONNECT;
 		vcrConnect.session = 0;
-		Sys_FileWrite(vcrFile, &vcrConnect, sizeof(vcrConnect));
+		fwrite(&vcrConnect, 1, sizeof(vcrConnect), vcrFile);
 	}
 
 	return NULL;
@@ -565,8 +565,7 @@ int	NET_GetMessage(qsocket_t* sock)
 			vcrGetMessage.session = (long)sock;
 			vcrGetMessage.ret = ret;
 			vcrGetMessage.len = net_message.cursize;
-			Sys_FileWrite(vcrFile, &vcrGetMessage, 24);
-			Sys_FileWrite(vcrFile, net_message.data, net_message.cursize);
+			fwrite(&vcrGetMessage, 1, sizeof(vcrGetMessage), vcrFile);
 		}
 	}
 	else
@@ -577,7 +576,8 @@ int	NET_GetMessage(qsocket_t* sock)
 			vcrGetMessage.op = VCR_OP_GETMESSAGE;
 			vcrGetMessage.session = (long)sock;
 			vcrGetMessage.ret = ret;
-			Sys_FileWrite(vcrFile, &vcrGetMessage, 20);
+			//TODO: why is this not writing the last 4 bytes?
+			fwrite(&vcrGetMessage, 1, sizeof(vcrGetMessage) - 4, vcrFile);
 		}
 	}
 
@@ -628,7 +628,7 @@ int NET_SendMessage(qsocket_t* sock, sizebuf_t* data)
 		vcrSendMessage.op = VCR_OP_SENDMESSAGE;
 		vcrSendMessage.session = (long)sock;
 		vcrSendMessage.r = r;
-		Sys_FileWrite(vcrFile, &vcrSendMessage, 20);
+		fwrite(&vcrSendMessage, 1, 20, vcrFile);
 	}
 
 	return r;
@@ -659,7 +659,7 @@ int NET_SendUnreliableMessage(qsocket_t* sock, sizebuf_t* data)
 		vcrSendMessage.op = VCR_OP_SENDMESSAGE;
 		vcrSendMessage.session = (long)sock;
 		vcrSendMessage.r = r;
-		Sys_FileWrite(vcrFile, &vcrSendMessage, 20);
+		fwrite(&vcrSendMessage, 1, 20, vcrFile);
 	}
 
 	return r;
@@ -694,7 +694,7 @@ bool NET_CanSendMessage(qsocket_t* sock)
 		vcrSendMessage.op = VCR_OP_CANSENDMESSAGE;
 		vcrSendMessage.session = (long)sock;
 		vcrSendMessage.r = r;
-		Sys_FileWrite(vcrFile, &vcrSendMessage, 20);
+		fwrite(&vcrSendMessage, 1, 20, vcrFile);
 	}
 
 	return r;
@@ -884,10 +884,11 @@ void		NET_Shutdown(void)
 		}
 	}
 
-	if (vcrFile != -1)
+	if (vcrFile != nullptr)
 	{
 		Con_Printf("Closing vcrfile.\n");
-		Sys_FileClose(vcrFile);
+		fclose(vcrFile);
+		vcrFile = nullptr;
 	}
 }
 

@@ -166,7 +166,6 @@ extern	char	com_gamedir[MAX_OSPATH];
 
 void COM_WriteFile(const char* filename, const void* data, int len);
 int COM_FOpenFile(const char* filename, FILE** file);
-void COM_CloseFile(int h);
 
 byte* COM_LoadStackFile(const char* path, void* buffer, int bufsize);
 byte* COM_LoadTempFile(const char* path);
