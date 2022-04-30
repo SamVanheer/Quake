@@ -323,9 +323,11 @@ void VID_Update(vrect_t* rects)
 	// handle the mouse state when windowed if that's changed
 	if (modestate == MS_WINDOWED)
 	{
-		if ((int)_windowed_mouse.value != windowed_mouse)
+		const bool newState = _windowed_mouse.value != 0;
+
+		if (newState != windowed_mouse)
 		{
-			if (_windowed_mouse.value)
+			if (newState)
 			{
 				IN_ActivateMouse();
 				IN_HideMouse();
@@ -336,7 +338,7 @@ void VID_Update(vrect_t* rects)
 				IN_ShowMouse();
 			}
 
-			windowed_mouse = (int)_windowed_mouse.value;
+			windowed_mouse = newState;
 		}
 	}
 }
