@@ -55,7 +55,7 @@ The Winsock2 API is now used directly and the IPX driver has been removed (no lo
 
 ## Replaced DirectSound, Wave and /dev/dsp sound APIs with OpenAL.
 
-OpenAL provides a cross-platform sound API. This implementation makes direct use of OpenAL's 3D audio APIs to allow latency-free sound playback.
+OpenAL provides a cross-platform sound API. This implementation makes direct use of OpenAL's 3D audio APIs to allow low-latency sound playback.
 
 ## Replaced Media Control Interface and /dev/cdrom with OpenAL.
 
