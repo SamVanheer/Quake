@@ -1,15 +1,3 @@
-[submodule "WinQuake/external/SDL2"]
-	path = WinQuake/external/SDL2
-	url = https://github.com/libsdl-org/SDL.git
-[submodule "WinQuake/external/OpenAL"]
-	path = WinQuake/external/OpenAL
-	url = https://github.com/kcat/openal-soft.git
-[submodule "WinQuake/external/ogg"]
-	path = WinQuake/external/ogg
-	url = https://github.com/xiph/ogg.git
-[submodule "WinQuake/external/vorbis"]
-	path = WinQuake/external/vorbis
-	url = https://github.com/xiph/vorbis.git
 [submodule "vcpkg"]
 	path = vcpkg
 	url = https://github.com/microsoft/vcpkg.git
