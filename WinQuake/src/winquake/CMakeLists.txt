@@ -8,38 +8,10 @@ find_package(OpenGL REQUIRED)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-option(BUILD_TESTING "" OFF)
-
-add_subdirectory(../../external/SDL2
-	SDL2-binary-dir
-	EXCLUDE_FROM_ALL)
-
-option(ALSOFT_UTILS  "" OFF)
-add_subdirectory(../../external/OpenAL
-	OpenAL-binary-dir
-	EXCLUDE_FROM_ALL)
-
-add_subdirectory(../../external/ogg
-	ogg-binary-dir
-	EXCLUDE_FROM_ALL)
-
-add_subdirectory(../../external/vorbis
-	vorbis-binary-dir
-	EXCLUDE_FROM_ALL)
-	
-set_target_properties(
-	SDL2
-	build_version
-	common
-	OpenAL
-	ogg
-	vorbis
-	vorbisfile
-	PROPERTIES
-		FOLDER "Dependencies")
-
-target_compile_options(common PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/MP>)
-target_compile_options(OpenAL PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/MP>)
+find_package(SDL2 CONFIG REQUIRED)
+find_package(OpenAL CONFIG REQUIRED)
+find_package(Ogg CONFIG REQUIRED)
+find_package(Vorbis CONFIG REQUIRED)
 
 set(WINQUAKE_RENDERER "OpenGL" CACHE STRING "Renderer to use")
 set_property(CACHE WINQUAKE_RENDERER PROPERTY STRINGS Software OpenGL)
@@ -91,7 +63,7 @@ target_link_libraries(winquake PRIVATE
 	SDL2::SDL2
 	OpenGL::GLU
 	OpenGL::GL
-	OpenAL
+	OpenAL::OpenAL
 	Ogg::ogg
 	Vorbis::vorbis
 	Vorbis::vorbisfile)
@@ -110,13 +82,8 @@ if(MSVC)
 			/W4 /wd4244 /wd4100 /wd4459 /wd4611)
 endif()
 
-install(TARGETS SDL2
-	RUNTIME DESTINATION .
-	LIBRARY DESTINATION .)
-
-install(TARGETS OpenAL
-	RUNTIME DESTINATION .
-	LIBRARY DESTINATION .)
+install(FILES $<TARGET_FILE:SDL2::SDL2> DESTINATION .)
+install(FILES $<TARGET_FILE:OpenAL::OpenAL> DESTINATION .)
 	
 install(TARGETS winquake
 	RUNTIME DESTINATION .)

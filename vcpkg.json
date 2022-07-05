@@ -1,0 +1,26 @@
+{
+	"$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
+	"name": "quake-custom-experimental",
+	"version-semver": "0.1.0",
+	"builtin-baseline": "af9fe3e266d94c45885d2252d0f8f805a4c4dd41",
+	"dependencies": [
+		{
+			"name": "sdl2",
+			"version>=": "2.0.22#1",
+			"default-features": false
+		},
+		{
+			"name": "openal-soft",
+			"version>=": "1.21.1#5",
+			"default-features": false
+		},
+		{
+			"name": "libogg",
+			"version>=": "1.3.5"
+		},
+		{
+			"name": "libvorbis",
+			"version>=": "1.3.7#2"
+		}
+  ]
+}

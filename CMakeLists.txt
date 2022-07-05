@@ -4,6 +4,8 @@
 
 cmake_minimum_required(VERSION 3.21)
 
+set(VCPKG_OVERLAY_TRIPLETS ${CMAKE_SOURCE_DIR}/vcpkg_config/triplets)
+
 # Link statically with the runtime
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
