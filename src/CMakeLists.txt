@@ -13,6 +13,20 @@ find_package(OpenAL CONFIG REQUIRED)
 find_package(Ogg CONFIG REQUIRED)
 find_package(Vorbis CONFIG REQUIRED)
 
+option(BUILD_STATIC_LIB "" ON)
+option(BUILD_SHARED_LIB "" OFF)
+option(BUILD_EXAMPLES "" OFF)
+option(BUILD_TESTS "" OFF)
+option(BUILD_TOOLS "" OFF)
+option(ENABLE_ICE "" OFF)
+option(Protobuf_USE_STATIC_LIBS "" ON)
+option(MSVC_CRT_STATIC "" ON)
+add_subdirectory(external/GameNetworkingSockets
+	GameNetworkingSockets-binary-dir
+	EXCLUDE_FROM_ALL)
+
+set_target_properties(GameNetworkingSockets_s PROPERTIES FOLDER "Dependencies")
+
 set(WINQUAKE_RENDERER "OpenGL" CACHE STRING "Renderer to use")
 set_property(CACHE WINQUAKE_RENDERER PROPERTY STRINGS Software OpenGL)
 
@@ -66,7 +80,8 @@ target_link_libraries(winquake PRIVATE
 	OpenAL::OpenAL
 	Ogg::ogg
 	Vorbis::vorbis
-	Vorbis::vorbisfile)
+	Vorbis::vorbisfile
+	GameNetworkingSockets_s)
 
 target_compile_options(winquake
 	PRIVATE
