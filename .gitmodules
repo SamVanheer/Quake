@@ -10,3 +10,6 @@
 [submodule "WinQuake/external/vorbis"]
 	path = WinQuake/external/vorbis
 	url = https://github.com/xiph/vorbis.git
+[submodule "vcpkg"]
+	path = vcpkg
+	url = https://github.com/microsoft/vcpkg.git
