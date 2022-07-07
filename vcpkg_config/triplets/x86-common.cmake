@@ -13,4 +13,5 @@ set(VCPKG_C_FLAGS "")
 set(VCPKG_CXX_FLAGS "-std=c++20")
 
 # We don't need debug builds.
-set(VCPKG_BUILD_TYPE "release")
+# TODO: this breaks due to different runtime libraries being used.
+#set(VCPKG_BUILD_TYPE "release")
