@@ -349,10 +349,10 @@ void SV_DropClient(bool crash)
 	if (!crash)
 	{
 		// send any final messages (don't check for errors)
-		if (NET_CanSendMessage(host_client->netconnection))
+		if (g_Networking->CanSendMessage(host_client->netconnection))
 		{
 			MSG_WriteByte(&host_client->message, svc_disconnect);
-			NET_SendMessage(host_client->netconnection, &host_client->message);
+			g_Networking->SendMessage(host_client->netconnection, &host_client->message);
 		}
 
 		if (host_client->edict && host_client->spawned)
@@ -366,7 +366,7 @@ void SV_DropClient(bool crash)
 	}
 
 	// break the net connection
-	NET_Close(host_client->netconnection);
+	g_Networking->Close(host_client->netconnection);
 	host_client->netconnection = NULL;
 
 	// free the client (the body stays around)
@@ -425,14 +425,14 @@ void Host_ShutdownServer(bool crash)
 		{
 			if (host_client->active && host_client->message.cursize)
 			{
-				if (NET_CanSendMessage(host_client->netconnection))
+				if (g_Networking->CanSendMessage(host_client->netconnection))
 				{
-					NET_SendMessage(host_client->netconnection, &host_client->message);
+					g_Networking->SendMessage(host_client->netconnection, &host_client->message);
 					SZ_Clear(&host_client->message);
 				}
 				else
 				{
-					NET_GetMessage(host_client->netconnection);
+					g_Networking->GetMessage(host_client->netconnection);
 					count++;
 				}
 			}
@@ -446,7 +446,7 @@ void Host_ShutdownServer(bool crash)
 	buf.maxsize = 4;
 	buf.cursize = 0;
 	MSG_WriteByte(&buf, svc_disconnect);
-	count = NET_SendToAll(&buf, 5);
+	count = g_Networking->SendToAll(&buf, 5);
 	if (count)
 		Con_Printf("Host_ShutdownServer: NET_SendToAll failed for %u clients\n", count);
 
@@ -602,7 +602,7 @@ void Host_ServerFrame(void)
 	SV_ClearDatagram();
 
 	// check for new clients
-	SV_CheckForNewClients();
+	//SV_CheckForNewClients();
 
 	// read client messages
 	SV_RunClients();
@@ -652,7 +652,7 @@ void _Host_Frame(float time)
 	// process console commands
 	Cbuf_Execute();
 
-	NET_Poll();
+	g_Networking->RunFrame();
 
 	// if running the server locally, make intentions now
 	if (sv.active)

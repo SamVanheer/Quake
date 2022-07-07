@@ -38,8 +38,6 @@ void M_Menu_Help_f(void);
 void M_Menu_Quit_f(void);
 void M_Menu_LanConfig_f(void);
 void M_Menu_GameOptions_f(void);
-void M_Menu_Search_f(void);
-void M_Menu_ServerList_f(void);
 
 void M_Main_Draw(void);
 void M_SinglePlayer_Draw(void);
@@ -55,8 +53,6 @@ void M_Help_Draw(void);
 void M_Quit_Draw(void);
 void M_LanConfig_Draw(void);
 void M_GameOptions_Draw(void);
-void M_Search_Draw(void);
-void M_ServerList_Draw(void);
 
 void M_Main_Key(int key);
 void M_SinglePlayer_Key(int key);
@@ -72,8 +68,6 @@ void M_Help_Key(int key);
 void M_Quit_Key(int key);
 void M_LanConfig_Key(int key);
 void M_GameOptions_Key(int key);
-void M_Search_Key(int key);
-void M_ServerList_Key(int key);
 
 bool		m_entersound;		// play after drawing a frame, so caching
 								// won't disrupt the sound
@@ -616,10 +610,6 @@ void M_MultiPlayer_Draw(void)
 	f = (int)(host_time * 10) % 6;
 
 	M_DrawTransPic(54, 32 + m_multiplayer_cursor * 20, Draw_CachePic(va("gfx/menudot%i.lmp", f + 1)));
-
-	if (tcpipAvailable)
-		return;
-	M_PrintWhite((320 / 2) - ((27 * 8) / 2), 148, "No Communications Available");
 }
 
 
@@ -648,13 +638,11 @@ void M_MultiPlayer_Key(int key)
 		switch (m_multiplayer_cursor)
 		{
 		case 0:
-			if (tcpipAvailable)
-				M_Menu_Net_f();
+			M_Menu_Net_f();
 			break;
 
 		case 1:
-			if (tcpipAvailable)
-				M_Menu_Net_f();
+			M_Menu_Net_f();
 			break;
 
 		case 2:
@@ -879,10 +867,7 @@ void M_Net_Draw(void)
 
 	f = 32;
 
-	if (tcpipAvailable)
-		p = Draw_CachePic("gfx/netmen4.lmp");
-	else
-		p = Draw_CachePic("gfx/dim_tcp.lmp");
+	p = Draw_CachePic("gfx/netmen4.lmp");
 	M_DrawTransPic(72, f, p);
 
 	if (m_net_items == 2)	// JDC, could just be removed
@@ -941,7 +926,7 @@ again:
 		}
 	}
 
-	if (m_net_cursor == 0 && !tcpipAvailable)
+	if (m_net_cursor == 0)
 		goto again;
 }
 
@@ -1740,7 +1725,8 @@ void M_LanConfig_Key(int key)
 				M_Menu_GameOptions_f();
 				break;
 			}
-			M_Menu_Search_f();
+			//TODO: remove this altogether
+			//M_Menu_Search_f();
 			break;
 		}
 
@@ -2269,169 +2255,6 @@ void M_GameOptions_Key(int key)
 }
 
 //=============================================================================
-/* SEARCH MENU */
-
-bool		searchComplete = false;
-double		searchCompleteTime;
-
-void M_Menu_Search_f(void)
-{
-	key_dest = key_menu;
-	m_state = m_search;
-	m_entersound = false;
-	slistSilent = true;
-	slistLocal = false;
-	searchComplete = false;
-	NET_Slist_f();
-
-}
-
-
-void M_Search_Draw(void)
-{
-	qpic_t* p;
-	int x;
-
-	p = Draw_CachePic("gfx/p_multi.lmp");
-	M_DrawPic((320 - p->width) / 2, 4, p);
-	x = (320 / 2) - ((12 * 8) / 2) + 4;
-	M_DrawTextBox(x - 8, 32, 12, 1);
-	M_Print(x, 40, "Searching...");
-
-	if (slistInProgress)
-	{
-		NET_Poll();
-		return;
-	}
-
-	if (!searchComplete)
-	{
-		searchComplete = true;
-		searchCompleteTime = realtime;
-	}
-
-	if (hostCacheCount)
-	{
-		M_Menu_ServerList_f();
-		return;
-	}
-
-	M_PrintWhite((320 / 2) - ((22 * 8) / 2), 64, "No Quake servers found");
-	if ((realtime - searchCompleteTime) < 3.0)
-		return;
-
-	M_Menu_LanConfig_f();
-}
-
-
-void M_Search_Key(int key)
-{
-}
-
-//=============================================================================
-/* SLIST MENU */
-
-int		slist_cursor;
-bool slist_sorted;
-
-void M_Menu_ServerList_f(void)
-{
-	key_dest = key_menu;
-	m_state = m_slist;
-	m_entersound = true;
-	slist_cursor = 0;
-	m_return_onerror = false;
-	m_return_reason[0] = 0;
-	slist_sorted = false;
-}
-
-
-void M_ServerList_Draw(void)
-{
-	int		n;
-	char	string[64];
-	qpic_t* p;
-
-	if (!slist_sorted)
-	{
-		if (hostCacheCount > 1)
-		{
-			int	i, j;
-			hostcache_t temp;
-			for (i = 0; i < hostCacheCount; i++)
-				for (j = i + 1; j < hostCacheCount; j++)
-					if (strcmp(hostcache[j].name, hostcache[i].name) < 0)
-					{
-						Q_memcpy(&temp, &hostcache[j], sizeof(hostcache_t));
-						Q_memcpy(&hostcache[j], &hostcache[i], sizeof(hostcache_t));
-						Q_memcpy(&hostcache[i], &temp, sizeof(hostcache_t));
-					}
-		}
-		slist_sorted = true;
-	}
-
-	p = Draw_CachePic("gfx/p_multi.lmp");
-	M_DrawPic((320 - p->width) / 2, 4, p);
-	for (n = 0; n < hostCacheCount; n++)
-	{
-		if (hostcache[n].maxusers)
-			sprintf(string, "%-15.15s %-15.15s %2u/%2u\n", hostcache[n].name, hostcache[n].map, hostcache[n].users, hostcache[n].maxusers);
-		else
-			sprintf(string, "%-15.15s %-15.15s\n", hostcache[n].name, hostcache[n].map);
-		M_Print(16, 32 + 8 * n, string);
-	}
-	M_DrawCharacter(0, 32 + slist_cursor * 8, 12 + ((int)(realtime * 4) & 1));
-
-	if (*m_return_reason)
-		M_PrintWhite(16, 148, m_return_reason);
-}
-
-
-void M_ServerList_Key(int k)
-{
-	switch (k)
-	{
-	case K_ESCAPE:
-		M_Menu_LanConfig_f();
-		break;
-
-	case K_SPACE:
-		M_Menu_Search_f();
-		break;
-
-	case K_UPARROW:
-	case K_LEFTARROW:
-		g_SoundSystem->LocalSound("misc/menu1.wav");
-		slist_cursor--;
-		if (slist_cursor < 0)
-			slist_cursor = hostCacheCount - 1;
-		break;
-
-	case K_DOWNARROW:
-	case K_RIGHTARROW:
-		g_SoundSystem->LocalSound("misc/menu1.wav");
-		slist_cursor++;
-		if (slist_cursor >= hostCacheCount)
-			slist_cursor = 0;
-		break;
-
-	case K_ENTER:
-		g_SoundSystem->LocalSound("misc/menu2.wav");
-		m_return_state = m_state;
-		m_return_onerror = true;
-		slist_sorted = false;
-		key_dest = key_game;
-		m_state = m_none;
-		Cbuf_AddText(va("connect \"%s\"\n", hostcache[slist_cursor].cname));
-		break;
-
-	default:
-		break;
-	}
-
-}
-
-//=============================================================================
 /* Menu Subsystem */
 
 
@@ -2538,14 +2361,6 @@ void M_Draw(void)
 	case m_gameoptions:
 		M_GameOptions_Draw();
 		break;
-
-	case m_search:
-		M_Search_Draw();
-		break;
-
-	case m_slist:
-		M_ServerList_Draw();
-		break;
 	}
 
 	if (m_entersound)
@@ -2621,14 +2436,6 @@ void M_Keydown(int key)
 	case m_gameoptions:
 		M_GameOptions_Key(key);
 		return;
-
-	case m_search:
-		M_Search_Key(key);
-		break;
-
-	case m_slist:
-		M_ServerList_Key(key);
-		return;
 	}
 }
 
@@ -2640,5 +2447,5 @@ void M_ConfigureNetSubsystem(void)
 	Cbuf_AddText("stopdemo\n");
 
 	if (TCPIPConfig)
-		net_hostport = lanConfig_port;
+		g_Networking->SetPort(lanConfig_port);
 }

@@ -247,19 +247,18 @@ void SV_ConnectClient(int clientnum)
 	edict_t* ent;
 	client_t* client;
 	int				edictnum;
-	struct qsocket_s* netconnection;
 	float			spawn_parms[NUM_SPAWN_PARMS];
 
 	client = svs.clients + clientnum;
 
-	Con_DPrintf("Client %s connected\n", client->netconnection->address);
+	Con_DPrintf("Client %s connected\n", client->netconnection->address.c_str());
 
 	edictnum = clientnum + 1;
 
 	ent = EDICT_NUM(edictnum);
 
 	// set up the client_t
-	netconnection = client->netconnection;
+	auto netconnection = client->netconnection;
 
 	if (sv.loadgame)
 		memcpy(spawn_parms, client->spawn_parms, sizeof(spawn_parms));
@@ -274,11 +273,7 @@ void SV_ConnectClient(int clientnum)
 	client->message.maxsize = sizeof(client->msgbuf);
 	client->message.allowoverflow = true;		// we can catch it
 
-#ifdef IDGODS
-	client->privileged = IsID(&client->netconnection->addr);
-#else	
 	client->privileged = false;
-#endif
 
 	if (sv.loadgame)
 		memcpy(client->spawn_parms, spawn_parms, sizeof(spawn_parms));
@@ -298,34 +293,22 @@ SV_CheckForNewClients
 
 ===================
 */
-void SV_CheckForNewClients(void)
+void SV_NewClient(qsocket_t* newClient)
 {
-	struct qsocket_s* ret;
-	int				i;
-
-	//
-	// check for new connections
-	//
-	while (1)
-	{
-		ret = NET_CheckNewConnections();
-		if (!ret)
+	// 
+	// init a new client structure
+	//	
+	int i;
+	for (i = 0; i < svs.maxclients; i++)
+		if (!svs.clients[i].active)
 			break;
+	if (i == svs.maxclients)
+		Sys_Error("Host_CheckForNewClients: no free clients");
 
-		// 
-		// init a new client structure
-		//	
-		for (i = 0; i < svs.maxclients; i++)
-			if (!svs.clients[i].active)
-				break;
-		if (i == svs.maxclients)
-			Sys_Error("Host_CheckForNewClients: no free clients");
+	svs.clients[i].netconnection = newClient;
+	SV_ConnectClient(i);
 
-		svs.clients[i].netconnection = ret;
-		SV_ConnectClient(i);
-
-		net_activeconnections++;
-	}
+	net_activeconnections++;
 }
 
 
@@ -708,6 +691,13 @@ void SV_WriteClientdataToMessage(edict_t* ent, sizebuf_t* msg)
 	}
 }
 
+static void SV_WriteMessageHeader(sizebuf_t& msg)
+{
+	//Write the header containing the current server spawn count so the client can skip messages on map change.
+	MSG_WriteByte(&msg, svc_spawncount);
+	MSG_WriteLong(&msg, svs.spawncount);
+}
+
 /*
 =======================
 SV_SendClientDatagram
@@ -722,6 +712,8 @@ bool SV_SendClientDatagram(client_t* client)
 	msg.maxsize = sizeof(buf);
 	msg.cursize = 0;
 
+	SV_WriteMessageHeader(msg);
+
 	MSG_WriteByte(&msg, svc_time);
 	MSG_WriteFloat(&msg, sv.time);
 
@@ -735,7 +727,7 @@ bool SV_SendClientDatagram(client_t* client)
 		SZ_Write(&msg, sv.datagram.data, sv.datagram.cursize);
 
 	// send the datagram
-	if (NET_SendUnreliableMessage(client->netconnection, &msg) == -1)
+	if (g_Networking->SendUnreliableMessage(client->netconnection, &msg) == -1)
 	{
 		SV_DropClient(true);// if the message couldn't send, kick off
 		return false;
@@ -800,9 +792,11 @@ void SV_SendNop(client_t* client)
 	msg.maxsize = sizeof(buf);
 	msg.cursize = 0;
 
+	SV_WriteMessageHeader(msg);
+
 	MSG_WriteChar(&msg, svc_nop);
 
-	if (NET_SendUnreliableMessage(client->netconnection, &msg) == -1)
+	if (g_Networking->SendUnreliableMessage(client->netconnection, &msg) == -1)
 		SV_DropClient(true);	// if the message couldn't send, kick off
 	client->last_message = realtime;
 }
@@ -857,7 +851,7 @@ void SV_SendClientMessages(void)
 
 		if (host_client->message.cursize || host_client->dropasap)
 		{
-			if (!NET_CanSendMessage(host_client->netconnection))
+			if (!g_Networking->CanSendMessage(host_client->netconnection))
 			{
 				//				I_Printf ("can't write\n");
 				continue;
@@ -867,7 +861,7 @@ void SV_SendClientMessages(void)
 				SV_DropClient(false);	// went to another level
 			else
 			{
-				if (NET_SendMessage(host_client->netconnection
+				if (g_Networking->SendMessage(host_client->netconnection
 					, &host_client->message) == -1)
 					SV_DropClient(true);	// if the message couldn't send, kick off
 				SZ_Clear(&host_client->message);
@@ -989,14 +983,16 @@ void SV_SendReconnect(void)
 
 	MSG_WriteChar(&msg, svc_stufftext);
 	MSG_WriteString(&msg, "reconnect\n");
-	NET_SendToAll(&msg, 5);
+	g_Networking->SendToAll(&msg, 5);
 
 	if (cls.state != ca_dedicated)
+	{
 #ifdef QUAKE2
 		Cbuf_InsertText("reconnect\n");
 #else
 		Cmd_ExecuteString("reconnect\n", src_command);
 #endif
+	}
 }
 
 
@@ -1043,6 +1039,8 @@ void SV_SpawnServer(const char* server)
 	edict_t* ent;
 	int			i;
 
+	++svs.spawncount;
+
 	// let's not have any servers with no name
 	if (hostname.string[0] == 0)
 		Cvar_Set("hostname", "UNNAMED");
@@ -1050,6 +1048,9 @@ void SV_SpawnServer(const char* server)
 
 	Con_DPrintf("SpawnServer: %s\n", server);
 	svs.changelevel_issued = false;		// now safe to issue another
+
+	//Start up server if needed.
+	g_Networking->Listen();
 
 //
 // tell all connected clients that we are going to a new level

@@ -77,8 +77,7 @@ void Host_Status_f(void)
 
 	print("host:    %s\n", Cvar_VariableString("hostname"));
 	print("version: %4.2f\n", VERSION);
-	if (tcpipAvailable)
-		print("tcp/ip:  %s\n", my_tcpip_address);
+	print("tcp/ip:  %s\n", my_tcpip_address);
 	print("map:     %s\n", sv.name);
 	print("players: %i active (%i max)\n\n", net_activeconnections, svs.maxclients);
 	for (j = 0, client = svs.clients; j < svs.maxclients; j++, client++)
@@ -97,7 +96,7 @@ void Host_Status_f(void)
 		else
 			hours = 0;
 		print("#%-2u %-16.16s  %3i  %2i:%02i:%02i\n", j + 1, client->name, (int)client->edict->v.frags, hours, minutes, seconds);
-		print("   %s\n", client->netconnection->address);
+		print("   %s\n", client->netconnection->address.c_str());
 	}
 }
 

@@ -26,6 +26,7 @@ typedef struct
 	struct client_s* clients;		// [maxclients]
 	int			serverflags;		// episode completion information
 	bool		changelevel_issued;	// cleared when at SV_SpawnServer
+	int spawncount;
 } server_static_t;
 
 //=============================================================================
@@ -86,7 +87,7 @@ typedef struct client_s
 	double			last_message;		// reliable messages must be sent
 										// periodically
 
-	struct qsocket_s* netconnection;	// communications handle
+	qsocket_t* netconnection;	// communications handle
 
 	usercmd_t		cmd;				// movement
 	vec3_t			wishdir;			// intended motion calced from cmd
@@ -233,7 +234,6 @@ void SV_SetIdealPitch(void);
 void SV_AddUpdates(void);
 
 void SV_ClientThink(void);
-void SV_AddClientToServer(struct qsocket_s* ret);
 
 void SV_ClientPrintf(const char* fmt, ...);
 void SV_BroadcastPrintf(const char* fmt, ...);
@@ -247,7 +247,6 @@ void SV_WriteClientdataToMessage(edict_t* ent, sizebuf_t* msg);
 
 void SV_MoveToGoal(edict_t* ent, float dist);
 
-void SV_CheckForNewClients(void);
 void SV_RunClients(void);
 void SV_SaveSpawnparms();
 #ifdef QUAKE2

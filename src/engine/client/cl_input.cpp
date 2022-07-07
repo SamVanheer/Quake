@@ -392,7 +392,7 @@ void CL_SendMove(usercmd_t* cmd)
 	if (++cl.movemessages <= 2)
 		return;
 
-	if (NET_SendUnreliableMessage(cls.netcon, &buf) == -1)
+	if (g_Networking->SendUnreliableMessage(cls.netcon, &buf) == -1)
 	{
 		Con_Printf("CL_SendMove: lost server connection\n");
 		CL_Disconnect();

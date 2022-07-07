@@ -488,7 +488,7 @@ bool SV_ReadClientMessage(void)
 	do
 	{
 	nextmsg:
-		ret = NET_GetMessage(host_client->netconnection);
+		ret = g_Networking->GetMessage(host_client->netconnection);
 		if (ret == -1)
 		{
 			Sys_Printf("SV_ReadClientMessage: NET_GetMessage failed\n");

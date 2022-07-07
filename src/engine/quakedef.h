@@ -258,6 +258,9 @@ typedef struct
 
 #ifdef _WIN32
 #include <windows.h>
+#undef GetMessage
+#undef SendMessage
+#undef SetPort
 #endif
 
 #include <GL/gl.h>

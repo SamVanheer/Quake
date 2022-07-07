@@ -64,7 +64,9 @@ const char* svc_strings[] =
 	"svc_finale",			// [string] music [string] text
 	"svc_cdtrack",			// [byte] track [byte] looptrack
 	"svc_sellscreen",
-	"svc_cutscene"
+	"svc_cutscene",
+
+	"svc_spawncount"
 };
 
 //=============================================================================
@@ -192,7 +194,7 @@ void CL_KeepaliveMessage(void)
 	Con_Printf("--> client to server keepalive\n");
 
 	MSG_WriteByte(&cls.message, clc_nop);
-	NET_SendMessage(cls.netcon, &cls.message);
+	g_Networking->SendMessage(cls.netcon, &cls.message);
 	SZ_Clear(&cls.message);
 }
 
@@ -952,6 +954,21 @@ void CL_ParseServerMessage(void)
 		case svc_sellscreen:
 			Cmd_ExecuteString("help", src_command);
 			break;
+
+		case svc_spawncount:
+		{
+			const int spawncount = MSG_ReadLong();
+
+			if (sv.active)
+			{
+				if (spawncount != svs.spawncount)
+				{
+					//Listen server just changed maps; skip all messages that belong to previous map.
+					return;
+				}
+			}
+			break;
+		}
 		}
 	}
 }

@@ -34,9 +34,7 @@ enum menustate_t
 	m_help,
 	m_quit,
 	m_lanconfig,
-	m_gameoptions,
-	m_search,
-	m_slist
+	m_gameoptions
 };
 
 extern menustate_t m_return_state;

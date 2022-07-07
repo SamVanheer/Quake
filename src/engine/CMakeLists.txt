@@ -71,11 +71,9 @@ target_sources(winquake
 		client/ui/sbar.cpp
 		client/ui/sbar.h
 		
+		net/CGNSNetSystem.cpp
+		net/CGNSNetSystem.h
 		net/net.h
-		net/net_dgrm.cpp
-		net/net_dgrm.h
-		net/net_loop.cpp
-		net/net_loop.h
 		net/net_main.cpp
 		
 		server/server.h
@@ -94,19 +92,8 @@ target_sources(winquake
 if (MSVC)
 	target_sources(winquake
 		PRIVATE
-			net/net_win.cpp
-			net/net_wins.cpp
-			net/net_wins.h
 			server/conproc.cpp
 			server/conproc.h)
-endif()
-
-if (UNIX)
-	target_sources(winquake
-		PRIVATE
-			net/net_bsd.cpp
-			net/net_udp.cpp
-			net/net_udp.h)
 endif()
 
 if(RENDERER_IS_SOFTWARE)

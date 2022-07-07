@@ -115,9 +115,9 @@ void CL_Disconnect(void)
 		Con_DPrintf("Sending clc_disconnect\n");
 		SZ_Clear(&cls.message);
 		MSG_WriteByte(&cls.message, clc_disconnect);
-		NET_SendUnreliableMessage(cls.netcon, &cls.message);
+		g_Networking->SendUnreliableMessage(cls.netcon, &cls.message);
 		SZ_Clear(&cls.message);
-		NET_Close(cls.netcon);
+		g_Networking->Close(cls.netcon);
 
 		cls.state = ca_disconnected;
 		if (sv.active)
@@ -155,7 +155,7 @@ void CL_EstablishConnection(const char* host)
 
 	CL_Disconnect();
 
-	cls.netcon = NET_Connect(host);
+	cls.netcon = g_Networking->Connect(host);
 	if (!cls.netcon)
 		Host_Error("CL_Connect: connect failed\n");
 	Con_DPrintf("CL_EstablishConnection: connected to %s\n", host);
@@ -697,13 +697,13 @@ void CL_SendCmd(void)
 	if (!cls.message.cursize)
 		return;		// no message at all
 
-	if (!NET_CanSendMessage(cls.netcon))
+	if (!g_Networking->CanSendMessage(cls.netcon))
 	{
 		Con_DPrintf("CL_WriteToServer: can't send\n");
 		return;
 	}
 
-	if (NET_SendMessage(cls.netcon, &cls.message) == -1)
+	if (g_Networking->SendMessage(cls.netcon, &cls.message) == -1)
 		Host_Error("CL_WriteToServer: lost server connection");
 
 	SZ_Clear(&cls.message);
