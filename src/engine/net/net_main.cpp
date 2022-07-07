@@ -20,7 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // net_main.c
 
 #include "quakedef.h"
-#include "net_vcr.h"
 
 qsocket_t* net_activeSockets = NULL;
 qsocket_t* net_freeSockets = NULL;
@@ -61,9 +60,6 @@ cvar_t	hostname = {"hostname", "UNNAMED"};
 #ifdef IDGODS
 cvar_t	idgods = {"idgods", "0"};
 #endif
-
-FILE*	vcrFile = nullptr;
-bool recording = false;
 
 // these two macros are to make the code more readable
 #define sfunc	net_drivers[sock->driver]
@@ -451,24 +447,8 @@ qsocket_t* NET_CheckNewConnections(void)
 		ret = dfunc.CheckNewConnections();
 		if (ret)
 		{
-			if (recording)
-			{
-				vcrConnect.time = host_time;
-				vcrConnect.op = VCR_OP_CONNECT;
-				vcrConnect.session = (long)ret;
-				fwrite(&vcrConnect, 1, sizeof(vcrConnect), vcrFile);
-				fwrite(ret->address, 1, NET_NAMELEN, vcrFile);
-			}
 			return ret;
 		}
-	}
-
-	if (recording)
-	{
-		vcrConnect.time = host_time;
-		vcrConnect.op = VCR_OP_CONNECT;
-		vcrConnect.session = 0;
-		fwrite(&vcrConnect, 1, sizeof(vcrConnect), vcrFile);
 	}
 
 	return NULL;
@@ -557,28 +537,6 @@ int	NET_GetMessage(qsocket_t* sock)
 			else if (ret == 2)
 				unreliableMessagesReceived++;
 		}
-
-		if (recording)
-		{
-			vcrGetMessage.time = host_time;
-			vcrGetMessage.op = VCR_OP_GETMESSAGE;
-			vcrGetMessage.session = (long)sock;
-			vcrGetMessage.ret = ret;
-			vcrGetMessage.len = net_message.cursize;
-			fwrite(&vcrGetMessage, 1, sizeof(vcrGetMessage), vcrFile);
-		}
-	}
-	else
-	{
-		if (recording)
-		{
-			vcrGetMessage.time = host_time;
-			vcrGetMessage.op = VCR_OP_GETMESSAGE;
-			vcrGetMessage.session = (long)sock;
-			vcrGetMessage.ret = ret;
-			//TODO: why is this not writing the last 4 bytes?
-			fwrite(&vcrGetMessage, 1, sizeof(vcrGetMessage) - 4, vcrFile);
-		}
 	}
 
 	return ret;
@@ -622,15 +580,6 @@ int NET_SendMessage(qsocket_t* sock, sizebuf_t* data)
 	if (r == 1 && sock->driver)
 		messagesSent++;
 
-	if (recording)
-	{
-		vcrSendMessage.time = host_time;
-		vcrSendMessage.op = VCR_OP_SENDMESSAGE;
-		vcrSendMessage.session = (long)sock;
-		vcrSendMessage.r = r;
-		fwrite(&vcrSendMessage, 1, 20, vcrFile);
-	}
-
 	return r;
 }
 
@@ -652,15 +601,6 @@ int NET_SendUnreliableMessage(qsocket_t* sock, sizebuf_t* data)
 	r = sfunc.SendUnreliableMessage(sock, data);
 	if (r == 1 && sock->driver)
 		unreliableMessagesSent++;
-
-	if (recording)
-	{
-		vcrSendMessage.time = host_time;
-		vcrSendMessage.op = VCR_OP_SENDMESSAGE;
-		vcrSendMessage.session = (long)sock;
-		vcrSendMessage.r = r;
-		fwrite(&vcrSendMessage, 1, 20, vcrFile);
-	}
 
 	return r;
 }
@@ -687,15 +627,6 @@ bool NET_CanSendMessage(qsocket_t* sock)
 	SetNetTime();
 
 	r = sfunc.CanSendMessage(sock);
-
-	if (recording)
-	{
-		vcrSendMessage.time = host_time;
-		vcrSendMessage.op = VCR_OP_CANSENDMESSAGE;
-		vcrSendMessage.session = (long)sock;
-		vcrSendMessage.r = r;
-		fwrite(&vcrSendMessage, 1, 20, vcrFile);
-	}
 
 	return r;
 }
@@ -789,15 +720,6 @@ void NET_Init(void)
 	int			controlSocket;
 	qsocket_t* s;
 
-	if (COM_CheckParm("-playback"))
-	{
-		net_numdrivers = 1;
-		net_drivers[0].Init = VCR_Init;
-	}
-
-	if (COM_CheckParm("-record"))
-		recording = true;
-
 	i = COM_CheckParm("-port");
 	if (!i)
 		i = COM_CheckParm("-udpport");
@@ -882,13 +804,6 @@ void		NET_Shutdown(void)
 			net_drivers[net_driverlevel].Shutdown();
 			net_drivers[net_driverlevel].initialized = false;
 		}
-	}
-
-	if (vcrFile != nullptr)
-	{
-		Con_Printf("Closing vcrfile.\n");
-		fclose(vcrFile);
-		vcrFile = nullptr;
 	}
 }
 

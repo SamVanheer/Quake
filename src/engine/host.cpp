@@ -758,69 +758,6 @@ void Host_Frame(float time)
 
 //============================================================================
 
-
-extern FILE* vcrFile;
-#define	VCR_SIGNATURE	0x56435231
-// "VCR1"
-
-void Host_InitVCR(quakeparms_t* parms)
-{
-	int		i, len, n;
-	char* p;
-
-	if (COM_CheckParm("-playback"))
-	{
-		if (com_argc != 2)
-			Sys_Error("No other parameters allowed with -playback\n");
-
-		Sys_FileOpenRead("quake.vcr", &vcrFile);
-		if (vcrFile == nullptr)
-			Sys_Error("playback file not found\n");
-
-		fread(&i, 1, sizeof(int), vcrFile);
-		if (i != VCR_SIGNATURE)
-			Sys_Error("Invalid signature in vcr file\n");
-
-		fread(&com_argc, 1, sizeof(int), vcrFile);
-		com_argv = reinterpret_cast<const char**>(malloc(com_argc * sizeof(char*)));
-		com_argv[0] = parms->argv[0];
-		for (i = 0; i < com_argc; i++)
-		{
-			fread(&len, 1, sizeof(int), vcrFile);
-			p = reinterpret_cast<char*>(malloc(len));
-			fread(p, 1, len, vcrFile);
-			com_argv[i + 1] = p;
-		}
-		com_argc++; /* add one for arg[0] */
-		parms->argc = com_argc;
-		parms->argv = com_argv;
-	}
-
-	if ((n = COM_CheckParm("-record")) != 0)
-	{
-		vcrFile = Sys_FileOpenWrite("quake.vcr");
-
-		i = VCR_SIGNATURE;
-		fwrite(&i, 1, sizeof(int), vcrFile);
-		i = com_argc - 1;
-		fwrite(&i, 1, sizeof(int), vcrFile);
-		for (i = 1; i < com_argc; i++)
-		{
-			if (i == n)
-			{
-				len = 10;
-				fwrite(&len, 1, sizeof(int), vcrFile);
-				fwrite("-playback", 1, len, vcrFile);
-				continue;
-			}
-			len = Q_strlen(com_argv[i]) + 1;
-			fwrite(&len, 1, sizeof(int), vcrFile);
-			fwrite(com_argv[i], 1, len, vcrFile);
-		}
-	}
-
-}
-
 /*
 ====================
 Host_Init
@@ -850,7 +787,6 @@ void Host_Init(quakeparms_t* parms)
 	Cmd_Init();
 	V_Init();
 	Chase_Init();
-	Host_InitVCR(parms);
 	COM_Init(parms->basedir);
 	Host_InitLocal();
 	W_LoadWadFile("gfx.wad");

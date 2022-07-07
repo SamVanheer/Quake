@@ -539,10 +539,7 @@ int EngineMain(int argc, const char* const* argv)
 			newtime = Sys_FloatTime();
 			time = newtime - oldtime;
 
-			extern FILE* vcrFile;
-			extern bool recording;
-
-			while (time < sys_ticrate.value && (vcrFile == nullptr || recording))
+			while (time < sys_ticrate.value)
 			{
 				Sys_Sleep();
 				newtime = Sys_FloatTime();

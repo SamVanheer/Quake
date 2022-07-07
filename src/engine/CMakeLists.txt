@@ -77,8 +77,6 @@ target_sources(winquake
 		net/net_loop.cpp
 		net/net_loop.h
 		net/net_main.cpp
-		net/net_vcr.cpp
-		net/net_vcr.h
 		
 		server/server.h
 		server/sv_main.cpp
