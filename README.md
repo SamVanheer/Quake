@@ -21,6 +21,10 @@ The use of default values for function parameters allows the removal of some glo
 
 The codebase now uses C++17.
 
+## vcpkg for third party dependencies.
+
+Most of the third party dependencies are acquired using vcpkg which simplifies dependency management and speeds up rebuilds.
+
 ## The OpenGL renderer has been updated to work on modern systems.
 
 As-is the game will crash on launch due to trying to print the value of `glGetString(GL_EXTENSIONS)` which now exceeds the console buffer.
@@ -49,9 +53,9 @@ The loading disc image is rendered on top of that when it is active.
 This allows Software mode to work without depending on the MegaGraph Graphics Library, which is a precompiled static library exclusive to Windows.
 This ensures all code is compiled with the same compiler and allows Software mode to work on Linux.
 
-## Improved networking driver code on Windows.
+## Replaced networking system with GameNetworkingSockets
 
-The Winsock2 API is now used directly and the IPX driver has been removed (no longer supported by Windows).
+The platform-specific networking implementations have been replaced with GameNetworkingSockets.
 
 ## Replaced DirectSound, Wave and /dev/dsp sound APIs with OpenAL.
 
