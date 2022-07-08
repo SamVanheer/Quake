@@ -618,7 +618,7 @@ void ai_run(edict_t* self, float dist)
 	{
 		self->v.enemy = pr_global_struct->world;
 		// FIXME: look all around for other targets
-		if (self->v.oldenemy->v.health > 0)
+		if (self->v.oldenemy && self->v.oldenemy->v.health > 0)
 		{
 			self->v.enemy = self->v.oldenemy;
 			HuntTarget(self);
