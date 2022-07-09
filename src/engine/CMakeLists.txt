@@ -74,7 +74,6 @@ target_sources(engine
 		sys.h
 		wad.cpp
 		wad.h
-		winquake.h
 		zone.cpp
 		zone.h
 		
