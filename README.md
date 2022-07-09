@@ -70,6 +70,10 @@ Music is now played using OpenAL just like all other game audio.
 The QuakeC game code is now implemented in C++ to allow direct use of engine APIs, as well as better ways to handle some things like animation.
 This change removes the last remaining roadblock preventing a 64 bit engine build from working.
 
+## Split engine into launcher and engine library
+
+This enables the dedicated server GUI to directly access the engine through an interface.
+
 ## More work to be done.
 
 # Original readme.txt contents
