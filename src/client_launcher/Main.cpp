@@ -35,7 +35,7 @@ static void Sys_Error(const char* msg)
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Quake Error", msg, nullptr);
 }
 
-static int LaunchGame(std::size_t argc, const char** argv)
+static int LaunchGame(std::size_t argc, const char* const* argv)
 {
 	DynamicLibrary engine{"engine"};
 
