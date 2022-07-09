@@ -1,4 +1,4 @@
-target_sources(winquake
+target_sources(engine
 	PRIVATE
 		ai.cpp
 		ai.h

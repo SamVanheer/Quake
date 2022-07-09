@@ -1,4 +1,4 @@
-target_sources(winquake
+target_sources(engine
 	PRIVATE
 		gl_draw.cpp
 		gl_mesh.cpp

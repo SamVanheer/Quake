@@ -1,4 +1,4 @@
-target_sources(winquake
+target_sources(engine
 	PRIVATE
 		d_edge.cpp
 		d_fill.cpp

@@ -1,4 +1,52 @@
-target_sources(winquake
+find_package(Threads REQUIRED)
+find_package(OpenGL REQUIRED)
+find_package(OpenAL CONFIG REQUIRED)
+find_package(Ogg CONFIG REQUIRED)
+find_package(Vorbis CONFIG REQUIRED)
+
+option(BUILD_STATIC_LIB "" ON)
+option(BUILD_SHARED_LIB "" OFF)
+option(BUILD_EXAMPLES "" OFF)
+option(BUILD_TESTS "" OFF)
+option(BUILD_TOOLS "" OFF)
+option(ENABLE_ICE "" OFF)
+option(Protobuf_USE_STATIC_LIBS "" ON)
+option(MSVC_CRT_STATIC "" ON)
+add_subdirectory(../external/GameNetworkingSockets
+	GameNetworkingSockets-binary-dir
+	EXCLUDE_FROM_ALL)
+
+set_target_properties(GameNetworkingSockets_s PROPERTIES FOLDER "Dependencies")
+
+add_library(engine SHARED)
+
+set_target_properties(engine PROPERTIES PREFIX "")
+
+target_precompile_headers(engine PRIVATE quakedef.h)
+
+target_include_directories(engine PRIVATE
+	${CMAKE_CURRENT_SOURCE_DIR})
+
+if(RENDERER_IS_OPENGL)
+	target_compile_definitions(engine PRIVATE
+		GLQUAKE)
+endif()
+
+target_link_libraries(engine PRIVATE
+	common
+	stdlib
+	$<$<CXX_COMPILER_ID:MSVC>:Ws2_32>
+	Threads::Threads
+	SDL2::SDL2
+	OpenGL::GLU
+	OpenGL::GL
+	OpenAL::OpenAL
+	Ogg::ogg
+	Vorbis::vorbis
+	Vorbis::vorbisfile
+	GameNetworkingSockets_s)
+
+target_sources(engine
 	PRIVATE
 		anorm_dots.h
 		anorms.h
@@ -90,7 +138,7 @@ target_sources(winquake
 		server/progs/progs.h)
 
 if (MSVC)
-	target_sources(winquake
+	target_sources(engine
 		PRIVATE
 			server/conproc.cpp
 			server/conproc.h)
@@ -100,4 +148,19 @@ if(RENDERER_IS_SOFTWARE)
 	add_subdirectory(client/renderer/software)
 elseif(RENDERER_IS_OPENGL)
 	add_subdirectory(client/renderer/opengl)
+endif()
+
+add_subdirectory(game)
+
+#Create filters
+get_target_property(TARGET_SOURCES engine SOURCES)
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/.. FILES ${TARGET_SOURCES})
+
+install(FILES $<TARGET_FILE:SDL2::SDL2> DESTINATION .)
+install(FILES $<TARGET_FILE:OpenAL::OpenAL> DESTINATION .)
+	
+install(TARGETS engine RUNTIME DESTINATION .)
+
+if (MSVC)
+	install(FILES $<TARGET_PDB_FILE:engine> DESTINATION . OPTIONAL)
 endif()

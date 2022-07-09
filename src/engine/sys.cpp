@@ -28,6 +28,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include "IClientLauncher.h"
+#include "interface.h"
+
 #ifdef WIN32
 #include "winquake.h"
 #include "server/conproc.h"
@@ -36,7 +39,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <signal.h>
 #endif
 
-#define SDL_MAIN_HANDLED
 #include <SDL.h>
 #include <SDL_events.h>
 #include <SDL_main.h>
@@ -573,52 +575,7 @@ int EngineMain(int argc, const char* const* argv)
 	return 0;
 }
 
-#ifdef WIN32
-const char* argv[MAX_NUM_ARGVS];
-
-int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
-{
-	HANDLE mutex = CreateMutexA(nullptr, TRUE, "Quake1Mutex");
-
-	if (mutex == nullptr || GetLastError() == ERROR_ALREADY_EXISTS)
-	{
-		Sys_Error("Could not launch game.\nOnly one instance of this game can be run at a time.");
-	}
-
-	int argc = 1;
-	argv[0] = "";
-
-	while (*lpCmdLine && (argc < MAX_NUM_ARGVS))
-	{
-		while (*lpCmdLine && ((*lpCmdLine <= 32) || (*lpCmdLine > 126)))
-			lpCmdLine++;
-
-		if (*lpCmdLine)
-		{
-			argv[argc] = lpCmdLine;
-			argc++;
-
-			while (*lpCmdLine && ((*lpCmdLine > 32) && (*lpCmdLine <= 126)))
-				lpCmdLine++;
-
-			if (*lpCmdLine)
-			{
-				*lpCmdLine = 0;
-				lpCmdLine++;
-			}
-
-		}
-	}
-
-	const int result = EngineMain(argc, argv);
-
-	ReleaseMutex(mutex);
-	mutex = nullptr;
-
-	//Translate regular main return values to WinMain return values.
-	return result != 0 ? 0 : 1;
-}
-#else
+#ifndef WIN32
 void signal_handler(int sig)
 {
 	printf("Received signal %d, exiting...\n", sig);
@@ -639,13 +596,18 @@ void InitSig()
 	signal(SIGSEGV, signal_handler);
 	signal(SIGTERM, signal_handler);
 }
-
-int main(int argc, char* argv[])
-{
-	InitSig();
-
-	const int result = EngineMain(argc, argv);
-
-	return result;
-}
 #endif
+
+struct CClientLauncher final : public IClientLauncher
+{
+	int Run(std::size_t argc, const char** argv) override
+	{
+#ifndef WIN32
+		InitSig();
+#endif
+
+		return EngineMain(argc, argv);
+	}
+};
+
+REGISTER_INTERFACE_SINGLETON(CLIENT_LAUNCHER_VERSION, IClientLauncher, CClientLauncher);
