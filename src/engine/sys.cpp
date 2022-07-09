@@ -35,7 +35,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifdef WIN32
 #include "winquake.h"
-#include <VersionHelpers.h>
 #else
 #include <signal.h>
 #endif
@@ -150,17 +149,6 @@ Sys_Init
 void Sys_Init(void)
 {
 	Sys_InitFloatTime();
-
-#ifdef WIN32
-	//Raised OS requirement to Windows 7 or newer because GetVersionEx is deprecated,
-	//and the XP toolset support is deprecated in VS2019 and removed entirely in current redistributables
-	//Steam dropped support for Windows Vista and this is being developed using the Steam version of Quake
-	//so this check avoids problems with older versions of the game
-	if (!IsWindows7OrGreater())
-	{
-		Sys_Error("WinQuake requires at least Windows 7");
-	}
-#endif
 }
 
 
