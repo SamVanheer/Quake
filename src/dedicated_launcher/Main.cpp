@@ -19,11 +19,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include <cstdio>
-#include <vector>
+#include <mutex>
+#include <queue>
+#include <string>
+#include <thread>
 
 #include "IDedicatedConsole.h"
 #include "IDedicatedLauncher.h"
 #include "interface.h"
+
+static std::thread g_InputThread;
+static std::queue<std::string> g_Inputs;
+static std::mutex g_InputMutex;
 
 static void Sys_Error(const char* msg)
 {
@@ -59,8 +66,26 @@ static int LaunchGame(std::size_t argc, const char* const* argv)
 	return launcher->Run(argc, argv, GetLocalQueryInterface());
 }
 
+static void SetupInputThread()
+{
+	g_InputThread = std::thread([]
+		{
+			while (true)
+			{
+				char input[4000];
+
+				if (fgets(input, sizeof(input), stdin))
+				{
+					const std::unique_lock lock{g_InputMutex};
+					g_Inputs.push(input);
+				}
+			}
+		});
+}
+
 int main(int argc, char* argv[])
 {
+	SetupInputThread();
 	const int result = LaunchGame(argc, argv);
 
 	return result;
@@ -85,8 +110,25 @@ struct CDedicatedConsole final : public IDedicatedConsole
 
 	bool GetTextInput(char* buffer, std::size_t bufferSize) override
 	{
-		//TODO: blocking input, freezes server.
-		return fgets(buffer, bufferSize, stdin) != nullptr;
+		if (std::unique_lock lock{g_InputMutex, std::try_to_lock}; lock)
+		{
+			if (!g_Inputs.empty())
+			{
+				const std::string input = std::move(g_Inputs.front());
+				g_Inputs.pop();
+
+				if (input.size() < bufferSize)
+				{
+					strncpy(buffer, input.c_str(), input.size());
+					buffer[bufferSize - 1] = '\0';
+					return true;
+				}
+
+				Printf("Console input is too long to process\n");
+			}
+		}
+
+		return false;
 	}
 };
 
