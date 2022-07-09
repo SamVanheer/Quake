@@ -94,7 +94,7 @@ InterfaceAccessor DynamicLibrary::GetInterfaceAccessor() const
 #ifdef WIN32
 			return GetProcAddress(reinterpret_cast<HMODULE>(m_Library), QueryInterfaceName);
 #else
-			return dlsym(library, QueryLibraryInterfaceName);
+			return dlsym(m_Library, QueryInterfaceName);
 #endif
 		}());
 	}
