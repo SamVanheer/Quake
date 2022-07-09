@@ -257,10 +257,27 @@ typedef struct
 //TODO: resolve conflicts between GL and Software modes so this doesn't need to be in here.
 
 #ifdef _WIN32
-#include <windows.h>
-#undef GetMessage
-#undef SendMessage
-#undef SetPort
+//#include <Windows.h>
+
+#ifndef WINGDIAPI
+#define WINGDIAPI __declspec(dllimport)
+#endif
+
+#ifndef APIENTRY
+#define APIENTRY __stdcall
+#endif
+
+#ifndef CALLBACK
+#define CALLBACK __stdcall
+#endif
+
+#else
+
+//Could be defined by GL.h
+#ifndef APIENTRY
+#define APIENTRY /* */
+#endif
+
 #endif
 
 #include <GL/gl.h>
@@ -269,13 +286,6 @@ typedef struct
 // Multitexture
 #define    TEXTURE0_SGIS				0x835E
 #define    TEXTURE1_SGIS				0x835F
-
-#ifndef _WIN32
-//Could be defined by GL.h
-#ifndef APIENTRY
-#define APIENTRY /* */
-#endif
-#endif
 
 typedef void (APIENTRY* lpMTexFUNC) (GLenum, GLfloat, GLfloat);
 typedef void (APIENTRY* lpSelTexFUNC) (GLenum);
