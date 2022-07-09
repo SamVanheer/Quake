@@ -5,7 +5,8 @@ target_include_directories(quakeds PRIVATE
 
 target_link_libraries(quakeds PRIVATE
 	common
-	stdlib)
+	stdlib
+	Threads::Threads)
 
 target_sources(quakeds PRIVATE
 	Main.cpp)

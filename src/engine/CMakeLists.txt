@@ -1,4 +1,3 @@
-find_package(Threads REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(OpenAL CONFIG REQUIRED)
 find_package(Ogg CONFIG REQUIRED)

@@ -1,3 +1,4 @@
+find_package(Threads REQUIRED)
 find_package(SDL2 CONFIG REQUIRED)
 
 add_subdirectory(common)
