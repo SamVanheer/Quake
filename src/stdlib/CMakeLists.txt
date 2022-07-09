@@ -8,7 +8,9 @@ target_link_libraries(stdlib PUBLIC
 	${CMAKE_DL_LIBS})
 
 target_sources(stdlib PRIVATE
-	IClientLauncher.h)
+	IClientLauncher.h
+	IDedicatedConsole.h
+	IDedicatedLauncher.h)
 
 # These need to be added to all users of this library.
 target_sources(stdlib PUBLIC

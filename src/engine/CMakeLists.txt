@@ -137,13 +137,6 @@ target_sources(engine
 		server/progs/progdefs.h
 		server/progs/progs.h)
 
-if (MSVC)
-	target_sources(engine
-		PRIVATE
-			server/conproc.cpp
-			server/conproc.h)
-endif()
-
 if(RENDERER_IS_SOFTWARE)
 	add_subdirectory(client/renderer/software)
 elseif(RENDERER_IS_OPENGL)

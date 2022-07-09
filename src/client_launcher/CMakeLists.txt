@@ -13,13 +13,13 @@ target_sources(winquake PRIVATE
 
 if (MSVC)
 	target_sources(winquake PRIVATE
-		resource.h
-		winquake.rc)
+		../resource.h
+		../winquake.rc)
 endif()
 
 #Create filters
 get_target_property(TARGET_SOURCES winquake SOURCES)
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${TARGET_SOURCES})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/.. FILES ${TARGET_SOURCES})
 
 install(TARGETS winquake RUNTIME DESTINATION .)
 

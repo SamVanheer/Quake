@@ -61,7 +61,7 @@ static int LaunchGame(std::size_t argc, const char** argv)
 		return EXIT_FAILURE;
 	}
 
-	return launcher->Run(argc, argv);
+	return launcher->Run(argc, argv, GetLocalQueryInterface());
 }
 
 #ifdef WIN32

@@ -157,29 +157,22 @@ Host_FindMaxClients
 */
 void	Host_FindMaxClients(void)
 {
-	int		i;
-
 	svs.maxclients = 1;
 
-	i = COM_CheckParm("-dedicated");
-	if (i)
+	if (isDedicated)
 	{
 		cls.state = ca_dedicated;
-		if (i != (com_argc - 1))
-		{
-			svs.maxclients = Q_atoi(com_argv[i + 1]);
-		}
-		else
-			svs.maxclients = 8;
+		svs.maxclients = 8;
 	}
 	else
 		cls.state = ca_disconnected;
 
-	i = COM_CheckParm("-listen");
+	//TODO: get rid of this and rely on +maxplayers on the command line.
+	const int i = COM_CheckParm("-listen");
 	if (i)
 	{
 		if (cls.state == ca_dedicated)
-			Sys_Error("Only one of -dedicated or -listen can be specified");
+			Sys_Error("Cannot specify -listen in dedicated server mode");
 		if (i != (com_argc - 1))
 			svs.maxclients = Q_atoi(com_argv[i + 1]);
 		else

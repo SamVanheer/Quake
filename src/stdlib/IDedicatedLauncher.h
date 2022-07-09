@@ -25,13 +25,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "interface.h"
 
 /**
-*	@brief Used by the launcher to access the engine.
+*	@brief Used by the dedicated server launcher to access the engine.
 */
-struct IClientLauncher
+struct IDedicatedLauncher
 {
-	virtual ~IClientLauncher() = default;
+	virtual ~IDedicatedLauncher() = default;
 
 	virtual int Run(std::size_t argc, const char* const* argv, InterfaceAccessor launcherInterfaceAccessor) = 0;
 };
 
-constexpr char CLIENT_LAUNCHER_VERSION[] = "ClientLauncherV001";
+constexpr char DEDICATED_LAUNCHER_VERSION[] = "DedicatedLauncherV001";

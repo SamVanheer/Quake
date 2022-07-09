@@ -17,21 +17,24 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
-// conproc.h
 
-#define CCOM_WRITE_TEXT		0x2
-// Param1 : Text
+#pragma once
 
-#define CCOM_GET_TEXT		0x3
-// Param1 : Begin line
-// Param2 : End line
+#include <cstdarg>
+#include <cstdlib>
 
-#define CCOM_GET_SCR_LINES	0x4
-// No params
+/**
+*	@brief Used by the engine to access the dedicated server console.
+*/
+struct IDedicatedConsole
+{
+	virtual ~IDedicatedConsole() = default;
 
-#define CCOM_SET_SCR_LINES	0x5
-// Param1 : Number of lines
+	virtual void Printf(const char* format, ...) = 0;
 
-void InitConProc(HANDLE hFile, HANDLE heventParent, HANDLE heventChild);
-void DeinitConProc(void);
+	virtual void VPrintf(const char* format, va_list list) = 0;
 
+	virtual bool GetTextInput(char* buffer, std::size_t bufferSize) = 0;
+};
+
+constexpr char DEDICATED_CONSOLE_VERSION[] = "DedicatedConsoleV001";

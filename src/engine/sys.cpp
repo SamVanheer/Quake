@@ -29,11 +29,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <sys/stat.h>
 
 #include "IClientLauncher.h"
+#include "IDedicatedConsole.h"
+#include "IDedicatedLauncher.h"
 #include "interface.h"
 
 #ifdef WIN32
 #include "winquake.h"
-#include "server/conproc.h"
 #include <VersionHelpers.h>
 #else
 #include <signal.h>
@@ -62,11 +63,7 @@ bool isDedicated;
 
 static const char* tracking_tag = "Clams & Mooses";
 
-#ifdef WIN32
-static HANDLE hFile;
-static HANDLE heventParent;
-static HANDLE heventChild;
-#endif
+IDedicatedConsole* g_DedicatedConsole = nullptr;
 
 void Sys_InitFloatTime(void);
 
@@ -171,7 +168,6 @@ void Sys_Error(const char* error, ...)
 {
 	static bool in_sys_error0 = false;
 	static bool in_sys_error1 = false;
-	static bool in_sys_error2 = false;
 	static bool in_sys_error3 = false;
 
 	if (!in_sys_error3)
@@ -187,27 +183,18 @@ void Sys_Error(const char* error, ...)
 
 	if (isDedicated)
 	{
-		const char* text3 = "Press Enter to exit\n";
-		const char* text4 = "***********************************\n";
-		const char* text5 = "\n";
-
-		char text2[1024];
-		sprintf(text2, "ERROR: %s\n", text);
-
-		fwrite(text5, sizeof(char), strlen(text5), stdout);
-		fwrite(text4, sizeof(char), strlen(text4), stdout);
-		fwrite(text2, sizeof(char), strlen(text2), stdout);
-		fwrite(text3, sizeof(char), strlen(text3), stdout);
-		fwrite(text4, sizeof(char), strlen(text4), stdout);
-
-		fflush(stdout);
-
-		const double starttime = Sys_FloatTime();
-
-		// accept empty input so Enter will get us out of here
-		while (!Sys_ConsoleInput(true) &&
-			((Sys_FloatTime() - starttime) < CONSOLE_ERROR_TIMEOUT))
+		//Can be null if we're erroring before it's acquired.
+		if (g_DedicatedConsole)
 		{
+			g_DedicatedConsole->Printf("\n");
+			g_DedicatedConsole->Printf("***********************************\n");
+			g_DedicatedConsole->Printf("ERROR: %s\n", text);
+			g_DedicatedConsole->Printf("***********************************\n");
+		}
+		else
+		{
+			//So something is logged somewhere.
+			printf("ERROR: %s\n", text);
 		}
 	}
 	else
@@ -232,15 +219,6 @@ void Sys_Error(const char* error, ...)
 		Host_Shutdown();
 	}
 
-#ifdef WIN32
-	// shut down QHOST hooks if necessary
-	if (!in_sys_error2)
-	{
-		in_sys_error2 = true;
-		DeinitConProc();
-	}
-#endif
-
 	exit(1);
 }
 
@@ -250,7 +228,7 @@ void Sys_Printf(const char* fmt, ...)
 	{
 		va_list argptr;
 		va_start(argptr, fmt);
-		vfprintf(stdout, fmt, argptr);
+		g_DedicatedConsole->VPrintf(fmt, argptr);
 		va_end(argptr);
 	}
 }
@@ -258,14 +236,6 @@ void Sys_Printf(const char* fmt, ...)
 void Sys_Quit(void)
 {
 	Host_Shutdown();
-
-#ifdef WIN32
-	if (isDedicated)
-		FreeConsole();
-
-	// shut down QHOST hooks if necessary
-	DeinitConProc();
-#endif
 
 	fflush(stdout);
 	exit(0);
@@ -360,7 +330,7 @@ char* Sys_ConsoleInput(bool acceptEmptyInput)
 			count -= len;
 		}
 
-		if (!fgets(buffer, count, stdin))
+		if (!g_DedicatedConsole->GetTextInput(buffer, count))
 		{
 			//No input was read, or some error occurred.
 			return nullptr;
@@ -442,8 +412,40 @@ WinMain
 ==================
 */
 
-int EngineMain(int argc, const char* const* argv)
+#ifndef WIN32
+void signal_handler(int sig)
 {
+	printf("Received signal %d, exiting...\n", sig);
+	Sys_Quit();
+	exit(0);
+}
+
+void InitSig()
+{
+	signal(SIGHUP, signal_handler);
+	signal(SIGINT, signal_handler);
+	signal(SIGQUIT, signal_handler);
+	signal(SIGILL, signal_handler);
+	signal(SIGTRAP, signal_handler);
+	signal(SIGIOT, signal_handler);
+	signal(SIGBUS, signal_handler);
+	signal(SIGFPE, signal_handler);
+	signal(SIGSEGV, signal_handler);
+	signal(SIGTERM, signal_handler);
+}
+#endif
+
+int EngineMain(int argc, const char* const* argv, InterfaceAccessor launcherInterfaceAccessor, bool dedicated)
+{
+	if (!launcherInterfaceAccessor)
+	{
+		Sys_Error("Launcher interface accessor is null");
+	}
+
+#ifndef WIN32
+	InitSig();
+#endif
+
 	//TODO: need to rework this so SDL2's setup code is used instead.
 	SDL_SetMainReady();
 
@@ -466,7 +468,17 @@ int EngineMain(int argc, const char* const* argv)
 	parms.argc = com_argc;
 	parms.argv = com_argv;
 
-	isDedicated = (COM_CheckParm("-dedicated") != 0);
+	isDedicated = dedicated;
+
+	if (isDedicated)
+	{
+		g_DedicatedConsole = reinterpret_cast<IDedicatedConsole*>(launcherInterfaceAccessor(DEDICATED_CONSOLE_VERSION));
+
+		if (!g_DedicatedConsole)
+		{
+			Sys_Error("Couldn't get dedicated server console");
+		}
+	}
 
 	// take 16 Mb, unless they explicitly
 	// request otherwise
@@ -484,45 +496,6 @@ int EngineMain(int argc, const char* const* argv)
 
 	if (!parms.membase)
 		Sys_Error("Not enough memory free; check disk space\n");
-
-	if (isDedicated)
-	{
-#ifdef WIN32
-		if (!AllocConsole())
-		{
-			Sys_Error("Couldn't create dedicated server console");
-		}
-
-		//Since we're allocating the console ourselves in a GUI program
-		//we need to re-open these streams so we can use the handles.
-		{
-			FILE* stream;
-			freopen_s(&stream, "CONOUT$", "w", stdout);
-			freopen_s(&stream, "CONIN$", "r", stdin);
-		}
-
-		// give QHOST a chance to hook into the console
-		if (int t = COM_CheckParm("-HFILE"); t > 0)
-		{
-			if (t < com_argc)
-				hFile = (HANDLE)Q_atoi(com_argv[t + 1]);
-		}
-
-		if (int t = COM_CheckParm("-HPARENT"); t > 0)
-		{
-			if (t < com_argc)
-				heventParent = (HANDLE)Q_atoi(com_argv[t + 1]);
-		}
-
-		if (int t = COM_CheckParm("-HCHILD"); t > 0)
-		{
-			if (t < com_argc)
-				heventChild = (HANDLE)Q_atoi(com_argv[t + 1]);
-		}
-
-		InitConProc(hFile, heventParent, heventChild);
-#endif
-	}
 
 	Sys_Init();
 
@@ -575,39 +548,22 @@ int EngineMain(int argc, const char* const* argv)
 	return 0;
 }
 
-#ifndef WIN32
-void signal_handler(int sig)
-{
-	printf("Received signal %d, exiting...\n", sig);
-	Sys_Quit();
-	exit(0);
-}
-
-void InitSig()
-{
-	signal(SIGHUP, signal_handler);
-	signal(SIGINT, signal_handler);
-	signal(SIGQUIT, signal_handler);
-	signal(SIGILL, signal_handler);
-	signal(SIGTRAP, signal_handler);
-	signal(SIGIOT, signal_handler);
-	signal(SIGBUS, signal_handler);
-	signal(SIGFPE, signal_handler);
-	signal(SIGSEGV, signal_handler);
-	signal(SIGTERM, signal_handler);
-}
-#endif
-
 struct CClientLauncher final : public IClientLauncher
 {
-	int Run(std::size_t argc, const char** argv) override
+	int Run(std::size_t argc, const char* const* argv, InterfaceAccessor launcherInterfaceAccessor) override
 	{
-#ifndef WIN32
-		InitSig();
-#endif
-
-		return EngineMain(argc, argv);
+		return EngineMain(argc, argv, launcherInterfaceAccessor, false);
 	}
 };
 
 REGISTER_INTERFACE_SINGLETON(CLIENT_LAUNCHER_VERSION, IClientLauncher, CClientLauncher);
+
+struct CDedicatedLauncher final : public IDedicatedLauncher
+{
+	int Run(std::size_t argc, const char* const* argv, InterfaceAccessor launcherInterfaceAccessor) override
+	{
+		return EngineMain(argc, argv, launcherInterfaceAccessor, true);
+	}
+};
+
+REGISTER_INTERFACE_SINGLETON(DEDICATED_LAUNCHER_VERSION, IDedicatedLauncher, CDedicatedLauncher);

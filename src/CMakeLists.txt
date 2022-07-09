@@ -4,4 +4,5 @@ add_subdirectory(common)
 add_subdirectory(stdlib)
 
 add_subdirectory(client_launcher)
+add_subdirectory(dedicated_launcher)
 add_subdirectory(engine)
