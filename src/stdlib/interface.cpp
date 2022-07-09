@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <dlfcn.h>
 #endif
 
-void* QueryInterface(const char* name)
+static void* LocalQueryInterface(const char* name)
 {
 	for (auto reg = CInterfaceRegistry::Head; reg; reg = reg->Next)
 	{
@@ -37,6 +37,16 @@ void* QueryInterface(const char* name)
 	}
 
 	return nullptr;
+}
+
+void* QueryInterface(const char* name)
+{
+	return LocalQueryInterface(name);
+}
+
+InterfaceAccessor GetLocalQueryInterface()
+{
+	return &LocalQueryInterface;
 }
 
 DynamicLibrary::DynamicLibrary(const char* libraryName)

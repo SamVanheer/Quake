@@ -57,6 +57,8 @@ using InterfaceAccessor = decltype(QueryInterface)*;
 
 constexpr char QueryInterfaceName[]{"QueryInterface"};
 
+InterfaceAccessor GetLocalQueryInterface();
+
 /**
 *	@brief Manages a dynamic library automatically.
 */
