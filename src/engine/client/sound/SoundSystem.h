@@ -145,22 +145,22 @@ struct OpenALSource final
 	ALuint Id = NullSource;
 };
 
-struct sfx_t
-{
-	char name[MAX_QPATH];
-	OpenALBuffer buffer;
-	OpenALBuffer loopingBuffer;
-};
-
 /**
 *	@brief OpenAL-based sound system.
 */
 class SoundSystem final : public ISoundSystem
 {
 private:
+	struct SoundEffect
+	{
+		char name[MAX_QPATH];
+		OpenALBuffer buffer;
+		OpenALBuffer loopingBuffer;
+	};
+
 	struct Channel
 	{
-		sfx_t* sfx = nullptr;	// sfx number
+		SoundEffect* sfx = nullptr;	// sfx number
 		int entnum = 0;			// to allow overriding a specific sound
 		int entchannel = 0;
 		OpenALSource source;
@@ -212,15 +212,17 @@ public:
 private:
 	bool CreateCore();
 
-	sfx_t* FindName(const char* name);
+	SoundEffect* FindName(const char* name);
 
-	sfx_t* GetSFX(SoundIndex index);
+	SoundEffect* GetSFX(SoundIndex index);
+
+	bool LoadSound(SoundEffect* s);
 
 	/**
 	*	@brief picks a channel based on priorities, empty slots, number of channels
 	*/
 	Channel* PickChannel(int entnum, int entchannel);
-	void SetupChannel(Channel& chan, sfx_t* sfx, vec3_t origin, float vol, float attenuation, bool isRelative);
+	void SetupChannel(Channel& chan, SoundEffect* sfx, vec3_t origin, float vol, float attenuation, bool isRelative);
 
 	void UpdateAmbientSounds();
 	void UpdateSounds();
@@ -236,7 +238,7 @@ private:
 
 	vec3_t m_ListenerOrigin{};
 
-	std::vector<sfx_t> m_KnownSFX; // [MAX_SFX]	
+	std::vector<SoundEffect> m_KnownSFX; // [MAX_SFX]	
 
 	std::array<SoundIndex, NUM_AMBIENTS> m_AmbientSFX;
 

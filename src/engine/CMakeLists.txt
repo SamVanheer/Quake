@@ -103,7 +103,6 @@ target_sources(engine
 		client/sound/ISoundSystem.h
 		client/sound/OggSoundLoader.cpp
 		client/sound/OggSoundLoader.h
-		client/sound/snd_mem.cpp
 		client/sound/sound.cpp
 		client/sound/sound.h
 		client/sound/sound_internal.h

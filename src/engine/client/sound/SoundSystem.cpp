@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "CDAudio.h"
 #include "sound_internal.h"
 #include "SoundSystem.h"
+#include "WaveSoundLoader.h"
 
 void CheckALErrors()
 {
@@ -133,7 +134,7 @@ SoundIndex SoundSystem::PrecacheSound(const char* name)
 
 	// cache it in
 	if (precache.value)
-		S_LoadSound(sfx);
+		LoadSound(sfx);
 
 	//Sound indices are 1-based.
 	static_assert(MAX_SFX <= (std::numeric_limits<int>::max)(), "SoundIndex needs to be a 64 bit datatype to reference all sound effects");
@@ -159,7 +160,7 @@ void SoundSystem::StartSound(int entnum, int entchannel, SoundIndex index, vec3_
 	target_chan->entchannel = entchannel;
 
 	// new channel
-	if (!S_LoadSound(sfx))
+	if (!LoadSound(sfx))
 	{
 		return;		// couldn't load the sound's data
 	}
@@ -221,7 +222,7 @@ void SoundSystem::StaticSound(SoundIndex index, vec3_t origin, float vol, float 
 	auto ss = &m_Channels[m_TotalChannels];
 	m_TotalChannels++;
 
-	if (!S_LoadSound(sfx))
+	if (!LoadSound(sfx))
 		return;
 
 	if (!sfx->loopingBuffer)
@@ -367,7 +368,7 @@ std::unique_ptr<ICDAudio> SoundSystem::CreateCDAudio()
 	return {};
 }
 
-sfx_t* SoundSystem::FindName(const char* name)
+SoundSystem::SoundEffect* SoundSystem::FindName(const char* name)
 {
 	if (!name)
 		Sys_Error("FindName: NULL\n");
@@ -393,7 +394,7 @@ sfx_t* SoundSystem::FindName(const char* name)
 	return &sfx;
 }
 
-sfx_t* SoundSystem::GetSFX(SoundIndex index)
+SoundSystem::SoundEffect* SoundSystem::GetSFX(SoundIndex index)
 {
 	const int i = index.Index - 1;
 
@@ -403,6 +404,105 @@ sfx_t* SoundSystem::GetSFX(SoundIndex index)
 	}
 
 	return &m_KnownSFX[i];
+}
+
+bool SoundSystem::LoadSound(SoundEffect* s)
+{
+	// see if still in memory
+	if (s->buffer)
+		return true;
+
+	//Con_Printf ("S_LoadSound: %x\n", (int)stackbuf);
+	// load it in
+	char namebuffer[256];
+	Q_strcpy(namebuffer, "sound/");
+	Q_strcat(namebuffer, s->name);
+
+	//	Con_Printf ("loading %s\n",namebuffer);
+
+	byte stackbuf[1 * 1024]; // avoid dirtying the cache heap
+	auto data = COM_LoadStackFile(namebuffer, stackbuf, sizeof(stackbuf));
+
+	if (!data)
+	{
+		Con_Printf("Couldn't load %s\n", namebuffer);
+		return false;
+	}
+
+	const wavinfo_t info = GetWavinfo(s->name, data, com_filesize);
+
+	if (info.channels != 1)
+	{
+		Con_Printf("%s is a stereo sample\n", s->name);
+		return false;
+	}
+
+	const ALenum format = [&]()
+	{
+		switch (info.channels)
+		{
+		case 1:
+			switch (info.width)
+			{
+			case 1: return AL_FORMAT_MONO8;
+			case 2: return AL_FORMAT_MONO16;
+			}
+			break;
+		case 2:
+			switch (info.width)
+			{
+			case 1: return AL_FORMAT_STEREO8;
+			case 2: return AL_FORMAT_STEREO16;
+			}
+			break;
+		}
+
+		Con_Printf("%s has invalid format (channels: %d, sample bits: %d)\n", s->name, info.channels, info.width * 8);
+		return 0;
+	}();
+
+	if (format == 0)
+	{
+		return false;
+	}
+
+	s->buffer = OpenALBuffer::Create();
+
+	if (!s->buffer)
+		return false;
+
+	if (info.loopstart >= 0)
+	{
+		s->loopingBuffer = OpenALBuffer::Create();
+
+		if (!s->loopingBuffer)
+		{
+			s->buffer.Delete();
+			return false;
+		}
+	}
+
+	byte* samples = data + info.dataofs;
+
+	if (info.width == 2)
+	{
+		for (int i = 0; i < info.samples; i++)
+		{
+			((short*)samples)[i] = LittleShort(((short*)samples)[i]);
+		}
+	}
+
+	if (info.loopstart >= 0)
+	{
+		alBufferData(s->buffer.Id, format, samples, info.loopstart * info.width * info.channels, info.rate);
+		alBufferData(s->loopingBuffer.Id, format, samples + info.loopstart, (info.samples - info.loopstart) * info.width * info.channels, info.rate);
+	}
+	else
+	{
+		alBufferData(s->buffer.Id, format, samples, info.samples * info.width * info.channels, info.rate);
+	}
+
+	return true;
 }
 
 SoundSystem::Channel* SoundSystem::PickChannel(int entnum, int entchannel)
@@ -456,7 +556,7 @@ SoundSystem::Channel* SoundSystem::PickChannel(int entnum, int entchannel)
 	return &m_Channels[first_to_die];
 }
 
-void SoundSystem::SetupChannel(Channel& chan, sfx_t* sfx, vec3_t origin, float vol, float attenuation, bool isRelative)
+void SoundSystem::SetupChannel(Channel& chan, SoundEffect* sfx, vec3_t origin, float vol, float attenuation, bool isRelative)
 {
 	alSourcefv(chan.source.Id, AL_POSITION, origin);
 	alSourcef(chan.source.Id, AL_GAIN, vol);
