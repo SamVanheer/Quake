@@ -22,6 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <limits>
 
+#include <AL/alext.h>
+
 #include "CDAudio.h"
 #include "sound_internal.h"
 #include "SoundSystem.h"
@@ -73,6 +75,12 @@ bool SoundSystem::CreateCore()
 	if (ALC_FALSE == alcMakeContextCurrent(m_Context.get()))
 	{
 		Con_SafePrintf("Couldn't make OpenAL context current\n");
+		return false;
+	}
+
+	if (alIsExtensionPresent("AL_SOFT_loop_points") == AL_FALSE)
+	{
+		Con_SafePrintf("OpenAL does not provide extension \"AL_SOFT_loop_points\", required for audio playback\n");
 		return false;
 	}
 
@@ -225,7 +233,7 @@ void SoundSystem::StaticSound(SoundIndex index, vec3_t origin, float vol, float 
 	if (!LoadSound(sfx))
 		return;
 
-	if (!sfx->loopingBuffer)
+	if (!sfx->IsLooping)
 	{
 		Con_Printf("Sound %s not looped\n", sfx->name);
 		return;
@@ -345,7 +353,7 @@ void SoundSystem::PrintSoundList()
 		alGetBufferi(sfx.buffer.Id, AL_SIZE, &size);
 		total += size;
 
-		if (sfx.loopingBuffer)
+		if (sfx.IsLooping)
 			Con_Printf("L");
 		else
 			Con_Printf(" ");
@@ -471,17 +479,6 @@ bool SoundSystem::LoadSound(SoundEffect* s)
 	if (!s->buffer)
 		return false;
 
-	if (info.loopstart >= 0)
-	{
-		s->loopingBuffer = OpenALBuffer::Create();
-
-		if (!s->loopingBuffer)
-		{
-			s->buffer.Delete();
-			return false;
-		}
-	}
-
 	byte* samples = data + info.dataofs;
 
 	if (info.width == 2)
@@ -492,15 +489,15 @@ bool SoundSystem::LoadSound(SoundEffect* s)
 		}
 	}
 
-	if (info.loopstart >= 0)
-	{
-		alBufferData(s->buffer.Id, format, samples, info.loopstart * info.width * info.channels, info.rate);
-		alBufferData(s->loopingBuffer.Id, format, samples + info.loopstart, (info.samples - info.loopstart) * info.width * info.channels, info.rate);
-	}
-	else
-	{
-		alBufferData(s->buffer.Id, format, samples, info.samples * info.width * info.channels, info.rate);
-	}
+	s->IsLooping = info.loopstart >= 0;
+
+	// TODO: this code has not been tested with stereo sounds, these calculations may not be correct.
+	alBufferData(s->buffer.Id, format, samples, info.samples * info.width * info.channels, info.rate);
+
+	const int loopstart = info.loopstart >= 0 ? info.loopstart : 0;
+
+	const ALint loopPoints[2] = {loopstart * info.width * info.channels, info.samples * info.width * info.channels};
+	alBufferiv(s->buffer.Id, AL_LOOP_POINTS_SOFT, loopPoints);
 
 	return true;
 }
@@ -563,19 +560,9 @@ void SoundSystem::SetupChannel(Channel& chan, SoundEffect* sfx, vec3_t origin, f
 	alSourcef(chan.source.Id, AL_ROLLOFF_FACTOR, attenuation);
 	alSourcef(chan.source.Id, AL_MAX_DISTANCE, sound_nominal_clip_dist);
 	alSourcei(chan.source.Id, AL_SOURCE_RELATIVE, isRelative ? AL_TRUE : AL_FALSE);
-	alSourcei(chan.source.Id, AL_LOOPING, AL_FALSE);
+	alSourcei(chan.source.Id, AL_LOOPING, sfx->IsLooping ? AL_TRUE : AL_FALSE);
 
-	alSourcei(chan.source.Id, AL_BUFFER, NullBuffer);
-
-	if (sfx->loopingBuffer)
-	{
-		const ALuint buffers[2] = {sfx->buffer.Id, sfx->loopingBuffer.Id};
-		alSourceQueueBuffers(chan.source.Id, 2, buffers);
-	}
-	else
-	{
-		alSourcei(chan.source.Id, AL_BUFFER, sfx->buffer.Id);
-	}
+	alSourcei(chan.source.Id, AL_BUFFER, sfx->buffer.Id);
 }
 
 void SoundSystem::UpdateAmbientSounds()
@@ -657,49 +644,12 @@ void SoundSystem::UpdateSounds()
 			continue;
 		}
 
-		if (chan.sfx->loopingBuffer)
+		ALint state;
+		alGetSourcei(chan.source.Id, AL_SOURCE_STATE, &state);
+
+		if (state == AL_STOPPED)
 		{
-			ALint queued;
-			alGetSourcei(chan.source.Id, AL_BUFFERS_QUEUED, &queued);
-
-			if (queued == 2)
-			{
-				ALint processed;
-				alGetSourcei(chan.source.Id, AL_BUFFERS_PROCESSED, &processed);
-
-				if (processed > 0)
-				{
-					//The intro part has played, convert source to use single looping buffer playing at offset.
-					ALint offset = 0;
-
-					if (processed == 1)
-					{
-						alGetSourcei(chan.source.Id, AL_BYTE_OFFSET, &offset);
-
-						ALint introSize;
-						alGetBufferi(chan.sfx->buffer.Id, AL_SIZE, &introSize);
-
-						offset -= introSize;
-					}
-
-					alSourceStop(chan.source.Id);
-					alSourcei(chan.source.Id, AL_BUFFER, NullBuffer);
-					alSourcei(chan.source.Id, AL_BUFFER, chan.sfx->loopingBuffer.Id);
-					alSourcei(chan.source.Id, AL_BYTE_OFFSET, offset);
-					alSourcei(chan.source.Id, AL_LOOPING, AL_TRUE);
-					alSourcePlay(chan.source.Id);
-				}
-			}
-		}
-		else
-		{
-			ALint state;
-			alGetSourcei(chan.source.Id, AL_SOURCE_STATE, &state);
-
-			if (state == AL_STOPPED)
-			{
-				chan.sfx = nullptr;
-			}
+			chan.sfx = nullptr;
 		}
 	}
 }

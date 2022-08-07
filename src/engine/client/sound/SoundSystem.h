@@ -155,7 +155,7 @@ private:
 	{
 		char name[MAX_QPATH];
 		OpenALBuffer buffer;
-		OpenALBuffer loopingBuffer;
+		bool IsLooping = false;
 	};
 
 	struct Channel
