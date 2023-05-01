@@ -84,4 +84,6 @@ private:
 	HSteamListenSocket m_GNSSocket = k_HSteamListenSocket_Invalid;
 
 	std::vector<std::unique_ptr<qsocket_t>> m_Connections;
+
+	qsocket_t* m_PendingServerLoopbackSocket = nullptr;
 };

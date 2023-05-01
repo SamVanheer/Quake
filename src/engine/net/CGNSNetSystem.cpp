@@ -103,21 +103,58 @@ qsocket_t* CGNSNetSystem::Connect(const char* host)
 {
 	SetNetTime();
 
+	// This can happen if commands like these are sent: "map foo; map bar"
+	if (m_PendingServerLoopbackSocket)
+	{
+		Close(m_PendingServerLoopbackSocket);
+		m_PendingServerLoopbackSocket = nullptr;
+	}
+
 	if (!host)
 		return nullptr;
 
-	SteamNetworkingIPAddr addr;
-
+	// Create a loopback connection for local hosts.
 	if (0 == strcmp(host, "local"))
 	{
-		addr.SetIPv6LocalHost(GetPort());
-	}
-	else
-	{
-		if (!addr.ParseString(host))
+		// Start server if needed.
+		Listen();
+
+		HSteamNetConnection clientConn, serverConn;
+
+		if (!m_GNSInterface->CreateSocketPair(&clientConn, &serverConn, false, nullptr, nullptr))
 		{
 			return nullptr;
 		}
+
+		auto clientSocket = std::make_unique<qsocket_t>();
+
+		clientSocket->connection = clientConn;
+		clientSocket->connecttime = net_time;
+		clientSocket->address = host;
+
+		m_Connections.push_back(std::move(clientSocket));
+
+		auto returnSocket = m_Connections.back().get();
+
+		auto serverSocket = std::make_unique<qsocket_t>();
+
+		serverSocket->connection = serverConn;
+		serverSocket->connecttime = net_time;
+		serverSocket->address = host;
+
+		m_Connections.push_back(std::move(serverSocket));
+
+		// Let the server finish connection at the same time a remote connection comes in.
+		m_PendingServerLoopbackSocket = m_Connections.back().get();
+
+		return returnSocket;
+	}
+
+	SteamNetworkingIPAddr addr;
+
+	if (!addr.ParseString(host))
+	{
+		return nullptr;
 	}
 
 	SteamNetworkingConfigValue_t opt;
@@ -321,6 +358,23 @@ void CGNSNetSystem::Close(qsocket_t* conn)
 
 void CGNSNetSystem::RunFrame()
 {
+	// Complete localhost loopback connection.
+	if (m_PendingServerLoopbackSocket)
+	{
+		// Handle edge case where commands like this are sent: "map foo; disconnect"
+		// The loopback connection will be created but the server will have already shut down by the time we get here.
+		if (sv.active)
+		{
+			SV_NewClient(m_PendingServerLoopbackSocket);
+		}
+		else
+		{
+			Close(m_PendingServerLoopbackSocket);
+		}
+
+		m_PendingServerLoopbackSocket = nullptr;
+	}
+
 	m_GNSInterface->RunCallbacks();
 }
 

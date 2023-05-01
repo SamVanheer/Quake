@@ -691,13 +691,6 @@ void SV_WriteClientdataToMessage(edict_t* ent, sizebuf_t* msg)
 	}
 }
 
-static void SV_WriteMessageHeader(sizebuf_t& msg)
-{
-	//Write the header containing the current server spawn count so the client can skip messages on map change.
-	MSG_WriteByte(&msg, svc_spawncount);
-	MSG_WriteLong(&msg, svs.spawncount);
-}
-
 /*
 =======================
 SV_SendClientDatagram
@@ -711,8 +704,6 @@ bool SV_SendClientDatagram(client_t* client)
 	msg.data = buf;
 	msg.maxsize = sizeof(buf);
 	msg.cursize = 0;
-
-	SV_WriteMessageHeader(msg);
 
 	MSG_WriteByte(&msg, svc_time);
 	MSG_WriteFloat(&msg, sv.time);
@@ -791,8 +782,6 @@ void SV_SendNop(client_t* client)
 	msg.data = buf;
 	msg.maxsize = sizeof(buf);
 	msg.cursize = 0;
-
-	SV_WriteMessageHeader(msg);
 
 	MSG_WriteChar(&msg, svc_nop);
 
