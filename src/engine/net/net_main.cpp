@@ -36,10 +36,6 @@ int unreliableMessagesReceived = 0;
 
 cvar_t	hostname = {"hostname", "UNNAMED"};
 
-#ifdef IDGODS
-cvar_t	idgods = {"idgods", "0"};
-#endif
-
 double net_time;
 
 void SetNetTime()
@@ -134,9 +130,6 @@ void NET_Init(void)
 	SZ_Alloc(&net_message, NET_MAXMESSAGE);
 
 	Cvar_RegisterVariable(&hostname);
-#ifdef IDGODS
-	Cvar_RegisterVariable(&idgods);
-#endif
 
 	Cmd_AddCommand("maxplayers", MaxPlayers_f);
 	Cmd_AddCommand("port", NET_Port_f);
